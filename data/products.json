@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Premium Rolling Tray",
+    "price": 29.99,
+    "slug": "premium-rolling-tray",
+    "stripeLink": "#"
+  },
+  {
+    "name": "Luxury Glass Piece",
+    "price": 79.99,
+    "slug": "luxury-glass-piece",
+    "stripeLink": "#"
+  }
+]
