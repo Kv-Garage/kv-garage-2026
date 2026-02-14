@@ -1,127 +1,80 @@
-import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 export default function SourcingDesk() {
-  const [form, setForm] = useState({
-    full_name: "",
-    email: "",
-    request_type: "Wholesale",
-    product_name: "",
-    description: ""
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const { error } = await supabase
-      .from("sourcing_requests")
-      .insert([form]);
-
-    setLoading(false);
-
-    if (!error) {
-      setSubmitted(true);
-      setForm({
-        full_name: "",
-        email: "",
-        request_type: "Wholesale",
-        product_name: "",
-        description: ""
-      });
-    } else {
-      alert("Submission failed. Try again.");
-    }
-  };
-
   return (
-    <div className="max-w-3xl mx-auto px-6 py-20">
-      <h1 className="text-4xl font-bold mb-8 text-center">
-        Sourcing Desk
-      </h1>
+    <main className="min-h-screen bg-black text-white px-6 py-20">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+        
+        {/* LEFT SIDE */}
+        <div>
+          <h1 className="text-4xl font-bold text-royal mb-6">
+            Sourcing Desk
+          </h1>
 
-      {submitted ? (
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">
-            Someone from KV Garage will contact you shortly.
-          </h2>
-          <a
-            href="/wholesale"
-            className="inline-block mt-6 text-blue-600 underline"
-          >
-            Back to Wholesale
-          </a>
+          <p className="text-gray-300 mb-6">
+            Can't find what you're looking for?
+            Submit a product request for wholesale or retail.
+          </p>
+
+          <p className="text-gray-400 mb-4">
+            Response time:
+          </p>
+
+          <ul className="text-gray-400 mb-6 list-disc pl-5 space-y-2">
+            <li>Within 30 minutes (9AM–6PM)</li>
+            <li>Within 24 hours outside office hours</li>
+          </ul>
+
+          <p className="text-gray-300">
+            If sourced successfully, you’ll receive:
+          </p>
+
+          <ul className="text-gray-400 list-disc pl-5 space-y-2 mt-2">
+            <li>Product photos</li>
+            <li>Pricing breakdown</li>
+            <li>Secure payment link</li>
+          </ul>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            name="full_name"
-            placeholder="Full Name"
-            value={form.full_name}
-            onChange={handleChange}
-            required
-            className="w-full border p-3"
-          />
 
-          <input
-            name="email"
-            placeholder="Email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full border p-3"
-          />
+        {/* RIGHT SIDE FORM */}
+        <div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800">
+          <form className="space-y-4">
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="w-full p-3 bg-black border border-zinc-700 rounded"
+            />
 
-          <select
-            name="request_type"
-            value={form.request_type}
-            onChange={handleChange}
-            className="w-full border p-3"
-          >
-            <option value="Wholesale">Wholesale</option>
-            <option value="Retail">Retail</option>
-          </select>
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full p-3 bg-black border border-zinc-700 rounded"
+            />
 
-          <input
-            name="product_name"
-            placeholder="Product Name"
-            value={form.product_name}
-            onChange={handleChange}
-            required
-            className="w-full border p-3"
-          />
+            <select className="w-full p-3 bg-black border border-zinc-700 rounded">
+              <option>Wholesale</option>
+              <option>Retail</option>
+            </select>
 
-          <textarea
-            name="description"
-            placeholder="Describe the product you're looking for..."
-            value={form.description}
-            onChange={handleChange}
-            required
-            className="w-full border p-3 h-32"
-          />
+            <input
+              type="text"
+              placeholder="Product Name"
+              className="w-full p-3 bg-black border border-zinc-700 rounded"
+            />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-orange-500 text-white py-3 font-semibold hover:bg-orange-600 transition"
-          >
-            {loading ? "Submitting..." : "Submit Request"}
-          </button>
-        </form>
-      )}
-    </div>
+            <textarea
+              placeholder="Describe what you're looking for..."
+              rows="4"
+              className="w-full p-3 bg-black border border-zinc-700 rounded"
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 transition p-3 font-semibold rounded"
+            >
+              Submit Request
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
   );
 }
