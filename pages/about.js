@@ -1,140 +1,71 @@
-import Layout from '../components/Layout';
+import Head from "next/head";
+import Link from "next/link";
 
 export default function About() {
   return (
-    <Layout>
-      <section className="container" style={{ padding: "6rem 2rem" }}>
-        
-        <div
-          style={{
-            display: "flex",
-            gap: "4rem",
-            alignItems: "center",
-            flexWrap: "wrap"
-          }}
-        >
-          
-          {/* Image */}
-          <div style={{ flex: "1 1 300px", textAlign: "center" }}>
+    <>
+      <Head>
+        <title>About | KV Garage</title>
+        <meta
+          name="description"
+          content="Learn about Kavion Steele and the structure behind KV Garage."
+        />
+      </Head>
+
+      <main className="bg-white">
+
+        <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-16 items-center">
+
+          {/* LEFT – FOUNDER IMAGE */}
+          <div>
             <img
               src="/founder.jpg"
               alt="Kavion Steele"
-              style={{
-                width: "100%",
-                maxWidth: "420px",
-                borderRadius: "10px"
-              }}
+              className="rounded-lg shadow-lg w-full object-cover"
             />
           </div>
 
-          {/* Text */}
-          <div style={{ flex: "1 1 450px" }}>
-            <h1>Kavion Steele</h1>
+          {/* RIGHT – STORY */}
+          <div>
 
-            <div
-              style={{
-                width: "60px",
-                height: "3px",
-                backgroundColor: "#D4AF37",
-                margin: "1rem 0 1.5rem 0"
-              }}
-            />
+            <h1 className="text-4xl font-bold text-royal mb-6">
+              About KV Garage
+            </h1>
 
-            <p style={{ color: "#D4AF37", marginBottom: "2rem" }}>
-              Founder, KV Garage
+            <div className="w-16 h-[3px] bg-gold mb-8"></div>
+
+            <p className="text-gray-600 mb-6">
+              KV Garage was founded by Kavion Steele in 2022 and refined in 2026
+              with one mission: build structured supply systems that make sense.
             </p>
 
-            <h2 style={{ marginBottom: "1.5rem" }}>
-              From Foster to Founder
-            </h2>
-
-            <p>
-              I didn’t begin with capital, connections, or inherited leverage.
-              I began in the foster system — learning early that survival
-              requires structure, discipline, and emotional control.
+            <p className="text-gray-600 mb-6">
+              The focus has never been random product flipping. It has always been
+              about positioning, margin control, supply reliability, and scalable execution.
             </p>
 
-            <p style={{ marginTop: "1.5rem" }}>
-              I have been in the battlefield of business for years — testing
-              products, navigating supply chains, managing risk, building teams,
-              and refining systems that produce results.
+            <p className="text-gray-600 mb-8">
+              Wholesale is built for operators. Retail is built for fast-moving
+              opportunity. Both are structured to create leverage.
             </p>
 
-            <p style={{ marginTop: "1.5rem" }}>
-              KV Garage was not built around hype. It was built around systems.
-              Systems designed to create jobs. Systems designed to supply demand.
-              Systems designed so stores move product and generate profit
-              consistently — not temporarily.
+            <p className="text-lg font-semibold text-royal mb-10">
+              This is not a storefront. This is an infrastructure model.
             </p>
 
-            <p style={{ marginTop: "1.5rem" }}>
-              Money comes from the people who support what you build. Long-term
-              growth comes from knowledge — the right partnerships, disciplined
-              execution, strong teams, and intelligent leverage.
-            </p>
+            {/* CTA */}
+            <Link
+              href="/contact"
+              className="inline-block bg-royal text-white px-6 py-3 rounded-md font-semibold hover:opacity-90 transition"
+            >
+              Contact Kavion Directly
+            </Link>
 
-            <p style={{ marginTop: "1.5rem" }}>
-              I operate with experienced teams and advanced AI infrastructure
-              to analyze demand, optimize supply, and position operations for
-              sustainable expansion. These systems are built to scale.
-            </p>
-
-            <p style={{ marginTop: "1.5rem" }}>
-              I believe I am called to build at this level — not for short-term
-              wins, but to construct something durable, structured, and
-              dependable. True business is earned. Trust is built through
-              execution. Value is created through strong connections.
-            </p>
-
-            <p style={{ marginTop: "1.5rem" }}>
-              I am here to win — ethically, strategically, and long-term.
-            </p>
           </div>
 
-        </div>
+        </section>
 
-        {/* Divider */}
-        <div
-          style={{
-            marginTop: "6rem",
-            height: "1px",
-            backgroundColor: "#222"
-          }}
-        />
-
-        {/* Call To Action */}
-        <div
-          style={{
-            marginTop: "4rem",
-            textAlign: "center"
-          }}
-        >
-          <h2>Strategic Partnerships & Direct Inquiries</h2>
-
-          <div
-            style={{
-              width: "60px",
-              height: "3px",
-              backgroundColor: "#D4AF37",
-              margin: "1rem auto 2rem auto"
-            }}
-          />
-
-          <p style={{ maxWidth: "700px", margin: "0 auto 2rem auto" }}>
-            If you are a long-term operator, investor, distributor, or serious
-            business owner looking to build structured supply systems that
-            generate real profit — reach out directly.
-          </p>
-
-          <a
-            href="mailto:kvgarage@kvgarage.com"
-            className="gold-btn"
-          >
-            kvgarage@kvgarage.com
-          </a>
-        </div>
-
-      </section>
-    </Layout>
+      </main>
+    </>
   );
 }

@@ -1,135 +1,210 @@
-import Layout from '../components/Layout';
-import Link from 'next/link';
+import Head from "next/head";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <Layout>
-      <section className="container" style={{ padding: "6rem 2rem" }}>
-        
-        {/* HERO SECTION */}
-        <div style={{ textAlign: "center" }}>
-          <h1 style={{ fontSize: "2.5rem", marginBottom: "1.5rem" }}>
-            Structured Supply Systems for Serious Buyers
-          </h1>
+    <>
+      <Head>
+        <title>KV Garage | Structured Supply Systems</title>
+        <meta
+          name="description"
+          content="Wholesale infrastructure. Retail execution. Structured sourcing for serious operators."
+        />
+      </Head>
 
-          <p style={{ maxWidth: "700px", margin: "0 auto 2rem auto" }}>
-            Bulk inventory. Verified demand. Protected margin.
-            Built for store owners, distributors, and long-term operators.
-          </p>
+      <main>
 
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/wholesale" className="gold-btn">
-              Apply for Wholesale Access
-            </Link>
+        {/* ================= HERO ================= */}
+        <section className="bg-white py-24">
+          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
 
-            <Link href="/shop" className="gold-btn">
-              Shop Retail
-            </Link>
+            <div>
+              <h1 className="text-5xl font-extrabold text-royal mb-6 leading-tight">
+                Structured Products <br />
+                For Serious Buyers
+              </h1>
+
+              <p className="text-lg text-gray-600 mb-8">
+                Wholesale supply. Retail execution.  
+                Built for operators, store owners, and long-term buyers.
+              </p>
+
+              <div className="flex gap-4">
+                <Link
+                  href="/wholesale"
+                  className="bg-royal text-white px-6 py-3 rounded font-semibold hover:opacity-90 transition"
+                >
+                  Enter Wholesale
+                </Link>
+
+                <Link
+                  href="/shop"
+                  className="border border-royal text-royal px-6 py-3 rounded font-semibold hover:bg-royal hover:text-white transition"
+                >
+                  Shop Retail
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-gray-100 h-96 rounded-xl flex items-center justify-center">
+              Hero Image Placeholder
+            </div>
+
           </div>
-        </div>
+        </section>
 
-        {/* DIVIDER */}
-        <div style={{ margin: "5rem 0", height: "1px", backgroundColor: "#222" }} />
 
-        {/* DIRECTORY SECTION */}
-        <h2 style={{ textAlign: "center", marginBottom: "3rem" }}>
-          Choose Your Path
-        </h2>
+        {/* ================= TRUST STRIP ================= */}
+        <section className="bg-gray-50 py-8 border-y">
+          <div className="max-w-6xl mx-auto px-6 flex justify-between text-sm text-gray-600">
+            <span>Structured Supply Model</span>
+            <span>Fast 7–10 Day Shipping</span>
+            <span>Bulk Pricing Available</span>
+            <span>U.S. Based Operations</span>
+          </div>
+        </section>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "2rem"
-          }}
-        >
-          {/* Store Owners */}
-          <div style={{ border: "1px solid #222", padding: "2rem" }}>
-            <h3>Store Owners</h3>
-            <p style={{ margin: "1rem 0" }}>
-              Cords, cases, charger blocks, glass products, trays,
-              candles, crystals and more.
+
+        {/* ================= WHOLESALE VALUE ================= */}
+        <section className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <h2 className="text-3xl font-bold text-royal mb-6">
+              Wholesale Built For Scale
+            </h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              The higher the volume, the lower the unit cost.  
+              Every retail product is eligible for wholesale once minimum quantities are met.
             </p>
-            <Link href="/wholesale" className="gold-btn">
-              Start Wholesale Application
-            </Link>
           </div>
+        </section>
 
-          {/* Bulk Buyers */}
-          <div style={{ border: "1px solid #222", padding: "2rem" }}>
-            <h3>Bulk Buyers</h3>
-            <p style={{ margin: "1rem 0" }}>
-              Volume purchasing with minimum order commitments.
-              Wholesale pricing structured for margin protection.
-            </p>
-            <Link href="/private-preview" className="gold-btn">
-              View Bulk Opportunities
-            </Link>
+
+        {/* ================= CHOOSE YOUR PATH ================= */}
+        <section className="bg-gray-50 py-20">
+          <div className="max-w-6xl mx-auto px-6">
+            <h2 className="text-3xl font-bold text-royal mb-12 text-center">
+              Choose Your Path
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8">
+
+              <Link href="/wholesale" className="border p-8 rounded-xl hover:shadow-lg transition bg-white">
+                <h3 className="text-xl font-semibold mb-3">Wholesale</h3>
+                <p className="text-gray-600 text-sm">
+                  Bulk inventory. Structured pricing.  
+                  Built for operators and store owners.
+                </p>
+              </Link>
+
+              <Link href="/shop" className="border p-8 rounded-xl hover:shadow-lg transition bg-white">
+                <h3 className="text-xl font-semibold mb-3">Retail</h3>
+                <p className="text-gray-600 text-sm">
+                  Fast-moving products. Clean checkout.  
+                  Direct to consumer buying.
+                </p>
+              </Link>
+
+              <Link href="/private-preview" className="border p-8 rounded-xl hover:shadow-lg transition bg-white">
+                <h3 className="text-xl font-semibold mb-3">Sourcing Desk</h3>
+                <p className="text-gray-600 text-sm">
+                  Request products not listed.  
+                  Custom sourcing for serious buyers.
+                </p>
+              </Link>
+
+            </div>
           </div>
+        </section>
 
-          {/* Retail Buyers */}
-          <div style={{ border: "1px solid #222", padding: "2rem" }}>
-            <h3>Retail Buyers</h3>
-            <p style={{ margin: "1rem 0" }}>
-              Watches and jewelry available for individual purchase.
-              Wholesale pricing begins at 4 units.
-            </p>
-            <Link href="/shop" className="gold-btn">
-              Shop Retail Inventory
-            </Link>
+
+        {/* ================= PRODUCT CATEGORIES ================= */}
+        <section className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <h2 className="text-3xl font-bold text-royal mb-12 text-center">
+              Product Categories
+            </h2>
+
+            <div className="grid md:grid-cols-4 gap-6 text-center">
+
+              {[
+                "Tech Accessories",
+                "Glass & Lifestyle",
+                "Jewelry",
+                "Essentials",
+                "Comfort",
+                "Hair & Nail",
+                "Skincare",
+                "Schooling Products"
+              ].map((cat, index) => (
+                <div
+                  key={index}
+                  className="border rounded-xl p-6 hover:shadow-md transition bg-gray-50"
+                >
+                  <div className="bg-gray-200 h-32 mb-4 rounded"></div>
+                  <h4 className="font-semibold text-sm">{cat}</h4>
+                </div>
+              ))}
+
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* DIVIDER */}
-        <div style={{ margin: "5rem 0", height: "1px", backgroundColor: "#222" }} />
 
-        {/* CATEGORY PREVIEW */}
-        <h2 style={{ textAlign: "center", marginBottom: "3rem" }}>
-          Product Categories
-        </h2>
+        {/* ================= FOUNDER SECTION ================= */}
+        <section className="bg-gray-50 py-24">
+          <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "2rem"
-          }}
-        >
-          <div style={{ border: "1px solid #222", padding: "2rem" }}>
-            <h3>Tech Accessories</h3>
-            <p>Cords, Cases, Charger Blocks</p>
+            {/* REAL IMAGE */}
+            <div>
+              <img
+                src="/founder.jpg"
+                alt="Kavion Steele"
+                className="rounded-xl shadow-lg w-full object-cover"
+              />
+            </div>
+
+            <div>
+              <h2 className="text-3xl font-bold text-royal mb-6">
+                Built By Kavion Steele
+              </h2>
+
+              <p className="text-gray-600 mb-6">
+                KV Garage was built on positioning, margin control,
+                supply reliability, and scalable execution.
+              </p>
+
+              <p className="text-gray-600 mb-8">
+                This is not random flipping.  
+                This is infrastructure.
+              </p>
+
+              <Link
+                href="/about"
+                className="bg-royal text-white px-6 py-3 rounded font-semibold hover:opacity-90 transition"
+              >
+                Read My Story
+              </Link>
+            </div>
+
           </div>
+        </section>
 
-          <div style={{ border: "1px solid #222", padding: "2rem" }}>
-            <h3>Glass & Lifestyle</h3>
-            <p>Glass pieces, trays, candles, crystals</p>
+
+        {/* ================= ECOSYSTEM ================= */}
+        <section className="py-20 bg-white text-center">
+          <h2 className="text-3xl font-bold text-royal mb-12">
+            KV Garage Ecosystem
+          </h2>
+
+          <div className="flex justify-center gap-8 text-gray-600 text-sm">
+            <Link href="/mentorship">Mentorship</Link>
+            <Link href="/affiliate">Affiliate</Link>
+            <Link href="/trading">Trading</Link>
+            <Link href="/private-preview">Sourcing Desk</Link>
           </div>
+        </section>
 
-          <div style={{ border: "1px solid #222", padding: "2rem" }}>
-            <h3>Watches & Jewelry</h3>
-            <p>Retail available. MOQ 4 for wholesale pricing.</p>
-          </div>
-        </div>
-
-        {/* DIVIDER */}
-        <div style={{ margin: "5rem 0", height: "1px", backgroundColor: "#222" }} />
-
-        {/* FOUNDER STRIP */}
-        <div style={{ textAlign: "center" }}>
-          <h2>Built on Systems. Earned Through Execution.</h2>
-
-          <p style={{ maxWidth: "700px", margin: "1.5rem auto" }}>
-            KV Garage was developed to create structured supply,
-            scalable distribution, and real opportunity for
-            serious operators.
-          </p>
-
-          <Link href="/about" className="gold-btn">
-            About The Founder
-          </Link>
-        </div>
-
-      </section>
-    </Layout>
+      </main>
+    </>
   );
 }

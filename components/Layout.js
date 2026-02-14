@@ -1,112 +1,104 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function Layout({ children }) {
   return (
-    <>
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          backgroundColor: "#000",
-          borderBottom: "1px solid #111",
-          padding: "1.5rem 2rem"
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          }}
-        >
-          {/* Brand */}
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <div>
-              <div
-                style={{
-                  fontSize: "1.2rem",
-                  letterSpacing: "3px",
-                  fontWeight: "600"
-                }}
-              >
-                KV GARAGE
-              </div>
+    <div className="min-h-screen flex flex-col bg-softwhite text-gray-900">
 
-              <div
-                style={{
-                  fontSize: "0.7rem",
-                  letterSpacing: "2px",
-                  opacity: "0.6",
-                  marginTop: "4px"
-                }}
-              >
-                ESTABLISHED 2022
-              </div>
-            </div>
-          </Link>
+      {/* HEADER */}
+      <header className="w-full bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
 
-          {/* Navigation */}
-          <nav
-            style={{
-              display: "flex",
-              gap: "2rem",
-              fontSize: "0.9rem",
-              letterSpacing: "1px"
-            }}
-          >
+          <div>
+            <h1 className="text-2xl font-extrabold text-royal tracking-wider">
+              KV GARAGE
+            </h1>
+            <div className="w-12 h-[2px] bg-gold my-1"></div>
+            <p className="text-xs text-gray-400 tracking-[0.3em]">
+              VERIFIED SUPPLIES
+            </p>
+          </div>
+
+          <nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-700">
             <Link href="/">Home</Link>
-            <Link href="/about">About</Link>
-            <Link href="/shop">Shop</Link>
             <Link href="/wholesale">Wholesale</Link>
+            <Link href="/shop">Retail</Link>
             <Link href="/private-preview">Private Preview</Link>
             <Link href="/mentorship">Mentorship</Link>
             <Link href="/affiliate">Affiliate</Link>
+            <Link href="/trading">Trading</Link>
+            <Link href="/learn">Learn</Link>
+            <Link href="/deals">Deals</Link>
+            <Link href="/contact">Contact</Link>
           </nav>
-        </div>
 
-        {/* Gold Accent Line */}
-        <div
-          style={{
-            height: "2px",
-            backgroundColor: "#D4AF37",
-            marginTop: "1rem"
-          }}
-        />
+        </div>
       </header>
 
-      <main>{children}</main>
+      {/* PAGE CONTENT */}
+      <main className="flex-grow">
+        {children}
+      </main>
 
-      <footer
-        style={{
-          borderTop: "1px solid #111",
-          marginTop: "6rem",
-          padding: "3rem 2rem",
-          backgroundColor: "#000"
-        }}
-      >
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <p style={{ marginBottom: "0.5rem" }}>
-            KV Garage 2026
-          </p>
+      {/* FOOTER */}
+      <footer className="bg-white border-t border-gray-200 pt-20 pb-12 mt-20">
+        <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-5 gap-12">
 
-          <p style={{ fontSize: "0.8rem", opacity: "0.6" }}>
-            Established 2022
-          </p>
-
-          <div style={{ marginTop: "1rem" }}>
-            <a
-              href="https://www.instagram.com/kave.steele/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Instagram
-            </a>
+          <div>
+            <h4 className="font-bold text-royal text-xl mb-4">
+              KV GARAGE
+            </h4>
+            <div className="w-12 h-[2px] bg-gold mb-4"></div>
+            <p className="text-gray-500 text-sm">
+              Structured wholesale supply and scalable product infrastructure built for serious operators.
+            </p>
           </div>
+
+          <div>
+            <h5 className="font-semibold mb-4">Core</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/">Home</Link></li>
+              <li><Link href="/wholesale">Wholesale</Link></li>
+              <li><Link href="/shop">Retail</Link></li>
+              <li><Link href="/deals">Deals</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h5 className="font-semibold mb-4">Ecosystem</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/private-preview">Private Preview</Link></li>
+              <li><Link href="/mentorship">Mentorship</Link></li>
+              <li><Link href="/affiliate">Affiliate</Link></li>
+              <li><Link href="/trading">Trading</Link></li>
+              <li><Link href="/learn">Learn</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h5 className="font-semibold mb-4">Support</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/contact">Contact</Link></li>
+              <li>support@kvgarage.com</li>
+            </ul>
+          </div>
+
+          <div>
+            <h5 className="font-semibold mb-4">Company</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li>Established 2022</li>
+              <li>Updated 2026</li>
+              <li>United States</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div className="text-center text-gray-400 text-xs mt-16">
+          © 2026 KV Garage. All Rights Reserved.
         </div>
       </footer>
-    </>
+
+    </div>
   );
 }
+
