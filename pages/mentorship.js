@@ -5,64 +5,71 @@ export default function Academy() {
   return (
     <>
       <Head>
-        <title>KV Garage Academy | Operator Development</title>
+        <title>KV Garage Academy | Institutional Operator Training</title>
         <meta
           name="description"
-          content="Structured business education, systems training, and private mentorship for serious builders."
+          content="An institutional-grade academy for operators. Structured systems, capital discipline, and long-term thinking."
         />
       </Head>
 
-      <main className="bg-white">
+      <main className="bg-[#0B0F19] text-white">
 
         {/* ================= HERO ================= */}
-        <section className="py-24 border-b">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12 items-start">
+        <section className="py-40 border-b border-[#1C2233]">
+          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-20 items-start">
 
-            {/* LEFT CONTENT */}
+            {/* LEFT */}
             <div className="md:col-span-2">
 
-              <h1 className="text-5xl font-bold text-royal mb-6 leading-tight">
+              <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+                Institutional Operator Development
+              </p>
+
+              <h1 className="text-6xl font-semibold leading-tight mb-10">
                 KV Garage Academy
               </h1>
 
-              <div className="w-20 h-[3px] bg-gold mb-6"></div>
+              <div className="w-24 h-[2px] bg-[#D4AF37] mb-10"></div>
 
-              <p className="text-lg text-gray-700 mb-6">
-                A structured learning environment for future operators.
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
+                A capital-grade learning institution built for disciplined builders.
               </p>
 
-              <p className="text-gray-600 mb-6">
-                This is a place you can send your son and say:
-                “Learn how business really works.”
+              <p className="text-gray-400 max-w-2xl leading-relaxed mb-6">
+                This is not content.
+                This is structure.
+                Infrastructure thinking.
+                Execution at a standard most never reach.
               </p>
 
-              <p className="text-gray-600">
-                Systems. Sales. AI. Infrastructure. Faith. Execution.
+              <p className="text-gray-500 max-w-2xl leading-relaxed">
+                Systems. Sales. AI Infrastructure. Capital Allocation.
+                Character. Faith. Long-term thinking.
               </p>
 
             </div>
 
-            {/* RIGHT SIDE – BOOK CALL BOX */}
-            <div className="border rounded-xl p-6 bg-gray-50">
+            {/* RIGHT PANEL */}
+            <div className="bg-[#111827] border border-[#1C2233] rounded-2xl p-10">
 
-              <h3 className="font-semibold text-royal mb-3">
-                Strategy Call
+              <h3 className="text-lg font-semibold mb-6 text-[#D4AF37]">
+                Qualification Interview
               </h3>
 
-              <p className="text-sm text-gray-600 mb-4">
-                For serious builders only.
-                This is not a casual conversation.
+              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                Entry is selective.
+                We work with builders committed to disciplined execution.
               </p>
 
-              <p className="text-sm text-gray-500 mb-6">
-                $50 — credited toward any program if accepted.
+              <p className="text-sm text-gray-500 mb-10">
+                $50 — credited upon acceptance.
               </p>
 
               <Link
                 href="/contact"
-                className="block text-center bg-royal text-white py-3 rounded font-semibold hover:opacity-90 transition"
+                className="block text-center bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
               >
-                Book Call
+                Request Interview
               </Link>
 
             </div>
@@ -71,38 +78,46 @@ export default function Academy() {
         </section>
 
 
-        {/* ================= LIBRARY SECTION ================= */}
-        <section className="py-24 bg-gray-50">
+        {/* ================= LIBRARY ================= */}
+        <section className="py-40 border-b border-[#1C2233]">
           <div className="max-w-7xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-12">
-              Free Operator Library
-            </h2>
+            <div className="mb-20">
+              <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-6">
+                Public Foundation
+              </p>
 
-            <div className="grid md:grid-cols-4 gap-8">
+              <h2 className="text-4xl font-semibold mb-6">
+                Operator Library
+              </h2>
+
+              <div className="w-16 h-[2px] bg-[#D4AF37]"></div>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-12">
 
               {[
-                "Building Your First Website",
-                "Using AI To Build Systems",
-                "Reselling Fundamentals",
-                "Understanding Markets",
-                "Sales & Positioning",
-                "Automation With n8n",
-                "Coding With ChatGPT",
-                "Faith & Discipline In Business"
+                "Building Infrastructure",
+                "AI System Architecture",
+                "Revenue & Distribution",
+                "Market Intelligence",
+                "Sales Positioning",
+                "Automation Design",
+                "Code & Execution",
+                "Faith & Discipline"
               ].map((title, index) => (
                 <div
                   key={index}
-                  className="border bg-white rounded-xl p-6 hover:shadow-md transition"
+                  className="group border border-[#1C2233] rounded-2xl p-8 hover:border-[#D4AF37] transition"
                 >
-                  <div className="bg-gray-200 h-32 rounded mb-4"></div>
+                  <div className="h-40 bg-[#111827] rounded-xl mb-8"></div>
 
-                  <h3 className="text-sm font-semibold mb-3">
+                  <h3 className="text-sm tracking-wide font-medium mb-6">
                     {title}
                   </h3>
 
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>YouTube</span>
+                  <div className="flex justify-between text-xs text-gray-500 group-hover:text-gray-300 transition">
+                    <span>Watch</span>
                     <span>Playbook</span>
                   </div>
                 </div>
@@ -114,29 +129,31 @@ export default function Academy() {
         </section>
 
 
-        {/* ================= STRUCTURED CLASS ================= */}
-        <section className="py-24 bg-white text-center">
+        {/* ================= CORE PROGRAM ================= */}
+        <section className="py-40 border-b border-[#1C2233] text-center">
           <div className="max-w-4xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-6">
-              4-Week Structured Operator Class
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              A guided, structured introduction to business systems.
-              Designed for builders who want clarity before scale.
+            <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+              Cohort Program
             </p>
 
-            <p className="text-2xl font-bold text-royal mb-6">
+            <h2 className="text-4xl font-semibold mb-10">
+              4-Week Operator Intensive
+            </h2>
+
+            <div className="w-20 h-[2px] bg-[#D4AF37] mx-auto mb-10"></div>
+
+            <p className="text-gray-400 mb-12 leading-relaxed">
+              A structured immersion into systems thinking,
+              revenue design, infrastructure, and disciplined execution.
+            </p>
+
+            <p className="text-3xl font-semibold mb-10">
               $129.99
             </p>
 
-            <p className="text-sm text-gray-500 mb-8">
-              Includes downloadable playbooks and full system walkthroughs.
-            </p>
-
-            <button className="bg-royal text-white px-8 py-3 rounded font-semibold hover:opacity-90 transition">
-              Enroll In Class
+            <button className="border border-[#D4AF37] px-10 py-4 rounded-lg hover:bg-[#D4AF37] hover:text-black transition font-semibold">
+              Secure Seat
             </button>
 
           </div>
@@ -144,34 +161,34 @@ export default function Academy() {
 
 
         {/* ================= PRIVATE MENTORSHIP ================= */}
-        <section className="py-24 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-6 text-center">
+        <section className="py-40 border-b border-[#1C2233] text-center">
+          <div className="max-w-4xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-6">
-              Private Mentorship
+            <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+              Private Tier
+            </p>
+
+            <h2 className="text-4xl font-semibold mb-10">
+              Mentorship & Oversight
             </h2>
 
-            <p className="text-gray-600 mb-6">
-              This is not open enrollment.
-              You must qualify.
+            <div className="w-20 h-[2px] bg-[#D4AF37] mx-auto mb-10"></div>
+
+            <p className="text-gray-400 mb-12 leading-relaxed">
+              Personalized infrastructure alignment.
+              Revenue architecture.
+              Strategic accountability.
             </p>
 
-            <p className="text-xl font-semibold text-royal mb-6">
+            <p className="text-2xl font-semibold mb-10">
               $500 / Month
-            </p>
-
-            <p className="text-gray-600 mb-10">
-              Twice weekly 1-on-1 sessions.
-              Full system integration.
-              Operational leverage.
-              Cashflow structure.
             </p>
 
             <Link
               href="/private-preview"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded font-semibold transition"
+              className="bg-[#D4AF37] text-black px-10 py-4 rounded-lg font-semibold hover:opacity-90 transition"
             >
-              Apply For Mentorship
+              Apply For Consideration
             </Link>
 
           </div>
@@ -179,27 +196,33 @@ export default function Academy() {
 
 
         {/* ================= ADVISORY ================= */}
-        <section className="py-24 bg-white text-center">
+        <section className="py-40 text-center">
           <div className="max-w-4xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-6">
-              Private Advisory Partnership
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              For businesses ready to scale and remove bottlenecks.
-              Hiring systems. Payroll structure. Growth execution.
+            <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+              Executive Advisory
             </p>
 
-            <p className="text-2xl font-bold text-royal mb-8">
+            <h2 className="text-4xl font-semibold mb-10">
+              Strategic Partnership
+            </h2>
+
+            <div className="w-20 h-[2px] bg-[#D4AF37] mx-auto mb-10"></div>
+
+            <p className="text-gray-400 mb-12 leading-relaxed">
+              For operators scaling teams, systems,
+              and capital allocation at meaningful levels.
+            </p>
+
+            <p className="text-2xl font-semibold mb-12">
               Starting at $1000
             </p>
 
             <Link
               href="/contact"
-              className="border border-royal text-royal px-8 py-3 rounded font-semibold hover:bg-royal hover:text-white transition"
+              className="border border-gray-600 px-10 py-4 rounded-lg hover:border-[#D4AF37] hover:text-[#D4AF37] transition font-semibold"
             >
-              Inquire About Advisory
+              Initiate Conversation
             </Link>
 
           </div>

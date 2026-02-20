@@ -5,75 +5,72 @@ export default function Affiliate() {
   return (
     <>
       <Head>
-        <title>KV Garage Distribution Partner Program</title>
+        <title>KV Garage | Private Distribution Network</title>
         <meta
           name="description"
-          content="Tiered distribution partner program. 15% commission. Performance bonuses. Structured payouts."
+          content="Structured distribution partnership. Institutional payout systems. Controlled supply network."
         />
       </Head>
 
-      <main className="bg-white">
+      <main className="bg-[#0B0F19] text-white">
 
         {/* ================= HERO ================= */}
-        <section className="py-24 border-b">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12 items-start">
+        <section className="py-40 border-b border-[#1C2233]">
+          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-20 items-start">
 
             <div className="md:col-span-2">
 
-              <h1 className="text-5xl font-bold text-royal mb-6 leading-tight">
-                Distribution Partner Program
-              </h1>
-
-              <div className="w-20 h-[3px] bg-gold mb-8"></div>
-
-              <p className="text-lg text-gray-700 mb-8">
-                Structured earnings through controlled supply referrals.
+              <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+                Private Distribution Network
               </p>
 
-              <div className="mb-10">
-                <p className="text-3xl font-bold text-royal mb-4">
-                  15% Commission Per Order
-                </p>
+              <h1 className="text-6xl font-semibold leading-tight mb-10">
+                Structured Partner Access
+              </h1>
 
-                <p className="text-gray-600 mb-4">
-                  Earn 15% on every completed order placed through your encrypted partner link.
-                </p>
+              <div className="w-24 h-[2px] bg-[#D4AF37] mb-10"></div>
 
-                <p className="text-sm text-gray-500">
-                  Minimum order requirement: <strong>$250 per customer</strong>.
-                </p>
-              </div>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
+                A controlled revenue channel for operators
+                with real networks.
+              </p>
 
-              <p className="text-gray-600">
-                Built for serious operators, buyers, and creators who want to extend
-                the supply network and monetize responsibly.
+              <p className="text-gray-400 max-w-2xl leading-relaxed mb-6">
+                When you move product through verified supply,
+                you participate in structured upside.
+              </p>
+
+              <p className="text-gray-500 max-w-2xl leading-relaxed">
+                No gimmicks. No public affiliate spam.
+                Only disciplined referral relationships.
               </p>
 
             </div>
 
-            {/* Earnings Summary */}
-            <div className="border rounded-xl p-8 bg-gray-50 shadow-sm">
+            {/* Terms Panel */}
+            <div className="bg-[#111827] border border-[#1C2233] rounded-2xl p-10">
 
-              <h3 className="font-semibold text-royal mb-6">
-                Core Terms
+              <h3 className="text-lg font-semibold mb-6 text-[#D4AF37]">
+                Core Economics
               </h3>
 
-              <ul className="text-sm text-gray-700 space-y-4 mb-8">
-                <li>• 15% per completed order ($250 minimum)</li>
+              <ul className="text-sm text-gray-400 space-y-4 mb-8 leading-relaxed">
+                <li>• 15% per completed order</li>
+                <li>• $250 minimum order value</li>
                 <li>• Weekly payout cycles</li>
-                <li>• On-demand withdrawal after first payout</li>
-                <li>• 1 Free Shipping Credit per referred customer</li>
+                <li>• Transparent tracking dashboard</li>
               </ul>
 
-              <p className="text-xs text-gray-500 mb-6">
-                Payouts processed within 3 business days depending on bank.
+              <p className="text-xs text-gray-500 mb-8">
+                Payments processed within 3 business days.
+                Institutional payout structure.
               </p>
 
               <Link
                 href="#apply"
-                className="block text-center bg-royal text-white py-3 rounded font-semibold hover:opacity-90 transition"
+                className="block text-center bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
               >
-                Apply To Join
+                Request Access
               </Link>
 
             </div>
@@ -82,61 +79,53 @@ export default function Affiliate() {
         </section>
 
 
-        {/* ================= TIER SYSTEM ================= */}
-        <section className="py-24 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-6 text-center">
+        {/* ================= ECONOMIC EXAMPLE ================= */}
+        <section className="py-40 border-b border-[#1C2233] text-center">
+          <div className="max-w-6xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-12">
-              Tier Structure
+            <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+              Economic Model
+            </p>
+
+            <h2 className="text-4xl font-semibold mb-12">
+              Example Distribution Economics
             </h2>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-12">
 
-              {/* Silver */}
-              <div className="bg-white border rounded-xl p-8">
-                <h3 className="text-xl font-semibold mb-4 text-royal">
-                  Silver Partner
+              <div className="border border-[#1C2233] rounded-2xl p-10">
+                <h3 className="text-lg mb-4 text-gray-300">
+                  10 Orders
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  0–15 monthly orders
+                <p className="text-sm text-gray-500 mb-6">
+                  $250 each
                 </p>
-                <p className="text-2xl font-bold mb-4">
-                  15%
-                </p>
-                <p className="text-sm text-gray-500">
-                  Base commission level.
+                <p className="text-3xl font-semibold">
+                  $375
                 </p>
               </div>
 
-              {/* Gold */}
-              <div className="bg-white border-2 border-royal rounded-xl p-8">
-                <h3 className="text-xl font-semibold mb-4 text-royal">
-                  Gold Partner
+              <div className="border border-[#D4AF37] rounded-2xl p-10">
+                <h3 className="text-lg mb-4 text-gray-300">
+                  25 Orders
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  16–40 monthly orders
+                <p className="text-sm text-gray-500 mb-6">
+                  $250 each
                 </p>
-                <p className="text-2xl font-bold mb-4">
-                  15% + Performance Bonus
-                </p>
-                <p className="text-sm text-gray-500">
-                  Quarterly performance incentives.
+                <p className="text-3xl font-semibold text-[#D4AF37]">
+                  $937
                 </p>
               </div>
 
-              {/* Elite */}
-              <div className="bg-white border rounded-xl p-8">
-                <h3 className="text-xl font-semibold mb-4 text-royal">
-                  Elite Partner
+              <div className="border border-[#1C2233] rounded-2xl p-10">
+                <h3 className="text-lg mb-4 text-gray-300">
+                  50 Orders
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  40+ monthly orders
+                <p className="text-sm text-gray-500 mb-6">
+                  $250 each
                 </p>
-                <p className="text-2xl font-bold mb-4">
-                  Custom Bonus Structure
-                </p>
-                <p className="text-sm text-gray-500">
-                  Strategic incentives & priority access.
+                <p className="text-3xl font-semibold">
+                  $1,875
                 </p>
               </div>
 
@@ -146,70 +135,53 @@ export default function Affiliate() {
         </section>
 
 
-        {/* ================= PERFORMANCE BONUSES ================= */}
-        <section className="py-24 bg-white text-center">
-          <div className="max-w-4xl mx-auto px-6">
+        {/* ================= TIER STRUCTURE ================= */}
+        <section className="py-40 border-b border-[#1C2233] text-center">
+          <div className="max-w-6xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-6">
-              Performance Incentives
-            </h2>
-
-            <p className="text-gray-600 mb-8">
-              High-volume partners may unlock structured bonuses,
-              including increased payout leverage and supply priority.
+            <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+              Partnership Tiers
             </p>
 
-            <p className="text-sm text-gray-500">
-              Exact bonus structure disclosed after performance review.
-            </p>
-
-          </div>
-        </section>
-
-
-        {/* ================= EARNINGS EXAMPLE ================= */}
-        <section className="py-24 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-6 text-center">
-
-            <h2 className="text-3xl font-bold text-royal mb-12">
-              Earnings Projection Example
+            <h2 className="text-4xl font-semibold mb-16">
+              Performance Alignment
             </h2>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-12">
 
-              <div className="bg-white border rounded-xl p-8">
-                <h3 className="text-xl font-semibold mb-4">
-                  10 Orders
+              <div className="border border-[#1C2233] rounded-2xl p-10">
+                <h3 className="text-lg font-semibold mb-6">
+                  Network Partner
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  $250 Minimum Each
+                <p className="text-sm text-gray-500 mb-6">
+                  0–15 Monthly Orders
                 </p>
-                <p className="text-2xl font-bold text-royal">
-                  $375+
+                <p className="text-2xl font-semibold">
+                  15%
                 </p>
               </div>
 
-              <div className="bg-white border rounded-xl p-8">
-                <h3 className="text-xl font-semibold mb-4">
-                  25 Orders
+              <div className="border border-[#D4AF37] rounded-2xl p-10">
+                <h3 className="text-lg font-semibold mb-6 text-[#D4AF37]">
+                  Strategic Partner
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  $250 Minimum Each
+                <p className="text-sm text-gray-500 mb-6">
+                  16–40 Monthly Orders
                 </p>
-                <p className="text-2xl font-bold text-royal">
-                  $937+
+                <p className="text-2xl font-semibold">
+                  15% + Performance Bonus
                 </p>
               </div>
 
-              <div className="bg-white border rounded-xl p-8">
-                <h3 className="text-xl font-semibold mb-4">
-                  50 Orders
+              <div className="border border-[#1C2233] rounded-2xl p-10">
+                <h3 className="text-lg font-semibold mb-6">
+                  Capital Partner
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  $250 Minimum Each
+                <p className="text-sm text-gray-500 mb-6">
+                  40+ Monthly Orders
                 </p>
-                <p className="text-2xl font-bold text-royal">
-                  $1,875+
+                <p className="text-2xl font-semibold">
+                  Custom Incentives
                 </p>
               </div>
 
@@ -220,50 +192,48 @@ export default function Affiliate() {
 
 
         {/* ================= APPLICATION ================= */}
-        <section id="apply" className="py-24 bg-white">
+        <section id="apply" className="py-40 text-center">
           <div className="max-w-3xl mx-auto px-6">
 
-            <h2 className="text-3xl font-bold text-royal mb-10 text-center">
-              Apply To Become A Partner
+            <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
+              Controlled Enrollment
+            </p>
+
+            <h2 className="text-4xl font-semibold mb-12">
+              Request Distribution Access
             </h2>
 
-            <form className="space-y-6 border rounded-xl p-8 shadow-sm">
+            <form className="space-y-6 border border-[#1C2233] rounded-2xl p-10 bg-[#111827]">
 
               <input
                 type="text"
                 placeholder="Full Name"
-                className="w-full border rounded-lg px-4 py-3"
+                className="w-full bg-[#0B0F19] border border-[#1C2233] rounded-lg px-4 py-3 text-white"
               />
 
               <input
                 type="email"
                 placeholder="Email Address"
-                className="w-full border rounded-lg px-4 py-3"
+                className="w-full bg-[#0B0F19] border border-[#1C2233] rounded-lg px-4 py-3 text-white"
               />
 
               <input
                 type="text"
-                placeholder="Business / Brand"
-                className="w-full border rounded-lg px-4 py-3"
-              />
-
-              <input
-                type="text"
-                placeholder="Social Media / Content Links"
-                className="w-full border rounded-lg px-4 py-3"
+                placeholder="Business / Network Description"
+                className="w-full bg-[#0B0F19] border border-[#1C2233] rounded-lg px-4 py-3 text-white"
               />
 
               <textarea
-                placeholder="Why should we approve you?"
+                placeholder="Describe your network and buyer access"
                 rows="4"
-                className="w-full border rounded-lg px-4 py-3"
+                className="w-full bg-[#0B0F19] border border-[#1C2233] rounded-lg px-4 py-3 text-white"
               ></textarea>
 
               <button
                 type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition"
+                className="w-full bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
               >
-                Submit Application
+                Submit Request
               </button>
 
             </form>

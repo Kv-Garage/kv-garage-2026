@@ -1,71 +1,79 @@
-import Head from "next/head";
-import Link from "next/link";
-
 export default function About() {
   return (
-    <>
-      <Head>
-        <title>About | KV Garage</title>
-        <meta
-          name="description"
-          content="Learn about Kavion Steele and the structure behind KV Garage."
-        />
-      </Head>
+    <div className="min-h-screen bg-[#0B0F19] text-white">
 
-      <main className="bg-white">
+      {/* TOP SECTION */}
+      <section className="max-w-7xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-20 items-center">
 
-        <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-16 items-center">
+        {/* LEFT — FOUNDER IMAGE */}
+        <div>
+          <img
+            src="/founder.jpg"
+            alt="Founder"
+            className="rounded-2xl shadow-2xl object-cover w-full h-[550px]"
+          />
+        </div>
 
-          {/* LEFT – FOUNDER IMAGE */}
+        {/* RIGHT — INFORMATION */}
+        <div>
+          <h1 className="text-4xl font-bold mb-8 text-[#D4AF37]">
+            Kavion Steele
+          </h1>
+
+          <p className="text-gray-400 leading-relaxed mb-6">
+            KV Garage operates through structured sourcing, controlled
+            margin management, and disciplined operational oversight.
+            Every division — retail, wholesale, capital allocation,
+            and education — is aligned under measurable performance
+            standards.
+          </p>
+
+          <p className="text-gray-400 leading-relaxed mb-6">
+            Growth is pursued through positioning and execution,
+            not impulse. Supplier relationships are built with
+            long-term stability in mind. Capital deployment is
+            structured with defined risk parameters.
+          </p>
+
+          <p className="text-gray-400 leading-relaxed">
+            The objective is sustained operational clarity,
+            scalable systems, and disciplined expansion.
+          </p>
+        </div>
+
+      </section>
+
+      {/* CONTACT SECTION */}
+      <section className="border-t border-gray-800 py-28 text-center px-6">
+
+        <h2 className="text-3xl font-semibold mb-6 text-[#D4AF37]">
+          Direct Contact
+        </h2>
+
+        <p className="text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          For wholesale partnerships, capital discussions,
+          strategic alignment, or executive consultation,
+          contact directly through the primary communication channel.
+        </p>
+
+        <div className="space-y-6">
+
+          <a href="mailto:your@email.com">
+            <button className="bg-[#D4AF37] text-black px-10 py-4 rounded-xl font-semibold hover:opacity-90 transition">
+              Email Directly
+            </button>
+          </a>
+
           <div>
-            <img
-              src="/founder.jpg"
-              alt="Kavion Steele"
-              className="rounded-lg shadow-lg w-full object-cover"
-            />
+            <a href="/contact" className="text-gray-400 hover:text-[#D4AF37] transition">
+              Or Schedule A Meeting
+            </a>
           </div>
 
-          {/* RIGHT – STORY */}
-          <div>
+        </div>
 
-            <h1 className="text-4xl font-bold text-royal mb-6">
-              About KV Garage
-            </h1>
+      </section>
 
-            <div className="w-16 h-[3px] bg-gold mb-8"></div>
-
-            <p className="text-gray-600 mb-6">
-              KV Garage was founded by Kavion Steele in 2022 and refined in 2026
-              with one mission: build structured supply systems that make sense.
-            </p>
-
-            <p className="text-gray-600 mb-6">
-              The focus has never been random product flipping. It has always been
-              about positioning, margin control, supply reliability, and scalable execution.
-            </p>
-
-            <p className="text-gray-600 mb-8">
-              Wholesale is built for operators. Retail is built for fast-moving
-              opportunity. Both are structured to create leverage.
-            </p>
-
-            <p className="text-lg font-semibold text-royal mb-10">
-              This is not a storefront. This is an infrastructure model.
-            </p>
-
-            {/* CTA */}
-            <Link
-              href="/contact"
-              className="inline-block bg-royal text-white px-6 py-3 rounded-md font-semibold hover:opacity-90 transition"
-            >
-              Contact Kavion Directly
-            </Link>
-
-          </div>
-
-        </section>
-
-      </main>
-    </>
+    </div>
   );
 }
