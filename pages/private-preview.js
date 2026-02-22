@@ -36,33 +36,57 @@ export default function SourcingDesk() {
 
         {/* RIGHT SIDE FORM */}
         <div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800">
-          <form className="space-y-4">
+          
+          <form
+            name="sourcing-desk"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            className="space-y-4"
+          >
+            {/* Required hidden input for Netlify */}
+            <input type="hidden" name="form-name" value="sourcing-desk" />
+
+            {/* Honeypot (spam protection) */}
+            <input type="hidden" name="bot-field" />
+
             <input
               type="text"
+              name="fullName"
               placeholder="Full Name"
+              required
               className="w-full p-3 bg-black border border-zinc-700 rounded"
             />
 
             <input
               type="email"
+              name="email"
               placeholder="Email"
+              required
               className="w-full p-3 bg-black border border-zinc-700 rounded"
             />
 
-            <select className="w-full p-3 bg-black border border-zinc-700 rounded">
-              <option>Wholesale</option>
-              <option>Retail</option>
+            <select
+              name="requestType"
+              className="w-full p-3 bg-black border border-zinc-700 rounded"
+            >
+              <option value="Wholesale">Wholesale</option>
+              <option value="Retail">Retail</option>
             </select>
 
             <input
               type="text"
+              name="productName"
               placeholder="Product Name"
+              required
               className="w-full p-3 bg-black border border-zinc-700 rounded"
             />
 
             <textarea
+              name="description"
               placeholder="Describe what you're looking for..."
               rows="4"
+              required
               className="w-full p-3 bg-black border border-zinc-700 rounded"
             />
 
@@ -72,6 +96,7 @@ export default function SourcingDesk() {
             >
               Submit Request
             </button>
+
           </form>
         </div>
       </div>
