@@ -1,6 +1,16 @@
 import Link from "next/link";
+import { useCart } from "../context/CartContext";
 
 export default function Layout({ children }) {
+  const { cart } = useCart();
+
+  const itemCount = cart.length;
+
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-softwhite text-gray-900">
 
@@ -8,6 +18,7 @@ export default function Layout({ children }) {
       <header className="w-full bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
 
+          {/* LEFT SIDE LOGO */}
           <div>
             <h1 className="text-2xl font-extrabold text-royal tracking-wider">
               KV GARAGE
@@ -18,18 +29,40 @@ export default function Layout({ children }) {
             </p>
           </div>
 
-          <nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-700">
-            <Link href="/">Home</Link>
-            <Link href="/wholesale">Wholesale</Link>
-            <Link href="/shop">Retail</Link>
-            <Link href="/private-preview">Private Preview</Link>
-            <Link href="/mentorship">Mentorship</Link>
-            <Link href="/affiliate">Affiliate</Link>
-            <Link href="/trading">Trading</Link>
-            <Link href="/learn">Learn</Link>
-            <Link href="/deals">Deals</Link>
-            <Link href="/contact">Contact</Link>
-          </nav>
+          {/* NAV + CART */}
+          <div className="flex items-center space-x-10">
+
+            <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-700 whitespace-nowrap">
+              <Link href="/">Home</Link>
+              <Link href="/wholesale">Wholesale</Link>
+              <Link href="/shop">Retail</Link>
+              <Link href="/private-preview" className="whitespace-nowrap">
+                Private Preview
+              </Link>
+              <Link href="/mentorship">Mentorship</Link>
+              <Link href="/affiliate">Affiliate</Link>
+              <Link href="/trading">Trading</Link>
+              <Link href="/learn">Learn</Link>
+              <Link href="/deals">Deals</Link>
+              <Link href="/contact">Contact</Link>
+            </nav>
+
+            {/* CART DISPLAY */}
+            <Link href="/cart">
+              <div className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2">
+
+                <span>🛒</span>
+
+                <span>{itemCount} items</span>
+
+                <span className="text-orange-600">
+                  ${totalPrice.toFixed(2)}
+                </span>
+
+              </div>
+            </Link>
+
+          </div>
 
         </div>
       </header>
@@ -101,4 +134,3 @@ export default function Layout({ children }) {
     </div>
   );
 }
-

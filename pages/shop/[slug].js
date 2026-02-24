@@ -2,17 +2,28 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { useState } from "react";
 import Link from "next/link";
+import { calculatePrice } from "../../lib/pricing";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+);
 
 export default function ProductPage() {
   const router = useRouter();
   const { slug } = router.query;
 
-  // TEMP DUMMY PRODUCT DATA
+  const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  if (!slug) return null;
+
   const product = {
-    name: slug ? slug.replaceAll("-", " ").toUpperCase() : "Product",
-    price: "$49.00",
+    name: slug.replaceAll("-", " ").toUpperCase(),
+    cost: 10,
     description:
-      "Premium structured retail product built for clean presentation and confident purchasing. Fast processing. Secure checkout.",
+      "Premium structured retail product built for clean presentation and confident purchasing.",
     images: [
       "/placeholder-product.jpg",
       "/placeholder-product.jpg",
@@ -20,9 +31,39 @@ export default function ProductPage() {
     ],
   };
 
-  const [selectedImage, setSelectedImage] = useState(product.images[0]);
+  if (!selectedImage) {
+    setSelectedImage(product.images[0]);
+  }
 
-  if (!slug) return null;
+  const pricePerUnit = calculatePrice(product.cost, quantity);
+  const totalPrice = pricePerUnit * quantity;
+
+  const handleCheckout = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: product.name,
+          amount: pricePerUnit,
+          quantity: quantity,
+        }),
+      });
+
+      const session = await response.json();
+      if (!session.url) return;
+
+      window.location.href = session.url;
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -33,7 +74,6 @@ export default function ProductPage() {
       <main className="bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-6 py-12">
 
-          {/* Back Button */}
           <Link
             href="/shop"
             className="text-sm text-royal hover:underline mb-8 inline-block"
@@ -43,7 +83,7 @@ export default function ProductPage() {
 
           <div className="grid md:grid-cols-2 gap-12">
 
-            {/* Image Section */}
+            {/* IMAGE SECTION */}
             <div>
               <div className="bg-gray-100 h-96 flex items-center justify-center rounded-lg mb-4">
                 <img
@@ -66,36 +106,60 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Product Info */}
+            {/* PRODUCT INFO */}
             <div>
               <h1 className="text-3xl font-bold text-royal mb-4">
                 {product.name}
               </h1>
 
+              <p className="text-xl mb-2">
+                Price Per Unit: <strong>${pricePerUnit.toFixed(2)}</strong>
+              </p>
+
               <p className="text-2xl font-semibold mb-6">
-                {product.price}
+                Total: ${totalPrice.toFixed(2)}
               </p>
 
               <p className="text-gray-600 mb-8">
                 {product.description}
               </p>
 
+              {/* Quantity */}
+              <div className="mb-6">
+                <label className="block mb-2 font-medium">Quantity</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="border px-4 py-2 w-24 rounded-md"
+                />
+              </div>
+
+              {/* Buttons */}
               <div className="flex gap-4 mb-8">
-                <button className="bg-royal text-white px-6 py-3 rounded-md font-semibold hover:opacity-90 transition">
-                  Buy Now
+                <button
+                  onClick={handleCheckout}
+                  disabled={loading}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md font-semibold transition disabled:opacity-50"
+                >
+                  {loading ? "Processing..." : "Buy Now"}
                 </button>
 
-                <button className="border border-royal text-royal px-6 py-3 rounded-md font-semibold hover:bg-royal hover:text-white transition">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold transition">
                   Add to Cart
                 </button>
               </div>
 
-              <div className="border-t pt-6 text-sm text-gray-500">
-                <p>✔ Secure checkout</p>
-                <p>✔ Fast 7–10 day processing</p>
-                <p>✔ Order confirmation + tracking email</p>
+              {/* Updated Trust Section */}
+              <div className="border-t pt-6 text-sm text-gray-600 space-y-2">
+                <p>✔ Secure checkout powered by Stripe</p>
+                <p>✔ Payment processing typically clears in 1–2 business days</p>
+                <p>✔ Order ships immediately after funds are confirmed</p>
               </div>
+
             </div>
+
           </div>
         </div>
       </main>
