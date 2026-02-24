@@ -164,7 +164,7 @@ export default function Home() {
           <Category title="Tech Accessories" image="https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=1200&auto=format&fit=crop" slug="tech-accessories" />
           <Category title="Glass & Lifestyle" image="/bong.webp" slug="glass-lifestyle" />
           <Category title="Jewelry" image="https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg" slug="jewelry" />
-          <Category title="Essentials" image="https://images.pexels.com/photos/1523275/pexels-photo-1523275.jpeg" slug="essentials" />
+         <Category title="Essentials" image="/febreze-vent-clip.png" slug="essentials" />
           <Category title="Comfort" image="https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg" slug="comfort" />
           <Category title="Hair & Nail" image="https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg" slug="hair-nail" />
           <Category title="Skincare" image="https://images.pexels.com/photos/3735657/pexels-photo-3735657.jpeg" slug="skincare" />

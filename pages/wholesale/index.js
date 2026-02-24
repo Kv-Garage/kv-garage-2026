@@ -100,10 +100,10 @@ export default function Wholesale() {
             <div style={cardStyle}>
               <div style={{ height: "260px" }}>
                 <img
-                  src="https://images.pexels.com/photos/1523275/pexels-photo-1523275.jpeg"
-                  alt="Essentials"
-                  style={imgCover}
-                />
+                 src="/febreze-vent-clip.png"
+                 alt="Essentials"
+                style={imgCover}
+              />
               </div>
               <div style={contentStyle}>
                 <h3>Essentials</h3>
