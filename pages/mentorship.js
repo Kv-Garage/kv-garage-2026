@@ -1,7 +1,38 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Academy() {
+  const [loading, setLoading] = useState(false);
+
+  const handleCallCheckout = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "Qualification Interview",
+          amount: 50,
+          quantity: 1,
+          type: "call",
+        }),
+      });
+
+      const session = await response.json();
+      if (!session.url) return;
+
+      window.location.href = session.url;
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -65,12 +96,13 @@ export default function Academy() {
                 $50 — credited upon acceptance.
               </p>
 
-              <Link
-                href="/contact"
-                className="block text-center bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
+              <button
+                onClick={handleCallCheckout}
+                disabled={loading}
+                className="block w-full text-center bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
               >
-                Request Interview
-              </Link>
+                {loading ? "Redirecting..." : "Request Interview"}
+              </button>
 
             </div>
 

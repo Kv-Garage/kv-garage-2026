@@ -1,4 +1,36 @@
+import { useState } from "react";
+
 export default function Trading() {
+  const [loading, setLoading] = useState(false);
+
+  const handleCallCheckout = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "Strategy Call",
+          amount: 50,
+          quantity: 1,
+          type: "call",
+        }),
+      });
+
+      const session = await response.json();
+      if (!session.url) return;
+
+      window.location.href = session.url;
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white">
 
@@ -25,9 +57,15 @@ export default function Trading() {
             <button className="bg-[#D4AF37] text-black px-8 py-3 rounded-xl font-semibold">
               Begin Learning Free
             </button>
-            <button className="border border-[#D4AF37] px-8 py-3 rounded-xl">
-              Book $50 Strategy Call
+
+            <button
+              onClick={handleCallCheckout}
+              disabled={loading}
+              className="border border-[#D4AF37] px-8 py-3 rounded-xl"
+            >
+              {loading ? "Redirecting..." : "Book $50 Strategy Call"}
             </button>
+
           </div>
         </div>
       </section>
@@ -130,8 +168,12 @@ export default function Trading() {
           with individuals committed to developing professionally.
         </p>
 
-        <button className="border border-[#D4AF37] px-10 py-4 rounded-xl text-lg">
-          Apply For Strategy Call
+        <button
+          onClick={handleCallCheckout}
+          disabled={loading}
+          className="border border-[#D4AF37] px-10 py-4 rounded-xl text-lg"
+        >
+          {loading ? "Redirecting..." : "Apply For Strategy Call"}
         </button>
       </section>
 

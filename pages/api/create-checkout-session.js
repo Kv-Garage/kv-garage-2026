@@ -8,11 +8,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, amount, quantity, cartItems } = req.body;
+    const { name, amount, quantity, cartItems, type } = req.body;
 
     let line_items = [];
 
-    // 🛒 If cart checkout
+    // 🛒 Cart checkout
     if (cartItems && Array.isArray(cartItems)) {
       line_items = cartItems.map((item) => ({
         price_data: {
@@ -24,9 +24,8 @@ export default async function handler(req, res) {
         },
         quantity: item.quantity,
       }));
-    }
-
-    // 🛍 Single product checkout
+    } 
+    // 💼 Single checkout (Call / Program)
     else {
       line_items = [
         {
@@ -45,7 +44,13 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items,
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
+
+      // 🔐 THIS IS CRITICAL
+      metadata: {
+        type: type || "product",
+      },
+
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
     });
 

@@ -1,59 +1,84 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import { useRouter } from "next/router";
 
 export default function Success() {
   const { clearCart } = useCart();
+  const router = useRouter();
+  const { session_id } = router.query;
+
+  const [isCall, setIsCall] = useState(false);
 
   useEffect(() => {
     clearCart();
     localStorage.removeItem("kv_cart");
-    setTimeout(() => {
-      window.location.reload();
-    }, 300);
-  }, []);
+
+    if (!session_id) return;
+
+    const checkSession = async () => {
+      try {
+        const res = await fetch(`/api/get-session?session_id=${session_id}`);
+        const data = await res.json();
+
+        if (data?.metadata?.type === "call") {
+          setIsCall(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    checkSession();
+  }, [session_id]);
 
   return (
     <main className="min-h-screen bg-white flex items-center justify-center px-6">
       <div className="max-w-3xl text-center">
 
         <h1 className="text-5xl font-extrabold text-green-600 mb-8 tracking-tight">
-          Payment Received
+          Payment Confirmed
         </h1>
 
-        <p className="text-xl text-gray-800 mb-4">
-          Thank you for shopping with KV Garage.
-        </p>
+        {!isCall && (
+          <>
+            <p className="text-xl text-gray-800 mb-4">
+              Thank you for shopping with KV Garage.
+            </p>
 
-        <p className="text-gray-600 mb-10">
-          Your payment is currently being processed through our secure
-          financial infrastructure. Once funds have officially cleared,
-          your order will immediately move into fulfillment.
-        </p>
+            <p className="text-gray-600 mb-10">
+              Your order is being processed.
+            </p>
 
-        <div className="bg-gray-50 border rounded-2xl p-8 mb-10 text-base text-gray-700 shadow-sm">
+            <Link
+              href="/shop"
+              className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-md"
+            >
+              Continue Shopping
+            </Link>
+          </>
+        )}
 
-          <p className="mb-2">✔ Payment processing initiated</p>
-          <p className="mb-2">✔ Funds verification in progress</p>
-          <p>✔ Order will ship once payment clears (typically 1–2 business days)</p>
+        {isCall && (
+          <>
+            <p className="text-xl text-gray-800 mb-4">
+              Your strategy call access has been unlocked.
+            </p>
 
-        </div>
+            <p className="text-gray-600 mb-10">
+              Please schedule your session below.
+            </p>
 
-        <div className="bg-gradient-to-r from-gray-50 to-white border rounded-xl p-6 mb-10 text-sm text-gray-600">
-          <p className="font-semibold mb-2">Security Notice</p>
-          <p>
-            All transactions are encrypted and processed through Stripe’s
-            PCI-DSS Level 1 compliant infrastructure. No card data is stored
-            on our servers.
-          </p>
-        </div>
-
-        <Link
-          href="/shop"
-          className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-md"
-        >
-          Continue Shopping
-        </Link>
+            <div className="rounded-2xl shadow-lg overflow-hidden">
+              <iframe
+                src="https://calendly.com/kvgarage-kvgarage/60min"
+                width="100%"
+                height="700"
+                frameBorder="0"
+              ></iframe>
+            </div>
+          </>
+        )}
 
       </div>
     </main>
