@@ -8,11 +8,33 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, amount, quantity, cartItems, type } = req.body;
+    const {
+      name,
+      amount,
+      quantity,
+      cartItems,
+      type,
+      legalAgreement,
+    } = req.body;
+
+    // 🔒 HARD STOP — Legal agreement required
+    if (!legalAgreement) {
+      return res.status(400).json({
+        error: "Legal agreement must be accepted before checkout.",
+      });
+    }
+
+    // Capture IP Address
+    const ip =
+      req.headers["x-forwarded-for"] ||
+      req.socket?.remoteAddress ||
+      "Unknown";
+
+    // Capture Browser / Device Info
+    const userAgent = req.headers["user-agent"] || "Unknown";
 
     let line_items = [];
 
-    // 🛒 Cart checkout
     if (cartItems && Array.isArray(cartItems)) {
       line_items = cartItems.map((item) => ({
         price_data: {
@@ -24,9 +46,7 @@ export default async function handler(req, res) {
         },
         quantity: item.quantity,
       }));
-    } 
-    // 💼 Single checkout (Call / Program)
-    else {
+    } else {
       line_items = [
         {
           price_data: {
@@ -45,9 +65,12 @@ export default async function handler(req, res) {
       mode: "payment",
       line_items,
 
-      // 🔐 THIS IS CRITICAL
       metadata: {
         type: type || "product",
+        legalAgreementAccepted: "true",
+        agreementTimestamp: new Date().toISOString(),
+        agreementIP: Array.isArray(ip) ? ip[0] : ip,
+        agreementUserAgent: userAgent,
       },
 
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,

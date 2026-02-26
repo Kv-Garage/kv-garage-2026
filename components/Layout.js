@@ -18,7 +18,6 @@ export default function Layout({ children }) {
       <header className="w-full bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
 
-          {/* LEFT SIDE LOGO */}
           <div>
             <h1 className="text-2xl font-extrabold text-royal tracking-wider">
               KV GARAGE
@@ -29,7 +28,6 @@ export default function Layout({ children }) {
             </p>
           </div>
 
-          {/* NAV + CART */}
           <div className="flex items-center space-x-10">
 
             <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-700 whitespace-nowrap">
@@ -47,27 +45,21 @@ export default function Layout({ children }) {
               <Link href="/contact">Contact</Link>
             </nav>
 
-            {/* CART DISPLAY */}
             <Link href="/cart">
               <div className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md text-sm font-semibold transition flex items-center space-x-2">
-
                 <span>🛒</span>
-
                 <span>{itemCount} items</span>
-
                 <span className="text-orange-600">
                   ${totalPrice.toFixed(2)}
                 </span>
-
               </div>
             </Link>
 
           </div>
-
         </div>
       </header>
 
-      {/* PAGE CONTENT */}
+      {/* CONTENT */}
       <main className="flex-grow">
         {children}
       </main>
@@ -111,7 +103,13 @@ export default function Layout({ children }) {
             <h5 className="font-semibold mb-4">Support</h5>
             <ul className="space-y-3 text-sm text-gray-500">
               <li><Link href="/contact">Contact</Link></li>
-              <li>support@kvgarage.com</li>
+              <li><Link href="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link href="/terms-and-conditions">Terms & Conditions</Link></li>
+              <li><Link href="/refund-policy">Refund Policy</Link></li>
+              <li><Link href="/risk-disclosure">Risk Disclosure</Link></li>
+              <li><Link href="/shipping-policy">Shipping Policy</Link></li>
+              <li>kvgarage@kvgarage.com</li>
+              <li>616-404-0751</li>
             </ul>
           </div>
 
@@ -127,7 +125,7 @@ export default function Layout({ children }) {
         </div>
 
         <div className="text-center text-gray-400 text-xs mt-16">
-          © 2026 KV Garage. All Rights Reserved.
+          © 2026 KV Garage LLC. All Rights Reserved.
         </div>
       </footer>
 

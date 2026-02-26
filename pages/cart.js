@@ -1,8 +1,13 @@
+// FULL cart.js replacement
+
 import Link from "next/link";
+import { useState } from "react";
 import { useCart } from "../context/CartContext";
 
 export default function CartPage() {
   const { cart, removeFromCart, clearCart } = useCart();
+  const [agreed, setAgreed] = useState(false);
+  const [error, setError] = useState("");
 
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -13,13 +18,17 @@ export default function CartPage() {
     try {
       if (cart.length === 0) return;
 
+      if (!agreed) {
+        setError("You must agree to the Terms & Policies before proceeding.");
+        return;
+      }
+
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           cartItems: cart,
+          legalAgreement: true,
         }),
       });
 
@@ -47,12 +56,11 @@ export default function CartPage() {
               href="/shop"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold transition"
             >
-              Back to Shop
+              Continue Shopping
             </Link>
           </div>
         ) : (
           <>
-            {/* CART ITEMS */}
             <div className="space-y-6 mb-10">
               {cart.map((item, index) => (
                 <div
@@ -88,100 +96,49 @@ export default function CartPage() {
                 Total: ${totalPrice.toFixed(2)}
               </h2>
 
-              {/* ENTERPRISE SECURITY PANEL */}
-              <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-8 mb-10 shadow-lg">
+              <div className="mb-8 bg-gray-50 border border-gray-200 rounded-xl p-6">
+                <label className="flex items-start space-x-3 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={() => {
+                      setAgreed(!agreed);
+                      setError("");
+                    }}
+                    className="mt-1"
+                  />
+                  <span>
+                    I agree to the{" "}
+                    <Link href="/terms-and-conditions" className="underline font-medium">
+                      Terms & Conditions
+                    </Link>
+                    ,{" "}
+                    <Link href="/refund-policy" className="underline font-medium">
+                      Refund Policy
+                    </Link>
+                    , and{" "}
+                    <Link href="/privacy-policy" className="underline font-medium">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </span>
+                </label>
 
-                <div className="flex items-center mb-6 space-x-3">
-                  <span className="text-2xl">🛡</span>
-                  <h3 className="text-xl font-bold">
-                    Enterprise-Grade Cyber Security
-                  </h3>
-                </div>
-
-                <ul className="space-y-2 text-sm text-gray-600 mb-6">
-                  <li>✔ 256-bit SSL Encryption</li>
-                  <li>✔ PCI-DSS Level 1 Compliant</li>
-                  <li>✔ Real-Time Fraud Monitoring</li>
-                  <li>✔ Zero Card Data Stored</li>
-                </ul>
-
-                {/* CLICKABLE STRIPE BADGE */}
-                <div className="flex items-center space-x-6 mb-6">
-
-                  <a
-                    href="https://stripe.com/security"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:opacity-80 transition"
-                  >
-                    <svg viewBox="0 0 48 20" className="h-6 fill-current text-purple-600">
-                      <text x="0" y="15" fontSize="14" fontWeight="700">
-                        Powered by Stripe
-                      </text>
-                    </svg>
-                  </a>
-
-                  <a
-                    href="https://www.pcisecuritystandards.org/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:opacity-80 transition"
-                  >
-                    <div className="text-xs font-semibold border px-3 py-1 rounded">
-                      PCI DSS Compliant
-                    </div>
-                  </a>
-
-                  <a
-                    href="https://en.wikipedia.org/wiki/Transport_Layer_Security"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:opacity-80 transition"
-                  >
-                    <div className="text-xs font-semibold border px-3 py-1 rounded">
-                      SSL Secured
-                    </div>
-                  </a>
-
-                </div>
-
-                {/* CARD NETWORK DISPLAY (OFFICIAL STYLE) */}
-                <div className="flex items-center space-x-6 opacity-90">
-
-                  <span className="font-bold text-blue-700">VISA</span>
-                  <span className="font-bold text-red-500">MASTERCARD</span>
-                  <span className="font-bold text-blue-600">AMEX</span>
-                  <span className="font-bold text-gray-800">DISCOVER</span>
-
-                </div>
-
-                <p className="text-xs text-gray-500 mt-6">
-                  All transactions are encrypted and securely processed through Stripe’s global payment infrastructure.
-                </p>
-
-              </div>
-
-              {/* CONFIDENCE SECTION */}
-              <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-600 mb-10">
-
-                <div>
-                  <h4 className="font-semibold mb-2">🚚 Fast Fulfillment</h4>
-                  <p>Orders processed within 24–72 hours.</p>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">📦 Order Protection</h4>
-                  <p>Tracking provided on all shipments.</p>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">⭐ Satisfaction Promise</h4>
-                  <p>Built for serious operators.</p>
-                </div>
-
+                {error && (
+                  <p className="text-red-600 text-sm mt-3">
+                    {error}
+                  </p>
+                )}
               </div>
 
               <div className="flex space-x-4">
+
+                <Link
+                  href="/shop"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold transition"
+                >
+                  Continue Shopping
+                </Link>
 
                 <button
                   onClick={clearCart}
