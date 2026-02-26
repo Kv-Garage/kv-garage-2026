@@ -6,9 +6,11 @@ import { useRouter } from 'next/router'
 
 export default function MyApp({ Component, pageProps }) {
 
+  const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
   const [passwordInput, setPasswordInput] = useState("")
-  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   const SITE_PASSWORD = "KVgarage2026!"
 
@@ -17,18 +19,29 @@ export default function MyApp({ Component, pageProps }) {
     if (storedAuth === "true") {
       setAuthorized(true)
     }
+    setLoading(false)
   }, [])
 
-  // Allow Stripe success + cancel pages to load without block
   const publicRoutes = ["/success", "/cancel"]
   const isPublicRoute = publicRoutes.includes(router.pathname)
+
+  const handleUnlock = () => {
+    if (passwordInput.trim() === SITE_PASSWORD) {
+      localStorage.setItem("kv_site_auth", "true")
+      setAuthorized(true)
+    } else {
+      setError("Incorrect password. Please try again.")
+    }
+  }
+
+  if (loading) return null
 
   if (!authorized && !isPublicRoute) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white px-6">
         <div className="max-w-md w-full text-center">
 
-          <h1 className="text-3xl font-bold text-royal mb-6">
+          <h1 className="text-3xl font-bold mb-6">
             Private Access
           </h1>
 
@@ -40,20 +53,24 @@ export default function MyApp({ Component, pageProps }) {
             type="password"
             placeholder="Enter site password"
             value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
+            onChange={(e) => {
+              setPasswordInput(e.target.value)
+              setError("")
+            }}
             className="border w-full px-4 py-3 rounded-md mb-4"
           />
 
+          {error && (
+            <p className="text-red-500 text-sm mb-4">
+              {error}
+            </p>
+          )}
+
           <button
-            onClick={() => {
-              if (passwordInput === SITE_PASSWORD) {
-                localStorage.setItem("kv_site_auth", "true")
-                setAuthorized(true)
-              }
-            }}
-            className="bg-royal text-white px-6 py-3 rounded-md font-semibold w-full"
+            onClick={handleUnlock}
+            className="bg-black text-white px-6 py-3 rounded-md font-semibold w-full"
           >
-            Enter
+            Confirm Access
           </button>
 
         </div>
