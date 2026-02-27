@@ -1,86 +1,51 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   try {
-    const {
-      name,
-      amount,
-      quantity,
-      cartItems,
-      type,
-      legalAgreement,
-    } = req.body;
+    console.log("ENV KEY:", process.env.STRIPE_SECRET_KEY);
 
-    // 🔒 HARD STOP — Legal agreement required
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({
+        error: "Stripe secret key is missing in production",
+      });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    const { name, amount, quantity, legalAgreement } = req.body;
+
     if (!legalAgreement) {
       return res.status(400).json({
         error: "Legal agreement must be accepted before checkout.",
       });
     }
 
-    // Capture IP Address
-    const ip =
-      req.headers["x-forwarded-for"] ||
-      req.socket?.remoteAddress ||
-      "Unknown";
-
-    // Capture Browser / Device Info
-    const userAgent = req.headers["user-agent"] || "Unknown";
-
-    let line_items = [];
-
-    if (cartItems && Array.isArray(cartItems)) {
-      line_items = cartItems.map((item) => ({
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name,
-          },
-          unit_amount: Math.round(item.price * 100),
-        },
-        quantity: item.quantity,
-      }));
-    } else {
-      line_items = [
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [
         {
           price_data: {
             currency: "usd",
-            product_data: {
-              name: name,
-            },
+            product_data: { name },
             unit_amount: Math.round(amount * 100),
           },
-          quantity: quantity,
+          quantity,
         },
-      ];
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items,
-
-      metadata: {
-        type: type || "product",
-        legalAgreementAccepted: "true",
-        agreementTimestamp: new Date().toISOString(),
-        agreementIP: Array.isArray(ip) ? ip[0] : ip,
-        agreementUserAgent: userAgent,
-      },
-
+      ],
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
     });
 
-    res.status(200).json({ url: session.url });
+    return res.status(200).json({ url: session.url });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("STRIPE ERROR:", error);
+    return res.status(500).json({
+      error: error.message || "Server error",
+    });
   }
 }
