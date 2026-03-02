@@ -16,16 +16,27 @@ export default function Contact() {
           name: "Strategy Call",
           amount: 50,
           quantity: 1,
-          type: "call",
+          legalAgreement: true, // ✅ REQUIRED
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Checkout Error:", errorData);
+        return;
+      }
+
       const session = await response.json();
-      if (!session.url) return;
+
+      if (!session.url) {
+        console.error("No session URL returned");
+        return;
+      }
 
       window.location.href = session.url;
+
     } catch (err) {
-      console.error(err);
+      console.error("Checkout failed:", err);
     } finally {
       setLoading(false);
     }
