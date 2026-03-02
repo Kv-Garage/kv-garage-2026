@@ -18,14 +18,21 @@ export default function Academy() {
           name: "Qualification Interview",
           amount: 50,
           quantity: 1,
-          type: "call",
+          legalAgreement: true,
         }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Checkout Error:", errorData);
+        return;
+      }
 
       const session = await response.json();
       if (!session.url) return;
 
       window.location.href = session.url;
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -109,7 +116,6 @@ export default function Academy() {
           </div>
         </section>
 
-
         {/* ================= LIBRARY ================= */}
         <section className="py-40 border-b border-[#1C2233]">
           <div className="max-w-7xl mx-auto px-6">
@@ -160,7 +166,6 @@ export default function Academy() {
           </div>
         </section>
 
-
         {/* ================= CORE PROGRAM ================= */}
         <section className="py-40 border-b border-[#1C2233] text-center">
           <div className="max-w-4xl mx-auto px-6">
@@ -190,7 +195,6 @@ export default function Academy() {
 
           </div>
         </section>
-
 
         {/* ================= PRIVATE MENTORSHIP ================= */}
         <section className="py-40 border-b border-[#1C2233] text-center">
@@ -225,7 +229,6 @@ export default function Academy() {
 
           </div>
         </section>
-
 
         {/* ================= ADVISORY ================= */}
         <section className="py-40 text-center">

@@ -2,8 +2,6 @@ import Stripe from "stripe";
 
 export default async function handler(req, res) {
   try {
-    console.log("ENV KEY:", process.env.STRIPE_SECRET_KEY);
-
     if (!process.env.STRIPE_SECRET_KEY) {
       return res.status(500).json({
         error: "Stripe secret key is missing in production",
@@ -26,6 +24,7 @@ export default async function handler(req, res) {
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+
       line_items: [
         {
           price_data: {
@@ -36,6 +35,12 @@ export default async function handler(req, res) {
           quantity,
         },
       ],
+
+      // 🚨 FORCE IT
+      metadata: {
+        type: "call",
+      },
+
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
     });
