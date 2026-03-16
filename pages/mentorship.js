@@ -54,7 +54,7 @@ export default function Academy() {
 
         {/* ================= HERO ================= */}
         <section className="py-40 border-b border-[#1C2233]">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-20 items-start">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-20 items-start">
 
             {/* LEFT */}
             <div className="md:col-span-2">
@@ -63,7 +63,7 @@ export default function Academy() {
                 Institutional Operator Development
               </p>
 
-              <h1 className="text-6xl font-semibold leading-tight mb-10">
+              <h1 className="text-4xl md:text-6xl font-semibold leading-tight mb-10">
                 KV Garage Academy
               </h1>
 

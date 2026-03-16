@@ -124,7 +124,7 @@ export default function Markets() {
         </h2>
 
         <a href="/trading">
-          <button className="bg-[#D4AF37] text-black px-8 py-3 rounded-xl font-semibold">
+          <button className="bg-[#D4AF37] text-black px-6 md:px-8 py-3 rounded-xl font-semibold">
             Explore Trading Division
           </button>
         </a>

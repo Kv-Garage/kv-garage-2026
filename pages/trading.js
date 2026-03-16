@@ -143,7 +143,7 @@ export default function Trading() {
           a structured roadmap to improve performance.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-8 text-gray-300">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-gray-300">
           <div>Performance Analytics</div>
           <div>Behavior Pattern Detection</div>
           <div>Custom Learning Roadmap</div>

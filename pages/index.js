@@ -49,7 +49,7 @@ export default function Home() {
           Divisions
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
 
           <Link href="/wholesale" className="group">
             <div className="rounded-2xl overflow-hidden bg-[#111827] hover:bg-[#161F2E] transition shadow-lg">

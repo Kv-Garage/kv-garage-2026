@@ -40,7 +40,7 @@ export default function Shop() {
         </section>
 
         {/* CATEGORY QUICK NAV */}
-        <section className="max-w-7xl mx-auto px-8 pb-12">
+        <section className="max-w-7xl mx-auto px-6 md:px-6 md:px-8 pb-12">
           <div className="flex flex-wrap gap-4 text-sm font-medium text-gray-700">
             {[
               "Nails & Beauty",
@@ -62,7 +62,7 @@ export default function Shop() {
         </section>
 
         {/* PRODUCT GRID */}
-        <section className="max-w-7xl mx-auto px-8 pb-24">
+        <section className="max-w-7xl mx-auto px-6 md:px-8 pb-24">
           <div className="grid md:grid-cols-4 gap-10">
             {products.map((product) => (
               <Link
@@ -92,14 +92,14 @@ export default function Shop() {
 
         {/* LIMITED DROPS */}
         <section className="bg-gray-50 py-20">
-          <div className="max-w-7xl mx-auto px-8">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
             <h2 className="text-3xl font-bold text-royal mb-6">
               Limited Time Drops
             </h2>
 
             <div className="w-16 h-[3px] bg-gold mb-10"></div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3gap-8">
               <div className="border rounded-xl p-8 bg-white hover:shadow-lg transition">
                 <h3 className="font-semibold text-lg mb-3">
                   Streamline Pallet Drop
@@ -140,14 +140,14 @@ export default function Shop() {
         </section>
 
         {/* REVIEWS PREVIEW */}
-        <section className="max-w-7xl mx-auto px-8 py-20">
+        <section className="max-w-7xl mx-auto px-6 md:px-8 py-20">
           <h2 className="text-3xl font-bold text-royal mb-6">
             Trusted By Buyers Nationwide
           </h2>
 
           <div className="w-16 h-[3px] bg-gold mb-10"></div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1,2,3].map((review) => (
               <div key={review} className="border rounded-xl p-6">
                 <div className="bg-gray-100 h-40 mb-4 flex items-center justify-center text-gray-400">

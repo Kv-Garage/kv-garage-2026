@@ -26,28 +26,27 @@ export default function WholesaleCategoryPage() {
           Wholesale distribution inventory for {formattedTitle}.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-12">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-12">
 
-          <div className="bg-[#111827] p-6 rounded-xl shadow-lg">
-            <div className="h-48 bg-gray-700 rounded-lg mb-4"></div>
-            <h3 className="text-lg font-semibold mb-2">Product A</h3>
-            <p className="text-gray-400">$199</p>
-          </div>
+  <div className="bg-[#111827] p-6 rounded-xl shadow-lg">
+    <div className="h-48 bg-gray-700 rounded-lg mb-4"></div>
+    <h3 className="text-lg font-semibold mb-2">Product A</h3>
+    <p className="text-gray-400">$199</p>
+  </div>
 
-          <div className="bg-[#111827] p-6 rounded-xl shadow-lg">
-            <div className="h-48 bg-gray-700 rounded-lg mb-4"></div>
-            <h3 className="text-lg font-semibold mb-2">Product B</h3>
-            <p className="text-gray-400">$299</p>
-          </div>
+  <div className="bg-[#111827] p-6 rounded-xl shadow-lg">
+    <div className="h-48 bg-gray-700 rounded-lg mb-4"></div>
+    <h3 className="text-lg font-semibold mb-2">Product B</h3>
+    <p className="text-gray-400">$299</p>
+  </div>
 
-          <div className="bg-[#111827] p-6 rounded-xl shadow-lg">
-            <div className="h-48 bg-gray-700 rounded-lg mb-4"></div>
-            <h3 className="text-lg font-semibold mb-2">Product C</h3>
-            <p className="text-gray-400">$399</p>
-          </div>
+  <div className="bg-[#111827] p-6 rounded-xl shadow-lg">
+    <div className="h-48 bg-gray-700 rounded-lg mb-4"></div>
+    <h3 className="text-lg font-semibold mb-2">Product C</h3>
+    <p className="text-gray-400">$399</p>
+  </div>
 
-        </div>
-
+</div>
       </div>
 
     </div>

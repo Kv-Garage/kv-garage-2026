@@ -130,7 +130,7 @@ export default function Business() {
         </h2>
 
         <a href="/mentorship">
-          <button className="bg-[#D4AF37] text-black px-8 py-3 rounded-xl font-semibold">
+          <button className="bg-[#D4AF37] text-black px-6 md:px-8 py-3 rounded-xl font-semibold">
             Explore Mentorship
           </button>
         </a>

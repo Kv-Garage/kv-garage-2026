@@ -16,14 +16,14 @@ export default function Affiliate() {
 
         {/* ================= HERO ================= */}
         <section className="py-40 border-b border-[#1C2233]">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-20 items-start">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-20 items-start">
 
             <div className="md:col-span-2">
               <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
                 Private Distribution Network
               </p>
 
-              <h1 className="text-6xl font-semibold leading-tight mb-10">
+              <h1 className="text-4xl md:text-6xl font-semibold leading-tight mb-10">
                 Structured Partner Access
               </h1>
 

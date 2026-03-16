@@ -47,7 +47,7 @@ export default function Deals() {
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-6 py-28 text-center">
 
-        <h1 className="text-5xl md:text-6xl font-extrabold text-royal mb-6 tracking-tight">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-royal mb-6 tracking-tight">
           Business Infrastructure Engineering
         </h1>
 
@@ -74,7 +74,7 @@ export default function Deals() {
 
 
       {/* WHAT WE BUILD */}
-      <section className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-12">
+      <section className="max-w-6xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-3 gap-12">
 
         <div>
           <h3 className="font-bold text-lg mb-3">Custom Websites</h3>
@@ -140,7 +140,7 @@ export default function Deals() {
         </div>
 
 
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           <div className="border border-gray-200 rounded-xl p-8">
             <h3 className="font-bold text-xl mb-4">Foundation Build</h3>

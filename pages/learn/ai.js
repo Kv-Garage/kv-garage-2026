@@ -132,7 +132,7 @@ export default function AI() {
         </h2>
 
         <a href="/edgepilot">
-          <button className="bg-[#D4AF37] text-black px-8 py-3 rounded-xl font-semibold">
+          <button className="bg-[#D4AF37] text-black px-6 md:px-8 py-3 rounded-xl font-semibold">
             Discover EdgePilot
           </button>
         </a>
