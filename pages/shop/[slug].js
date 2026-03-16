@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { calculatePrice } from "../../lib/pricing";
 import { useCart } from "../../context/CartContext";
@@ -32,9 +32,11 @@ export default function ProductPage() {
     ],
   };
 
-  if (!selectedImage) {
-    setSelectedImage(product.images[0]);
-  }
+  useEffect(() => {
+    if (product.images && product.images.length > 0) {
+      setSelectedImage(product.images[0]);
+    }
+  }, []);
 
   const pricePerUnit = calculatePrice(product.cost, quantity);
   const totalPrice = pricePerUnit * quantity;
@@ -99,15 +101,18 @@ export default function ProductPage() {
             ← Back to Shop
           </Link>
 
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
 
+            {/* LEFT SIDE - IMAGES */}
             <div>
               <div className="bg-gray-100 h-96 flex items-center justify-center rounded-lg mb-4">
-                <img
-                  src={selectedImage}
-                  alt={product.name}
-                  className="h-full object-contain"
-                />
+                {selectedImage && (
+                  <img
+                    src={selectedImage}
+                    alt={product.name}
+                    className="h-full object-contain"
+                  />
+                )}
               </div>
 
               <div className="flex gap-4">
@@ -117,12 +122,17 @@ export default function ProductPage() {
                     onClick={() => setSelectedImage(img)}
                     className="border rounded-md overflow-hidden w-20 h-20"
                   >
-                    <img src={img} alt="" className="object-cover h-full w-full" />
+                    <img
+                      src={img}
+                      alt=""
+                      className="object-cover h-full w-full"
+                    />
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* RIGHT SIDE - PRODUCT INFO */}
             <div>
               <h1 className="text-3xl font-bold text-royal mb-4">
                 {product.name}

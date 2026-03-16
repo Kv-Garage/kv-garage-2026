@@ -7,43 +7,50 @@ export default function Success() {
   const { clearCart } = useCart();
   const router = useRouter();
 
-  const [isCall, setIsCall] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showCalendly, setShowCalendly] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
 
     const { session_id } = router.query;
 
-    if (!session_id) return;
+    if (!session_id) {
+      setLoading(false);
+      return;
+    }
 
-    clearCart();
-    localStorage.removeItem("kv_cart");
-
-    const checkSession = async () => {
+    const verifySession = async () => {
       try {
         const res = await fetch(`/api/get-session?session_id=${session_id}`);
-        const data = await res.json();
+        const session = await res.json();
 
-        console.log("SESSION DATA:", data);
+        console.log("SESSION:", session);
 
-        if (data?.metadata?.type === "call") {
-          setIsCall(true);
+        if (session?.payment_status === "paid") {
+          clearCart();
+          localStorage.removeItem("kv_cart");
+
+          // SIMPLE RULE:
+          // If the payment was $50 (5000 cents), unlock Calendly
+          if (session?.amount_total === 5000) {
+            setShowCalendly(true);
+          }
         }
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
       }
+
+      setLoading(false);
     };
 
-    checkSession();
-  }, [router.isReady, router.query.session_id]);
+    verifySession();
+  }, [router.isReady]);
 
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <p>Verifying payment...</p>
       </main>
     );
   }
@@ -52,29 +59,29 @@ export default function Success() {
     <main className="min-h-screen bg-white flex items-center justify-center px-6">
       <div className="max-w-3xl text-center">
 
-        <h1 className="text-5xl font-extrabold text-green-600 mb-8 tracking-tight">
+        <h1 className="text-5xl font-extrabold text-green-600 mb-8">
           Payment Confirmed
         </h1>
 
-        {!isCall && (
+        {!showCalendly && (
           <>
-            <p className="text-xl text-gray-800 mb-4">
-              Thank you for your order.
+            <p className="text-xl text-gray-800 mb-6">
+              Thank you for your purchase.
             </p>
 
             <Link
-              href="/shop"
+              href="/"
               className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-md"
             >
-              Continue Shopping
+              Return Home
             </Link>
           </>
         )}
 
-        {isCall && (
+        {showCalendly && (
           <>
-            <p className="text-xl text-gray-800 mb-4">
-              Your strategy call access has been unlocked.
+            <p className="text-xl text-gray-800 mb-6">
+              Step 2 of 2 — Schedule Your Strategy Session
             </p>
 
             <div className="rounded-2xl shadow-lg overflow-hidden">

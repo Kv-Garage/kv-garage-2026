@@ -67,7 +67,7 @@ export default function Shop() {
             {products.map((product) => (
               <Link
                 key={product.slug}
-                href={`/shop/${product.slug}`}
+               href={`/shop/${product.slug}`}
                 className="group border border-gray-200 rounded-xl p-6 hover:shadow-xl transition duration-300"
               >
                 <div className="bg-gray-100 aspect-square rounded-lg flex items-center justify-center mb-6">
