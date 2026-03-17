@@ -1,103 +1,157 @@
 import Link from "next/link";
-import { useState } from "react";
 import { useCart } from "../context/CartContext";
 
 export default function Layout({ children }) {
-
   const { cart } = useCart();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const itemCount = cart.length;
-
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-900">
+    <div className="min-h-screen flex flex-col bg-[#05070D] text-white relative overflow-hidden">
 
-      {/* 🔥 STICKY HEADER */}
-      <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
+      {/* 🔥 GLOBAL GLOW SYSTEM */}
+      <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-[#D4AF37]/20 blur-[120px] rounded-full"></div>
+      <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-blue-500/20 blur-[120px] rounded-full"></div>
+      <div className="absolute top-[40%] left-[30%] w-[400px] h-[400px] bg-purple-500/10 blur-[120px] rounded-full"></div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-4 flex justify-between items-center">
+      {/* ================= HEADER ================= */}
+      <header className="w-full border-b border-[#1C2233] bg-[#05070D]/80 backdrop-blur sticky top-0 z-50">
+
+        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
 
           {/* LOGO */}
           <Link href="/">
-            <h1 className="text-xl md:text-2xl font-bold cursor-pointer">
-              KV GARAGE
-            </h1>
+            <div className="cursor-pointer">
+
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-[#D4AF37] rounded-full animate-pulse"></div>
+
+                <h1 className="text-2xl font-bold tracking-wide">
+                  KV GARAGE
+                </h1>
+              </div>
+
+              <div className="w-12 h-[2px] bg-[#D4AF37] mt-1"></div>
+
+            </div>
           </Link>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
+          {/* NAV */}
+          <nav className="hidden md:flex items-center space-x-8 text-sm text-gray-300 whitespace-nowrap">
 
             <Link href="/">Home</Link>
-            <Link href="/shop">Retail</Link>
             <Link href="/wholesale">Wholesale</Link>
-            <Link href="/trading">Trading</Link>
-
-            {/* 🔥 CORE MONEY PAGES */}
-            <Link href="/learn">Learn</Link>
+            <Link href="/shop">Retail</Link>
+            <Link href="/private-preview">Private Preview</Link>
             <Link href="/mentorship">Mentorship</Link>
             <Link href="/affiliate">Affiliate</Link>
-
+            <Link href="/trading">Trading</Link>
+            <Link href="/learn">Learn</Link>
             <Link href="/deals">Deals</Link>
             <Link href="/contact">Contact</Link>
 
           </nav>
 
-          {/* RIGHT SIDE */}
-          <div className="flex items-center space-x-4">
+          {/* CART */}
+          <Link href="/cart">
+            <div className="cursor-pointer bg-[#111827] px-4 py-2 rounded-md text-sm font-semibold flex items-center space-x-2 hover:border hover:border-[#D4AF37] transition">
+              <span>🛒</span>
+              <span>{itemCount}</span>
+              <span className="text-[#D4AF37]">
+                ${totalPrice.toFixed(2)}
+              </span>
+            </div>
+          </Link>
 
-            {/* CART */}
-            <Link href="/cart">
-              <div className="cursor-pointer bg-gray-100 px-3 py-2 rounded-md text-sm">
-                🛒 {itemCount} (${totalPrice.toFixed(2)})
-              </div>
-            </Link>
+        </div>
 
-            {/* MOBILE MENU BUTTON */}
-            <button
-              className="md:hidden text-2xl"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              ☰
-            </button>
+      </header>
 
+      {/* ================= MAIN ================= */}
+      <main className="flex-grow relative z-10">
+        {children}
+      </main>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="border-t border-[#1C2233] pt-20 pb-12 mt-20 relative z-10">
+
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-5 gap-12">
+
+          {/* BRAND */}
+          <div>
+            <h4 className="font-bold text-xl mb-4">
+              KV GARAGE
+            </h4>
+
+            <div className="w-12 h-[2px] bg-[#D4AF37] mb-4"></div>
+
+            <p className="text-gray-500 text-sm leading-relaxed mb-4">
+              Structured supply, retail execution, and scalable business systems.
+            </p>
+
+            <p className="text-gray-400 text-sm">
+              kvgarage@kvgarage.com
+            </p>
+
+            <p className="text-gray-400 text-sm">
+              616-404-0751
+            </p>
+          </div>
+
+          {/* CORE */}
+          <div>
+            <h5 className="font-semibold mb-4">Core</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/">Home</Link></li>
+              <li><Link href="/wholesale">Wholesale</Link></li>
+              <li><Link href="/shop">Retail</Link></li>
+              <li><Link href="/deals">Deals</Link></li>
+            </ul>
+          </div>
+
+          {/* ECOSYSTEM */}
+          <div>
+            <h5 className="font-semibold mb-4">Ecosystem</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/private-preview">Private Preview</Link></li>
+              <li><Link href="/mentorship">Mentorship</Link></li>
+              <li><Link href="/affiliate">Affiliate</Link></li>
+              <li><Link href="/trading">Trading</Link></li>
+              <li><Link href="/learn">Learn</Link></li>
+            </ul>
+          </div>
+
+          {/* COMPANY */}
+          <div>
+            <h5 className="font-semibold mb-4">Company</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/about">About</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
+            </ul>
+          </div>
+
+          {/* LEGAL */}
+          <div>
+            <h5 className="font-semibold mb-4">Legal</h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              <li><Link href="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link href="/terms-and-conditions">Terms</Link></li>
+              <li><Link href="/refund-policy">Refund Policy</Link></li>
+              <li><Link href="/shipping-policy">Shipping</Link></li>
+            </ul>
           </div>
 
         </div>
 
-        {/* 🔥 MOBILE NAV */}
-        {menuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200">
+        <div className="text-center text-gray-600 text-xs mt-16">
+          © 2026 KV Garage LLC. All Rights Reserved.
+        </div>
 
-            <div className="flex flex-col px-6 py-4 space-y-4 text-gray-700">
-
-              <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
-              <Link href="/shop" onClick={() => setMenuOpen(false)}>Retail</Link>
-              <Link href="/wholesale" onClick={() => setMenuOpen(false)}>Wholesale</Link>
-              <Link href="/trading" onClick={() => setMenuOpen(false)}>Trading</Link>
-
-              <Link href="/learn" onClick={() => setMenuOpen(false)}>Learn</Link>
-              <Link href="/mentorship" onClick={() => setMenuOpen(false)}>Mentorship</Link>
-              <Link href="/affiliate" onClick={() => setMenuOpen(false)}>Affiliate</Link>
-
-              <Link href="/deals" onClick={() => setMenuOpen(false)}>Deals</Link>
-              <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
-
-            </div>
-
-          </div>
-        )}
-
-      </header>
-
-      {/* PAGE CONTENT */}
-      <main className="flex-grow">
-        {children}
-      </main>
+      </footer>
 
     </div>
   );

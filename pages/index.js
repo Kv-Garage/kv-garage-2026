@@ -1,200 +1,256 @@
+import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
+
+  const [budget, setBudget] = useState(500);
+  const [type, setType] = useState("glass");
+
+  const products = [
+    {
+      name: "Luxury Watch",
+      price: 120,
+      slug: "luxury-watch",
+      image: "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg"
+    },
+    {
+      name: "Skincare Kit",
+      price: 45,
+      slug: "skincare-kit",
+      image: "https://images.pexels.com/photos/3735657/pexels-photo-3735657.jpeg"
+    },
+    {
+      name: "Nail Kit",
+      price: 35,
+      slug: "nail-kit",
+      image: "https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg"
+    },
+    {
+      name: "Bulk Inventory",
+      price: 300,
+      slug: "bulk-pack",
+      image: "https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg"
+    }
+  ];
+
+  const pricing = {
+    glass: { cost: 10, sell: 30 },
+    accessories: { cost: 5, sell: 20 },
+    jewelry: { cost: 8, sell: 35 },
+  };
+
+  const cost = pricing[type].cost;
+  const sell = pricing[type].sell;
+
+  const units = Math.floor(budget / cost);
+  const revenue = units * sell;
+  const profit = revenue - budget;
+  const projected = profit * 6;
+
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-white">
+    <>
+      <Head>
+        <title>KV Garage | Supply → Systems → Revenue</title>
+      </Head>
 
-      {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-20 items-center">
+      <div className="min-h-screen text-white relative overflow-hidden">
 
-        <div>
-          <h1 className="text-5xl font-bold leading-tight mb-6">
-            Structured Operations.<br />
-            Disciplined Growth.
-          </h1>
+        {/* GLOBAL GLOW */}
+        <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-[#D4AF37]/25 blur-[140px] rounded-full"></div>
 
-          <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-            Wholesale distribution, retail execution, and capital alignment managed through controlled systems and measurable standards.
-          </p>
+        {/* ================= HERO ================= */}
+        <section className="py-20 border-b border-[#1C2233]">
 
-          <Link href="/wholesale">
-            <button className="bg-[#D4AF37] text-black px-10 py-4 rounded-xl font-semibold hover:opacity-90 transition">
-              Explore Operations
-            </button>
-          </Link>
-        </div>
+          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
 
-        <div>
-          <img
-            src="https://images.pexels.com/photos/6169668/pexels-photo-6169668.jpeg"
-            alt="Warehouse Operations"
-            className="rounded-2xl shadow-2xl object-cover w-full h-[480px]"
-          />
-        </div>
-      </section>
+            <div>
+              <h1 className="text-5xl font-semibold mb-6">
+                Source Inventory → Sell → Scale
+              </h1>
 
-      {/* STRATEGIC BAR */}
-      <section className="border-t border-b border-gray-800 py-8 text-center text-gray-400">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-6 text-sm tracking-wide">
-          <p>Wholesale & Distribution</p>
-          <p>Capital Allocation</p>
-          <p>Founder-Led Oversight</p>
-          <p>Operational Discipline</p>
-        </div>
-      </section>
+              <p className="text-gray-400 mb-8">
+                Wholesale supply and scalable systems.
+              </p>
 
-      {/* DIVISIONS */}
-      <section className="max-w-7xl mx-auto px-6 py-28">
-        <h2 className="text-3xl font-semibold text-center mb-20 text-[#D4AF37]">
-          Divisions
-        </h2>
+              <div className="flex gap-4">
+                <Link href="/wholesale">
+                  <button className="bg-[#D4AF37] text-black px-8 py-4 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.6)]">
+                    Enter Wholesale
+                  </button>
+                </Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-
-          <Link href="/wholesale" className="group">
-            <div className="rounded-2xl overflow-hidden bg-[#111827] hover:bg-[#161F2E] transition shadow-lg">
-              <img
-                src="https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg"
-                alt="Wholesale"
-                className="w-full h-72 object-cover group-hover:scale-105 transition"
-              />
-              <div className="p-8">
-                <h3 className="text-xl font-semibold mb-3 text-white">Wholesale</h3>
-                <p className="text-gray-400">
-                  Bulk distribution and structured supply relationships.
-                </p>
+                <Link href="/shop">
+                  <button className="border border-[#D4AF37] px-8 py-4 rounded-xl">
+                    Shop Retail
+                  </button>
+                </Link>
               </div>
             </div>
-          </Link>
 
-          <Link href="/deals" className="group">
-            <div className="rounded-2xl overflow-hidden bg-[#111827] hover:bg-[#161F2E] transition shadow-lg">
-              <img
-                src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg"
-                alt="Capital"
-                className="w-full h-72 object-cover group-hover:scale-105 transition"
-              />
-              <div className="p-8">
-                <h3 className="text-xl font-semibold mb-3 text-white">Capital</h3>
-                <p className="text-gray-400">
-                  Strategic alignment and controlled deal execution.
-                </p>
-              </div>
+            {/* PRODUCT COLLAGE */}
+            <div className="grid grid-cols-3 gap-4">
+              {products.map((item, i) => (
+                <Link key={i} href={`/shop/${item.slug}`}>
+                  <img
+                    src={item.image}
+                    className="h-28 w-full object-cover rounded-xl hover:scale-105 transition"
+                  />
+                </Link>
+              ))}
             </div>
-          </Link>
 
-          <Link href="/learn" className="group">
-            <div className="rounded-2xl overflow-hidden bg-[#111827] hover:bg-[#161F2E] transition shadow-lg">
-              <img
-                src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg"
-                alt="Education"
-                className="w-full h-72 object-cover group-hover:scale-105 transition"
-              />
-              <div className="p-8">
-                <h3 className="text-xl font-semibold mb-3 text-white">Education</h3>
-                <p className="text-gray-400">
-                  Execution-based business and market instruction.
-                </p>
-              </div>
+          </div>
+        </section>
+
+        {/* ================= CONVEYOR BELT ================= */}
+        <section className="py-16 border-t border-[#1C2233] overflow-hidden">
+
+          <div className="max-w-7xl mx-auto px-6 mb-6">
+            <h2 className="text-xl text-[#D4AF37]">
+              Trending Inventory
+            </h2>
+          </div>
+
+          <div className="relative">
+
+            <div className="flex gap-6 animate-scroll">
+
+              {[...products, ...products].map((item, i) => (
+                <Link key={i} href={`/shop/${item.slug}`}>
+                  <div className="min-w-[220px] bg-[#111827] rounded-xl overflow-hidden border border-[#1C2233]
+                  hover:shadow-[0_0_40px_rgba(212,175,55,0.6)] transition">
+
+                    <img src={item.image} className="h-40 w-full object-cover"/>
+
+                    <div className="p-4">
+                      <p>{item.name}</p>
+                      <p className="text-gray-400 text-sm">${item.price}</p>
+                    </div>
+
+                  </div>
+                </Link>
+              ))}
+
             </div>
-          </Link>
 
-        </div>
-      </section>
+          </div>
 
-      {/* FOSTER TO FOUNDER */}
-      <section className="py-28 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
+        </section>
 
-          <div>
+        {/* ================= PROFIT TOOL ================= */}
+        <section className="py-24 border-t border-[#1C2233] text-center relative">
+
+          {/* 🔥 BACKGROUND SYSTEM VISUAL */}
+          <div className="absolute inset-0 opacity-10">
             <img
-              src="/founder.jpg"
-              alt="Founder"
-              className="rounded-2xl shadow-2xl object-cover w-full h-[500px]"
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71"
+              className="w-full h-full object-cover"
             />
           </div>
 
-          <div>
-            <h2 className="text-3xl font-semibold mb-6 text-[#D4AF37]">
-              Foster to Founder
+          <div className="relative z-10">
+
+            <h2 className="text-3xl mb-6 text-[#D4AF37]">
+              Profit System Tool
             </h2>
 
-            <p className="text-gray-400 leading-relaxed mb-6">
-              Systems were built from instability. Discipline replaced chaos.
-              Execution replaced circumstance.
-            </p>
-
-            <p className="text-gray-400 leading-relaxed mb-8">
-              Retail, wholesale, capital allocation, and education operate under
-              defined structure and measurable performance standards.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Link href="/about">
-                <button className="border border-[#D4AF37] px-8 py-3 rounded-xl hover:bg-[#D4AF37] hover:text-black transition">
-                  Full Profile
+            <div className="flex justify-center gap-4 mb-6">
+              {["glass", "accessories", "jewelry"].map((t) => (
+                <button key={t} onClick={() => setType(t)}
+                  className={`px-4 py-2 rounded ${
+                    type === t ? "bg-[#D4AF37] text-black" : "border"
+                  }`}>
+                  {t}
                 </button>
-              </Link>
-
-              <Link href="/wholesale">
-                <button className="bg-[#D4AF37] text-black px-8 py-3 rounded-xl font-semibold">
-                  Wholesale Division
-                </button>
-              </Link>
-
-              <Link href="/shop">
-                <button className="border border-gray-600 px-8 py-3 rounded-xl hover:border-[#D4AF37] hover:text-[#D4AF37] transition">
-                  Retail Division
-                </button>
-              </Link>
+              ))}
             </div>
+
+            <input
+              type="number"
+              value={budget}
+              onChange={(e) => setBudget(Number(e.target.value))}
+              className="bg-[#111827] px-6 py-4 rounded-xl mb-10 text-center"
+            />
+
+            <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+
+              <Stat label="Units" value={units} />
+              <Stat label="Revenue" value={`$${revenue}`} />
+              <Stat label="Profit" value={`$${profit}`} />
+              <Stat label="6 Month" value={`$${projected}`} />
+
+            </div>
+
           </div>
 
-        </div>
-      </section>
+        </section>
 
-      {/* DISTRIBUTION CATEGORIES */}
-      <section className="max-w-7xl mx-auto px-6 py-28 border-t border-gray-800">
-        <h2 className="text-3xl font-semibold text-center mb-20 text-[#D4AF37]">
-          Distribution Categories
-        </h2>
+        {/* ================= SERVICES ================= */}
+        <section className="py-24 border-t border-[#1C2233]">
 
-        <div className="grid md:grid-cols-4 gap-12">
+          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10">
 
-          <Category title="Tech Accessories" image="https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=1200&auto=format&fit=crop" slug="tech-accessories" />
-          <Category title="Glass & Lifestyle" image="/bong.webp" slug="glass-lifestyle" />
-          <Category title="Jewelry" image="https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg" slug="jewelry" />
-         <Category title="Essentials" image="/febreze-vent-clip.png" slug="essentials" />
-          <Category title="Comfort" image="https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg" slug="comfort" />
-          <Category title="Hair & Nail" image="https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg" slug="hair-nail" />
-          <Category title="Skincare" image="https://images.pexels.com/photos/3735657/pexels-photo-3735657.jpeg" slug="skincare" />
-          <Category title="Schooling Products" image="https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg" slug="schooling-products" />
+            <Link href="/mentorship">
+              <div className="relative p-8 border rounded-xl overflow-hidden
+              hover:shadow-[0_0_60px_rgba(212,175,55,0.7)] transition">
 
-        </div>
-      </section>
+                <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg"
+                  className="absolute inset-0 w-full h-full object-cover opacity-20"/>
 
-    </div>
+                <div className="relative z-10">
+                  <h3 className="text-xl mb-3">Mentorship</h3>
+                  <p>Learn systems and execution</p>
+                </div>
+
+              </div>
+            </Link>
+
+            <Link href="/trading">
+              <div className="relative p-8 border rounded-xl overflow-hidden
+              hover:shadow-[0_0_60px_rgba(59,130,246,0.7)] transition">
+
+                <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3"
+                  className="absolute inset-0 w-full h-full object-cover opacity-20"/>
+
+                <div className="relative z-10">
+                  <h3 className="text-xl mb-3">Trading</h3>
+                  <p>Market systems & execution</p>
+                </div>
+
+              </div>
+            </Link>
+
+            <Link href="/deals">
+              <div className="relative p-8 border rounded-xl overflow-hidden
+              hover:shadow-[0_0_60px_rgba(168,85,247,0.7)] transition">
+
+                <img src="https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg"
+                  className="absolute inset-0 w-full h-full object-cover opacity-20"/>
+
+                <div className="relative z-10">
+                  <h3 className="text-xl mb-3">We Build Your Site</h3>
+                  <p>Funnels, systems, infrastructure</p>
+                </div>
+
+              </div>
+            </Link>
+
+          </div>
+
+        </section>
+
+      </div>
+    </>
   );
 }
 
-function Category({ title, image, slug }) {
+function Stat({ label, value }) {
   return (
-    <Link href={`/wholesale/${slug}`} className="group">
-      <div className="bg-[#111827] rounded-2xl p-6 hover:bg-[#161F2E] transition shadow-lg cursor-pointer">
-
-        <div className="w-full h-56 flex items-center justify-center bg-white rounded-xl mb-6 overflow-hidden">
-          <img
-            src={image}
-            alt={title}
-            className="max-h-[180px] max-w-full object-contain"
-          />
-        </div>
-
-        <p className="text-center font-medium text-white group-hover:text-[#D4AF37] transition">
-          {title}
-        </p>
-
-      </div>
-    </Link>
+    <div className="bg-[#111827] p-6 rounded-xl border border-[#1C2233]
+    hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition">
+      <p className="text-gray-400 text-sm">{label}</p>
+      <h3 className="text-xl">{value}</h3>
+    </div>
   );
 }

@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ================= SMOOTH SCROLL ================= */
+html, body {
+  scroll-behavior: smooth;
+}
+
+/* ================= CONVEYOR BELT FIX ================= */
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* THIS IS THE IMPORTANT PART */
+.animate-scroll {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 30s linear infinite;
+}
+
+/* Pause on hover = premium feel */
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
