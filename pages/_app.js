@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 export default function MyApp({ Component, pageProps }) {
 
   const router = useRouter()
+
   const [authorized, setAuthorized] = useState(false)
   const [passwordInput, setPasswordInput] = useState("")
   const [loading, setLoading] = useState(true)
@@ -16,13 +17,16 @@ export default function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     const storedAuth = localStorage.getItem("kv_site_auth")
+
     if (storedAuth === "true") {
       setAuthorized(true)
     }
+
     setLoading(false)
   }, [])
 
-  const publicRoutes = ["/success", "/cancel"]
+  // Allow access to these routes without password
+ const publicRoutes = ["/success", "/cancel", "/learn", "/mentorship", "/affiliate"]
   const isPublicRoute = publicRoutes.includes(router.pathname)
 
   const handleUnlock = () => {
@@ -36,6 +40,7 @@ export default function MyApp({ Component, pageProps }) {
 
   if (loading) return null
 
+  // 🔒 PASSWORD GATE (NO Layout here)
   if (!authorized && !isPublicRoute) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white px-6">
@@ -78,6 +83,7 @@ export default function MyApp({ Component, pageProps }) {
     )
   }
 
+  // ✅ MAIN APP (Layout ALWAYS wraps pages)
   return (
     <CartProvider>
       <Layout>

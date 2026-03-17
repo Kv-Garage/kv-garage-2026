@@ -62,7 +62,7 @@ export default function Contact() {
       </section>
 
       <section className="py-20 px-6 text-center">
-        <div className="max-w-2xl mx-auto bg-blue-900/40 backdrop-blur-md rounded-2xl p-10 shadow-xl border border-emerald-500/20">
+        <div className="max-w-2xl mx-auto bg-blue-900/40 backdrop-blur-md rounded-2xl p-6 md:p-10 shadow-xl border border-emerald-500/20">
 
           <h2 className="text-3xl font-semibold text-emerald-400 mb-4">
             Book a Strategy Call

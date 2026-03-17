@@ -47,7 +47,7 @@ export default function Deals() {
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-6 py-28 text-center">
 
-        <h1 className="text-4xl md:text-6xl font-extrabold text-royal mb-6 tracking-tight">
+        <h1 className="text-3xl md:text-6xl font-extrabold text-royal mb-6 tracking-tight">
           Business Infrastructure Engineering
         </h1>
 

@@ -1,7 +1,6 @@
 import Stripe from "stripe";
 
 export default async function handler(req, res) {
-
   try {
 
     if (req.method !== "POST") {
@@ -9,127 +8,48 @@ export default async function handler(req, res) {
     }
 
     if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(500).json({
-        error: "Stripe secret key missing",
-      });
+      return res.status(500).json({ error: "Missing Stripe key" });
+    }
+
+    const { name, amount, quantity, legalAgreement, type } = req.body;
+
+    if (!name || !amount || !quantity) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    if (!legalAgreement) {
+      return res.status(400).json({ error: "Must accept terms" });
     }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const {
-      name,
-      amount,
-      quantity,
-      cartItems,
-      booking,
-      legalAgreement
-    } = req.body;
-
-
-    if (!legalAgreement) {
-      return res.status(400).json({
-        error: "Legal agreement required",
-      });
-    }
-
-
-    let line_items = [];
-
-
-    // BOOKING SESSION ($50 CALL)
-    if (booking) {
-
-      line_items = [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Infrastructure Strategy Session",
-            },
-            unit_amount: 5000,
-          },
-          quantity: 1,
-        },
-      ];
-
-    }
-
-
-    // CART CHECKOUT
-    else if (cartItems && cartItems.length > 0) {
-
-      line_items = cartItems.map((item) => ({
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name,
-          },
-          unit_amount: Math.round(Number(item.price) * 100),
-        },
-        quantity: Number(item.quantity),
-      }));
-
-    }
-
-
-    // SINGLE PRODUCT
-    else if (name && amount && quantity) {
-
-      line_items = [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name,
-            },
-            unit_amount: Math.round(Number(amount) * 100),
-          },
-          quantity: Number(quantity),
-        },
-      ];
-
-    }
-
-
-    else {
-      return res.status(400).json({
-        error: "Missing checkout data",
-      });
-    }
-
-
-
     const session = await stripe.checkout.sessions.create({
-
       mode: "payment",
 
-      line_items,
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name },
+            unit_amount: Math.round(amount * 100),
+          },
+          quantity: quantity,
+        },
+      ],
 
+      // 🔥 CONTROL FLOW HERE
       metadata: {
-        type: booking ? "call" : "product",
+        type: type || "product",
       },
 
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
-
     });
 
+    return res.status(200).json({ url: session.url });
 
-    return res.status(200).json({
-      url: session.url,
-    });
-
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
   }
-
-  catch (error) {
-
-    console.error("STRIPE ERROR:", error);
-
-    return res.status(500).json({
-      error: error.message,
-    });
-
-  }
-
 }

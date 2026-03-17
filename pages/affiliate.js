@@ -15,7 +15,7 @@ export default function Affiliate() {
       <main className="bg-[#0B0F19] text-white">
 
         {/* ================= HERO ================= */}
-        <section className="py-40 border-b border-[#1C2233]">
+        <section className="py-24 md:py-40 border-b border-[#1C2233]">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-20 items-start">
 
             <div className="md:col-span-2">
@@ -23,7 +23,7 @@ export default function Affiliate() {
                 Private Distribution Network
               </p>
 
-              <h1 className="text-4xl md:text-6xl font-semibold leading-tight mb-10">
+              <h1 className="text-3xl md:text-6xl font-semibold leading-tight mb-10">
                 Structured Partner Access
               </h1>
 
@@ -45,7 +45,7 @@ export default function Affiliate() {
               </p>
             </div>
 
-            <div className="bg-[#111827] border border-[#1C2233] rounded-2xl p-10">
+            <div className="bg-[#111827] border border-[#1C2233] rounded-2xl p-6 md:p-10">
               <h3 className="text-lg font-semibold mb-6 text-[#D4AF37]">
                 Core Economics
               </h3>
@@ -74,7 +74,7 @@ export default function Affiliate() {
         </section>
 
         {/* ================= APPLICATION ================= */}
-        <section id="apply" className="py-40 text-center">
+        <section id="apply" className="py-24 md:py-40 text-center">
           <div className="max-w-3xl mx-auto px-6">
 
             <p className="uppercase tracking-[0.3em] text-xs text-gray-500 mb-8">
@@ -85,12 +85,13 @@ export default function Affiliate() {
               Request Distribution Access
             </h2>
 
-            <form
-              name="affiliate-application"
-              method="POST"
-              data-netlify="true"
-              data-netlify-honeypot="bot-field"
-              className="space-y-6 border border-[#1C2233] rounded-2xl p-10 bg-[#111827]"
+<form
+  name="affiliate-application"
+  method="POST"
+  data-netlify="true"
+  netlify
+  data-netlify-honeypot="bot-field"
+  className="space-y-6 border border-[#1C2233] rounded-2xl p-6 md:p-10 bg-[#111827]"
             >
               {/* Required for Netlify */}
               <input type="hidden" name="form-name" value="affiliate-application" />

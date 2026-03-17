@@ -136,7 +136,7 @@ export default function ProductPage() {
         </div>
 
         {/* PREMIUM WATCH CTA */}
-        <section className="mt-20 bg-gray-50 p-10 rounded-xl text-center">
+        <section className="mt-20 bg-gray-50 p-6 md:p-10 rounded-xl text-center">
           <h2 className="text-2xl font-bold text-royal mb-4">
             Looking for Premium Models?
           </h2>

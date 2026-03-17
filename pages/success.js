@@ -7,8 +7,8 @@ export default function Success() {
   const { clearCart } = useCart();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
   const [showCalendly, setShowCalendly] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -20,71 +20,94 @@ export default function Success() {
       return;
     }
 
-    const verifySession = async () => {
+    clearCart();
+    localStorage.removeItem("kv_cart");
+
+    const fetchSession = async () => {
       try {
         const res = await fetch(`/api/get-session?session_id=${session_id}`);
-        const session = await res.json();
+        const data = await res.json();
 
-        console.log("SESSION:", session);
+        console.log("SESSION:", data);
 
-        if (session?.payment_status === "paid") {
-          clearCart();
-          localStorage.removeItem("kv_cart");
-
-          // SIMPLE RULE:
-          // If the payment was $50 (5000 cents), unlock Calendly
-          if (session?.amount_total === 5000) {
-            setShowCalendly(true);
-          }
+        // 🔥 ONLY show calendar for these types
+        if (
+          data?.metadata?.type === "call" ||
+          data?.metadata?.type === "mentorship" ||
+          data?.metadata?.type === "full"
+        ) {
+          setShowCalendly(true);
         }
+
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
-    verifySession();
+    fetchSession();
   }, [router.isReady]);
 
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p>Verifying payment...</p>
+        <p>Processing...</p>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-white flex items-center justify-center px-6">
+
       <div className="max-w-3xl text-center">
 
-        <h1 className="text-5xl font-extrabold text-green-600 mb-8">
-          Payment Confirmed
+        <h1 className="text-4xl font-bold text-green-600 mb-6">
+          Payment Successful
         </h1>
 
+        {/* 🔥 NORMAL PURCHASE */}
         {!showCalendly && (
           <>
-            <p className="text-xl text-gray-800 mb-6">
-              Thank you for your purchase.
+            <p className="text-gray-700 mb-6">
+              Your purchase has been completed successfully.
             </p>
 
-            <Link
-              href="/"
-              className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-md"
-            >
-              Return Home
-            </Link>
+            <div className="flex gap-4 justify-center flex-wrap">
+
+              <Link
+                href="/learn"
+                className="bg-blue-600 text-white px-6 py-3 rounded-md"
+              >
+                Go to Learn
+              </Link>
+
+              <Link
+                href="/mentorship"
+                className="bg-orange-500 text-white px-6 py-3 rounded-md"
+              >
+                View Mentorship
+              </Link>
+
+              <Link
+                href="/shop"
+                className="bg-gray-200 px-6 py-3 rounded-md"
+              >
+                Continue Shopping
+              </Link>
+
+            </div>
           </>
         )}
 
+        {/* 🔥 CALENDAR FLOW */}
         {showCalendly && (
           <>
-            <p className="text-xl text-gray-800 mb-6">
-              Step 2 of 2 — Schedule Your Strategy Session
+            <p className="text-gray-700 mb-6">
+              Your access has been unlocked. Book your session below.
             </p>
 
-            <div className="rounded-2xl shadow-lg overflow-hidden">
+            <div className="rounded-xl overflow-hidden shadow-lg">
               <iframe
                 src="https://calendly.com/kvgarage-kvgarage/60min"
                 width="100%"
@@ -96,6 +119,7 @@ export default function Success() {
         )}
 
       </div>
+
     </main>
   );
 }
