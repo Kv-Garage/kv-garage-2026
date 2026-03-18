@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { calculatePrice } from "../../lib/pricing";
 import { useCart } from "../../context/CartContext";
+import { supabase } from "../../lib/supabase";
 
 export default function ProductPage() {
   const router = useRouter();
@@ -11,34 +12,50 @@ export default function ProductPage() {
 
   const { addToCart } = useCart();
 
+  const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
   const [addedMessage, setAddedMessage] = useState("");
 
-  if (!slug) return null;
-
-  const product = {
-    name: slug.replaceAll("-", " ").toUpperCase(),
-    cost: 10,
-    description:
-      "Premium structured retail product built for clean presentation and confident purchasing.",
-    images: [
-      "/placeholder-product.jpg",
-      "/placeholder-product.jpg",
-      "/placeholder-product.jpg",
-    ],
-  };
-
+  // 🔥 FETCH PRODUCT FROM SUPABASE
   useEffect(() => {
-    if (product.images && product.images.length > 0) {
-      setSelectedImage(product.images[0]);
-    }
-  }, []);
+    if (!slug) return;
 
-  const pricePerUnit = calculatePrice(product.cost, quantity);
+    const fetchProduct = async () => {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("slug", slug)
+        .single();
+
+      if (error) {
+        console.error(error);
+        setProduct(null);
+      } else {
+        setProduct(data);
+        setSelectedImage(data.image);
+      }
+
+      setLoading(false);
+    };
+
+    fetchProduct();
+  }, [slug]);
+
+  if (loading) {
+    return <p className="p-10">Loading product...</p>;
+  }
+
+  if (!product) {
+    return <p className="p-10">Product not found.</p>;
+  }
+
+  const pricePerUnit = calculatePrice(product.cost || product.price, quantity);
   const totalPrice = pricePerUnit * quantity;
 
   const handleAddToCart = () => {
@@ -103,36 +120,40 @@ export default function ProductPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
 
-            {/* LEFT SIDE - IMAGES */}
-            <div>
-              <div className="bg-gray-100 h-96 flex items-center justify-center rounded-lg mb-4">
-                {selectedImage && (
-                  <img
-                    src={selectedImage}
-                    alt={product.name}
-                    className="h-full object-contain"
-                  />
-                )}
-              </div>
+<div>
+  {/* MAIN IMAGE */}
+  <div className="bg-gray-100 h-96 flex items-center justify-center rounded-lg mb-4">
+    {selectedImage && (
+      <img
+        src={selectedImage}
+        alt={product.name}
+        className="h-full object-contain"
+      />
+    )}
+  </div>
 
-              <div className="flex gap-4">
-                {product.images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(img)}
-                    className="border rounded-md overflow-hidden w-20 h-20"
-                  >
-                    <img
-                      src={img}
-                      alt=""
-                      className="object-cover h-full w-full"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* RIGHT SIDE - PRODUCT INFO */}
+  {/* IMAGE GALLERY */}
+  {product.images && product.images.length > 0 && (
+    <div className="flex gap-4 flex-wrap">
+      {product.images.map((img, index) => (
+        <button
+          key={index}
+          onClick={() => setSelectedImage(img)}
+          className={`border rounded-md overflow-hidden w-20 h-20 ${
+            selectedImage === img ? "border-blue-500" : ""
+          }`}
+        >
+          <img
+            src={img}
+            alt=""
+            className="object-cover h-full w-full"
+          />
+        </button>
+      ))}
+    </div>
+  )}
+</div>
+            {/* INFO */}
             <div>
               <h1 className="text-3xl font-bold text-royal mb-4">
                 {product.name}
@@ -182,16 +203,13 @@ export default function ProductPage() {
                     I agree to the{" "}
                     <Link href="/terms-and-conditions" className="underline font-medium">
                       Terms & Conditions
-                    </Link>
-                    ,{" "}
+                    </Link>,{" "}
                     <Link href="/refund-policy" className="underline font-medium">
                       Refund Policy
-                    </Link>
-                    , and{" "}
+                    </Link>, and{" "}
                     <Link href="/privacy-policy" className="underline font-medium">
                       Privacy Policy
-                    </Link>
-                    .
+                    </Link>.
                   </span>
                 </label>
 
@@ -221,8 +239,7 @@ export default function ProductPage() {
 
               <div className="border-t pt-6 text-sm text-gray-600 space-y-2">
                 <p>✔ Secure checkout powered by Stripe</p>
-                <p>✔ Payment processing typically clears in 1–2 business days</p>
-                <p>✔ Order ships immediately after funds are confirmed</p>
+                <p>✔ Ships after payment confirmation</p>
               </div>
 
             </div>
