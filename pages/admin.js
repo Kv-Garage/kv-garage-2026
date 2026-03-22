@@ -1,34 +1,71 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useRouter } from "next/router";
+import { calculatePrice } from "../lib/pricing";
 
 export default function Admin() {
+
   const router = useRouter();
 
   useEffect(() => {
-    console.log("✅ ADMIN PAGE LOADED");
-
     const auth = localStorage.getItem("kv_admin_auth");
     if (auth !== "true") {
       router.push("/admin-login");
     }
   }, []);
 
+  // 🔥 MODES
+  const [mode, setMode] = useState("manual"); // manual | url | bulk | cj
+
+  const [url, setUrl] = useState("");
+  const [bulkUrls, setBulkUrls] = useState("");
+
+  const [cjProducts, setCjProducts] = useState([]);
+  const [loadingCJ, setLoadingCJ] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
-    price: "",
     cost: "",
+    supplier_price: "",
     category: "glass",
     description: "",
-    supplier: ""
+    supplier: "cj"
   });
 
   const [images, setImages] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const categories = [
+    "glass",
+    "jewelry",
+    "nails",
+    "hair",
+    "tech",
+    "christian",
+    "school",
+    "comfort",
+    "accessories"
+  ];
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const generateSlug = (name) => {
+    return name.toLowerCase().replaceAll(" ", "-");
+  };
+
+  // 🔥 IMAGE SYSTEM
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+
+    const previewImages = files.map((file) => ({
+      id: Date.now() + Math.random(),
+      url: URL.createObjectURL(file)
+    }));
+
+    setImages((prev) => [...prev, ...previewImages]);
   };
 
   const addImageByUrl = (url) => {
@@ -44,218 +81,305 @@ export default function Admin() {
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  const generateSlug = (name) => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replaceAll(" ", "-")
-      .replace(/[^\w-]+/g, "");
-  };
+  // 🔥 SAVE PRODUCT (CORE SYSTEM)
+  const saveProduct = async (data) => {
+    const baseCost = Number(data.cost || data.supplier_price);
 
-  // 🧪 TEST CONNECTION
-  const testConnection = async () => {
-    console.log("🧪 TEST CONNECTION");
+    const price = calculatePrice({
+      cost: baseCost,
+      quantity: 1,
+      role: "retail",
+      cartTotal: 0
+    });
 
-    const { data, error } = await supabase
+    const payload = {
+      ...data,
+      slug: generateSlug(data.name),
+      cost: baseCost,
+      supplier_price: baseCost,
+      price,
+      image: data.image,
+      images: data.images || [],
+      fulfillment_type: "dropship",
+      inventory_count: 0
+    };
+
+    const { error } = await supabase
       .from("products")
-      .select("*")
-      .limit(1);
+      .insert([payload]);
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-
-    if (error) {
-      setMessage("❌ " + error.message);
-    } else {
-      setMessage("✅ Supabase Connected");
-    }
+    return error;
   };
 
-  // 🚀 MAIN INSERT
+  // 🔥 MANUAL ADD
   const handleSubmit = async () => {
-    console.log("🚀 SUBMIT CLICKED");
+    setLoading(true);
     setMessage("");
 
-    if (!form.name || !form.price || !form.cost) {
-      setMessage("❌ Fill all required fields");
+    if (!form.name) {
+      setMessage("❌ Product name required");
+      setLoading(false);
       return;
     }
 
     if (images.length === 0) {
       setMessage("❌ Add at least 1 image");
+      setLoading(false);
       return;
     }
 
-    try {
-      setLoading(true);
+    const error = await saveProduct({
+      ...form,
+      image: images[0]?.url,
+      images: images.map((img) => img.url)
+    });
 
-      const payload = {
-        name: form.name,
-        price: Number(form.price),
-        cost: Number(form.cost),
-        category: form.category,
-        description: form.description,
-        supplier: form.supplier,
-        slug: generateSlug(form.name),
-        image: images[0].url,
-        images: images.map((img) => img.url)
-      };
-
-      console.log("📦 PAYLOAD:", payload);
-
-      const { data, error } = await supabase
-        .from("products")
-        .insert([payload])
-        .select();
-
-      console.log("📊 DATA:", data);
-      console.log("❌ ERROR:", error);
-
-      if (error) {
-        setMessage("❌ " + error.message);
-        return;
-      }
-
-      setMessage("✅ PRODUCT ADDED");
-
+    if (error) {
+      setMessage("❌ " + error.message);
+    } else {
+      setMessage("✅ Product Added");
       setForm({
         name: "",
-        price: "",
         cost: "",
+        supplier_price: "",
         category: "glass",
         description: "",
-        supplier: ""
+        supplier: "cj"
       });
-
       setImages([]);
+    }
 
-    } catch (err) {
-      console.error("🔥 CRASH:", err);
-      setMessage("❌ System error");
-    } finally {
+    setLoading(false);
+  };
+
+  // 🔥 URL IMPORT
+  const handleUrlImport = async () => {
+    setLoading(true);
+    setMessage("");
+
+    if (!url) {
+      setMessage("❌ Missing URL");
       setLoading(false);
+      return;
+    }
+
+    const data = {
+      name: "Imported Product",
+      description: `Imported from ${url}`,
+      supplier: url.includes("dhgate") ? "dhgate" : "cj",
+      category: "glass",
+      supplier_price: 10,
+      image: "https://via.placeholder.com/300",
+      images: ["https://via.placeholder.com/300"]
+    };
+
+    const error = await saveProduct(data);
+
+    if (error) {
+      setMessage("❌ " + error.message);
+    } else {
+      setMessage("✅ URL Product Imported");
+    }
+
+    setLoading(false);
+  };
+
+  // 🔥 BULK IMPORT
+  const handleBulkImport = async () => {
+    setLoading(true);
+    setMessage("");
+
+    const urls = bulkUrls.split("\n").filter((u) => u.trim());
+
+    for (let u of urls) {
+      await saveProduct({
+        name: "Bulk Product",
+        description: `Imported from ${u}`,
+        supplier: u.includes("dhgate") ? "dhgate" : "cj",
+        category: "glass",
+        supplier_price: 10,
+        image: "https://via.placeholder.com/300",
+        images: ["https://via.placeholder.com/300"]
+      });
+    }
+
+    setMessage(`✅ Imported ${urls.length} products`);
+    setLoading(false);
+  };
+
+  // 🔥 FETCH CJ PRODUCTS
+  const fetchCJProducts = async () => {
+    setLoadingCJ(true);
+
+    const res = await fetch("/api/cj-test");
+    const data = await res.json();
+
+    if (data?.data?.list) {
+      setCjProducts(data.data.list);
+    }
+
+    setLoadingCJ(false);
+  };
+
+  // 🔥 IMPORT FROM CJ
+  const handleImportCJ = async (p) => {
+    setMessage("Importing...");
+
+    const error = await saveProduct({
+      name: p.productNameEn || p.productName,
+      description: p.productNameEn || p.productName,
+      supplier: "cj",
+      category: "glass",
+      supplier_price: p.sellPrice,
+      image: p.productImage,
+      images: [p.productImage],
+      cj_product_id: p.pid
+    });
+
+    if (error) {
+      setMessage("❌ " + error.message);
+    } else {
+      setMessage("✅ Imported: " + (p.productNameEn || p.productName));
     }
   };
 
   return (
     <div className="min-h-screen bg-[#05070D] text-white p-10">
 
-      <h1 className="text-3xl mb-6 text-[#D4AF37]">
-        Product Manager (Debug)
+      <h1 className="text-3xl mb-10 text-[#D4AF37]">
+        KV Product System (CJ Connected)
       </h1>
 
-      {/* DEBUG BUTTON */}
-      <button
-        onClick={testConnection}
-        className="bg-white text-black px-4 py-2 mb-6 rounded"
-      >
-        Test Supabase Connection
-      </button>
-
-      {/* FORM */}
-      <div className="grid md:grid-cols-2 gap-6">
-
-        <input
-          name="name"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={handleChange}
-          className="bg-[#111827] px-4 py-3 rounded-lg"
-        />
-
-        <input
-          name="price"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-          className="bg-[#111827] px-4 py-3 rounded-lg"
-        />
-
-        <input
-          name="cost"
-          placeholder="Cost"
-          value={form.cost}
-          onChange={handleChange}
-          className="bg-[#111827] px-4 py-3 rounded-lg"
-        />
-
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          className="bg-[#111827] px-4 py-3 rounded-lg"
-        >
-          <option value="glass">Glass</option>
-          <option value="beauty">Beauty</option>
-          <option value="tech">Tech</option>
-        </select>
-
-        <input
-          name="supplier"
-          placeholder="Supplier"
-          value={form.supplier}
-          onChange={handleChange}
-          className="bg-[#111827] px-4 py-3 rounded-lg"
-        />
-
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          className="bg-[#111827] px-4 py-3 rounded-lg col-span-2"
-        />
-
+      {/* 🔥 MODE SWITCH */}
+      <div className="flex gap-4 mb-8 flex-wrap">
+        <button onClick={() => setMode("manual")}>Manual</button>
+        <button onClick={() => setMode("url")}>URL Import</button>
+        <button onClick={() => setMode("bulk")}>Bulk Import</button>
+        <button onClick={() => {
+          setMode("cj");
+          fetchCJProducts();
+        }}>
+          CJ Products
+        </button>
       </div>
 
-      {/* IMAGE INPUT */}
-      <div className="mt-8">
+      {/* 🔥 CJ MODE */}
+      {mode === "cj" && (
+        <div>
+          <h2 className="text-xl mb-6">CJ Product Feed</h2>
 
-        <input
-          type="text"
-          placeholder="Paste image URL + press Enter"
-          className="bg-[#111827] px-4 py-3 rounded-lg w-full mb-6"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              addImageByUrl(e.target.value);
-              e.target.value = "";
-            }
-          }}
-        />
+          {loadingCJ && <p>Loading CJ Products...</p>}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {images.map((img) => (
-            <div key={img.id} className="relative">
-              <button
-                onClick={() => removeImage(img.id)}
-                className="absolute top-1 right-1 bg-red-600 text-xs px-2"
-              >
-                X
-              </button>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {cjProducts.map((p, i) => (
+              <div key={i} className="bg-[#111827] p-4 rounded-xl">
 
-              <img
-                src={img.url}
-                className="h-40 w-full object-cover rounded"
-              />
-            </div>
-          ))}
+                <img src={p.productImage} className="h-40 w-full object-cover mb-3" />
+
+                <p className="text-sm mb-2 line-clamp-2">
+                  {p.productNameEn || p.productName}
+                </p>
+
+                <p className="text-[#D4AF37] mb-3">
+                  ${p.sellPrice}
+                </p>
+
+                <button
+                  onClick={() => handleImportCJ(p)}
+                  className="w-full bg-[#D4AF37] text-black py-2 rounded"
+                >
+                  Import
+                </button>
+
+              </div>
+            ))}
+          </div>
         </div>
-
-      </div>
-
-      {/* SUBMIT */}
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="mt-10 bg-[#D4AF37] text-black px-10 py-3 rounded-lg font-semibold"
-      >
-        {loading ? "Adding..." : "Add Product"}
-      </button>
-
-      {/* MESSAGE */}
-      {message && (
-        <p className="mt-6 text-gray-300">{message}</p>
       )}
+
+      {/* 🔥 URL MODE */}
+      {mode === "url" && (
+        <div className="mb-10">
+          <input
+            placeholder="Paste CJ / DHGate URL"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="w-full p-3 bg-[#111827] rounded-lg mb-4"
+          />
+          <button onClick={handleUrlImport}>Import Product</button>
+        </div>
+      )}
+
+      {/* 🔥 BULK MODE */}
+      {mode === "bulk" && (
+        <div className="mb-10">
+          <textarea
+            placeholder="Paste URLs (1 per line)"
+            value={bulkUrls}
+            onChange={(e) => setBulkUrls(e.target.value)}
+            className="w-full p-3 bg-[#111827] rounded-lg mb-4"
+          />
+          <button onClick={handleBulkImport}>Import Bulk</button>
+        </div>
+      )}
+
+      {/* 🔥 MANUAL MODE */}
+      {mode === "manual" && (
+        <div className="grid md:grid-cols-2 gap-6">
+
+          <input name="name" placeholder="Product Name" value={form.name} onChange={handleChange} className="bg-[#111827] px-4 py-3 rounded-lg" />
+
+          <input name="supplier_price" placeholder="Supplier Price" value={form.supplier_price} onChange={handleChange} className="bg-[#111827] px-4 py-3 rounded-lg" />
+
+          <select name="category" value={form.category} onChange={handleChange} className="bg-[#111827] px-4 py-3 rounded-lg">
+            {categories.map((c) => <option key={c}>{c}</option>)}
+          </select>
+
+          <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="bg-[#111827] px-4 py-3 rounded-lg col-span-2" />
+
+        </div>
+      )}
+
+      {/* 🔥 IMAGE SYSTEM */}
+      {mode !== "cj" && (
+        <div className="mt-10">
+
+          <input type="file" multiple onChange={handleImageUpload} className="mb-4" />
+
+          <input
+            type="text"
+            placeholder="Paste image URL + Enter"
+            className="bg-[#111827] px-4 py-3 rounded-lg w-full mb-6"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                addImageByUrl(e.target.value);
+                e.target.value = "";
+              }
+            }}
+          />
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {images.map((img) => (
+              <div key={img.id} className="relative">
+                <button onClick={() => removeImage(img.id)}>X</button>
+                <img src={img.url} className="h-40 w-full object-cover" />
+              </div>
+            ))}
+          </div>
+
+        </div>
+      )}
+
+      {mode === "manual" && (
+        <button
+          onClick={handleSubmit}
+          className="mt-10 bg-[#D4AF37] text-black px-10 py-3 rounded-lg"
+        >
+          {loading ? "Processing..." : "Add Product"}
+        </button>
+      )}
+
+      {message && <p className="mt-6">{message}</p>}
 
     </div>
   );

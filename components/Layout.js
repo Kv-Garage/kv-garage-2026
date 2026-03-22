@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import { supabase } from "../lib/supabase";
+import { useEffect, useState } from "react";
 
 export default function Layout({ children }) {
   const { cart } = useCart();
@@ -10,6 +12,35 @@ export default function Layout({ children }) {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  // 🔥 USER STATE (ADDED)
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getUser();
+
+    // 🔄 Listen for login/logout
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // 🔥 LOGOUT
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#05070D] text-white">
@@ -29,20 +60,55 @@ export default function Layout({ children }) {
             </h1>
           </div>
 
-          {/* CART */}
-          <Link href="/cart">
-            <div className="cursor-pointer bg-[#111827] hover:bg-[#1A2235] px-4 py-2 rounded-md text-sm flex items-center gap-2 transition">
-              <span>🛒</span>
-              <span>{itemCount}</span>
-              <span className="text-[#D4AF37]">
-                ${totalPrice.toFixed(2)}
-              </span>
-            </div>
-          </Link>
+          {/* 🔥 RIGHT SIDE (AUTH + CART) */}
+          <div className="flex items-center gap-4">
+
+            {/* AUTH */}
+            {!user ? (
+              <>
+                <Link href="/login">
+                  <span className="text-sm border px-3 py-2 rounded cursor-pointer hover:border-[#D4AF37] transition">
+                    Login
+                  </span>
+                </Link>
+
+                <Link href="/signup">
+                  <span className="text-sm bg-[#D4AF37] text-black px-3 py-2 rounded cursor-pointer">
+                    Sign Up
+                  </span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <span className="text-xs text-gray-400 hidden md:block">
+                  {user.email}
+                </span>
+
+                <button
+                  onClick={handleLogout}
+                  className="text-xs border px-3 py-2 rounded hover:border-red-500 transition"
+                >
+                  Logout
+                </button>
+              </>
+            )}
+
+            {/* CART */}
+            <Link href="/cart">
+              <div className="cursor-pointer bg-[#111827] hover:bg-[#1A2235] px-4 py-2 rounded-md text-sm flex items-center gap-2 transition">
+                <span>🛒</span>
+                <span>{itemCount}</span>
+                <span className="text-[#D4AF37]">
+                  ${totalPrice.toFixed(2)}
+                </span>
+              </div>
+            </Link>
+
+          </div>
 
         </div>
 
-        {/* NAV (FIXED + CENTERED) */}
+        {/* NAV */}
         <div className="w-full border-t border-[#1C2233]">
           <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-center overflow-x-auto">
 
@@ -59,7 +125,6 @@ export default function Layout({ children }) {
               <NavLink href="/deals">Deals</NavLink>
               <NavLink href="/contact">Contact</NavLink>
 
-              {/* ADMIN BUTTON */}
               <Link href="/admin-login">
                 <span className="text-xs text-[#D4AF37] border border-[#D4AF37] px-3 py-1 rounded cursor-pointer hover:bg-[#D4AF37] hover:text-black transition">
                   Admin
@@ -73,17 +138,16 @@ export default function Layout({ children }) {
 
       </header>
 
-      {/* ================= CONTENT ================= */}
+      {/* CONTENT */}
       <main className="flex-grow">
         {children}
       </main>
 
-      {/* ================= FOOTER ================= */}
+      {/* FOOTER */}
       <footer className="bg-[#05070D] border-t border-[#1C2233] pt-16 pb-10 mt-20">
 
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-10">
 
-          {/* BRAND */}
           <div className="col-span-2 md:col-span-1">
             <h4 className="text-lg font-semibold text-[#D4AF37] mb-4">
               KV GARAGE
@@ -136,7 +200,6 @@ export default function Layout({ children }) {
   );
 }
 
-/* NAV LINK */
 function NavLink({ href, children }) {
   return (
     <Link href={href} className="hover:text-[#D4AF37] transition">
@@ -145,7 +208,6 @@ function NavLink({ href, children }) {
   );
 }
 
-/* FOOTER COLUMN */
 function FooterCol({ title, links }) {
   return (
     <div>

@@ -3,6 +3,7 @@ import Layout from '../components/Layout'
 import { CartProvider } from '../context/CartContext'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { supabase } from '../lib/supabase'
 
 export default function MyApp({ Component, pageProps }) {
 
@@ -13,6 +14,9 @@ export default function MyApp({ Component, pageProps }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+
   const SITE_PASSWORD = "KVgarage2026!"
 
   useEffect(() => {
@@ -22,11 +26,56 @@ export default function MyApp({ Component, pageProps }) {
       setAuthorized(true)
     }
 
+    // 🔐 GET CURRENT USER
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        setUser(user)
+
+        // 🔥 GET PROFILE (ROLE)
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single()
+
+        setProfile(data)
+      }
+    }
+
+    getUser()
+
+    // 🔄 LISTEN FOR LOGIN CHANGES
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user)
+
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single()
+
+          setProfile(data)
+        } else {
+          setUser(null)
+          setProfile(null)
+        }
+      }
+    )
+
     setLoading(false)
+
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+
   }, [])
 
   // Allow access to these routes without password
- const publicRoutes = ["/success", "/cancel", "/learn", "/mentorship", "/affiliate"]
+  const publicRoutes = ["/success", "/cancel", "/learn", "/mentorship", "/affiliate", "/login", "/signup"]
   const isPublicRoute = publicRoutes.includes(router.pathname)
 
   const handleUnlock = () => {
@@ -40,7 +89,7 @@ export default function MyApp({ Component, pageProps }) {
 
   if (loading) return null
 
-  // 🔒 PASSWORD GATE (NO Layout here)
+  // 🔒 PASSWORD GATE
   if (!authorized && !isPublicRoute) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white px-6">
@@ -83,11 +132,10 @@ export default function MyApp({ Component, pageProps }) {
     )
   }
 
-  // ✅ MAIN APP (Layout ALWAYS wraps pages)
   return (
     <CartProvider>
-      <Layout>
-        <Component {...pageProps} />
+      <Layout user={user} profile={profile}>
+        <Component {...pageProps} user={user} profile={profile} />
       </Layout>
     </CartProvider>
   )

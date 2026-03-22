@@ -1,209 +1,194 @@
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 
-export default function Wholesale() {
+export default function WholesalePage() {
+  const [products, setProducts] = useState([]);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchProfile();
+  }, []);
+
+  const fetchProducts = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .limit(6);
+
+    setProducts(data || []);
+  };
+
+  const fetchProfile = async () => {
+    const { data: user } = await supabase.auth.getUser();
+
+    if (!user?.user) return;
+
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.user.id)
+      .single();
+
+    setProfile(data);
+  };
+
+  const role = profile?.role || "retail";
+  const approved = profile?.approved || false;
+
   return (
-    <div style={{
-      background: "#0A0F1C",
-      minHeight: "100vh",
-      color: "#E6EAF2"
-    }}>
+    <div className="min-h-screen bg-[#0B0F19] text-white px-6 py-24">
 
-      {/* HERO */}
-      <section style={{
-        padding: "160px 8% 100px 8%",
-        borderBottom: "1px solid #1A2235"
-      }}>
-        <h1 style={{
-          fontSize: "60px",
-          fontWeight: "600",
-          marginBottom: "20px"
-        }}>
-          Direct Wholesale Supply
-        </h1>
+      <div className="max-w-6xl mx-auto">
 
-        <p style={{ opacity: 0.75 }}>
-          Built for operators. Minimum 4 units per SKU.
-        </p>
-      </section>
+        {/* 🔥 HERO */}
+        <div className="mb-20">
 
-      {/* GRID */}
-      <section style={{ padding: "120px 8%" }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "50px"
-        }}>
+          <h1 className="text-5xl font-bold text-[#D4AF37] mb-6">
+            Direct Wholesale Supply
+          </h1>
 
-          {/* Tech */}
-          <Link href="/wholesale/tech-accessories" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                  src="https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg"
-                  alt="Tech Accessories"
-                  style={imgCover}
-                />
-              </div>
-              <div style={contentStyle}>
-                <h3>Tech Accessories</h3>
-                <p style={descStyle}>High turnover electronics</p>
-              </div>
-            </div>
-          </Link>
+          <p className="text-gray-400 max-w-3xl mb-6">
+            Built for resellers, retail store owners, and volume buyers looking for
+            consistent inventory, strong margins, and scalable supply access.
+          </p>
 
-          {/* Premium Glass */}
-          <Link href="/wholesale/glass" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{
-                height: "260px",
-                background: "#0F172A",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                <img
-                  src="/bong.webp"
-                  alt="Premium Glass"
-                  style={{
-                    maxHeight: "220px",
-                    maxWidth: "90%",
-                    objectFit: "contain"
-                  }}
-                />
-              </div>
-              <div style={contentStyle}>
-                <h3>Premium Glass</h3>
-                <p style={descStyle}>Crystal & functional pieces</p>
-              </div>
-            </div>
-          </Link>
+          <div className="flex flex-wrap gap-4 text-sm text-gray-300 mb-6">
+            <span>✔ Resellers</span>
+            <span>✔ Retail Stores</span>
+            <span>✔ Bulk Buyers</span>
+            <span>✔ Inventory Scaling</span>
+          </div>
 
-          {/* Jewelry */}
-          <Link href="/wholesale/jewelry" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                  src="https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg"
-                  alt="Jewelry"
-                  style={imgCover}
-                />
-              </div>
-              <div style={contentStyle}>
-                <h3>Jewelry</h3>
-                <p style={descStyle}>Margin-driven accessories</p>
-              </div>
-            </div>
-          </Link>
+          <div className="flex gap-4">
+            <Link href="/apply">
+              <button className="bg-[#D4AF37] text-black px-6 py-3 rounded font-semibold">
+                Apply for Access
+              </button>
+            </Link>
 
-          {/* Essentials */}
-          <Link href="/wholesale/essentials" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                 src="/febreze-vent-clip.png"
-                 alt="Essentials"
-                style={imgCover}
-              />
-              </div>
-              <div style={contentStyle}>
-                <h3>Essentials</h3>
-                <p style={descStyle}>Daily repeat inventory</p>
-              </div>
-            </div>
-          </Link>
+            <Link href="/signup">
+              <button className="border border-gray-500 px-6 py-3 rounded">
+                Create Account
+              </button>
+            </Link>
+          </div>
 
-          {/* Comfort */}
-          <Link href="/wholesale/comfort" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                  src="https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg"
-                  alt="Comfort"
-                  style={imgCover}
-                />
-              </div>
-              <div style={contentStyle}>
-                <h3>Comfort</h3>
-                <p style={descStyle}>Home & lifestyle staples</p>
-              </div>
-            </div>
-          </Link>
+        </div>
 
-          {/* Hair & Nail */}
-          <Link href="/wholesale/hair-nail" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                  src="https://images.pexels.com/photos/3992874/pexels-photo-3992874.jpeg"
-                  alt="Hair & Nail"
-                  style={imgCover}
-                />
-              </div>
-              <div style={contentStyle}>
-                <h3>Hair & Nail</h3>
-                <p style={descStyle}>Professional supply</p>
-              </div>
-            </div>
-          </Link>
+        {/* 🔥 WHY THIS SYSTEM */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
 
-          {/* Skincare */}
-          <Link href="/wholesale/skincare" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                  src="https://images.pexels.com/photos/3736397/pexels-photo-3736397.jpeg"
-                  alt="Skincare"
-                  style={imgCover}
-                />
-              </div>
-              <div style={contentStyle}>
-                <h3>Skincare</h3>
-                <p style={descStyle}>Retail-ready product lines</p>
-              </div>
-            </div>
-          </Link>
+          <div className="bg-[#111827] p-6 rounded-xl">
+            <h3 className="font-semibold mb-2">
+              Structured Supply
+            </h3>
+            <p className="text-sm text-gray-400">
+              Access consistent inventory without relying on random sourcing or unstable suppliers.
+            </p>
+          </div>
 
-          {/* Schooling Products */}
-          <Link href="/wholesale/schooling-products" style={{ textDecoration: "none" }}>
-            <div style={cardStyle}>
-              <div style={{ height: "260px" }}>
-                <img
-                  src="https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg"
-                  alt="Schooling Products"
-                  style={imgCover}
-                />
+          <div className="bg-[#111827] p-6 rounded-xl">
+            <h3 className="font-semibold mb-2">
+              Bundle-Based Buying
+            </h3>
+            <p className="text-sm text-gray-400">
+              Purchase optimized bundles designed for resale and higher margins.
+            </p>
+          </div>
+
+          <div className="bg-[#111827] p-6 rounded-xl">
+            <h3 className="font-semibold mb-2">
+              Scalable Orders
+            </h3>
+            <p className="text-sm text-gray-400">
+              Designed for growth — from small resellers to full retail operations.
+            </p>
+          </div>
+
+        </div>
+
+        {/* 🔥 ACCESS CONTROL */}
+        {role === "retail" && (
+          <div className="mb-16 bg-[#111827] border border-[#1C2233] p-6 rounded-xl">
+            <p className="mb-3 text-sm">
+              Wholesale access is restricted. Create an account to unlock inventory.
+            </p>
+            <Link href="/signup">
+              <button className="bg-[#D4AF37] text-black px-4 py-2 rounded text-sm">
+                Unlock Access
+              </button>
+            </Link>
+          </div>
+        )}
+
+        {role === "student" && !approved && (
+          <div className="mb-16 bg-[#111827] border border-[#1C2233] p-6 rounded-xl">
+            <p className="mb-3 text-sm">
+              You are in preview mode. Apply to unlock full wholesale pricing.
+            </p>
+            <Link href="/apply">
+              <button className="bg-[#D4AF37] text-black px-4 py-2 rounded text-sm">
+                Apply Now
+              </button>
+            </Link>
+          </div>
+        )}
+
+        {/* 🔥 INVENTORY PREVIEW */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6 text-[#D4AF37]">
+            Inventory Preview
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {products.map((p) => (
+              <div key={p.id} className="bg-[#111827] p-4 rounded-xl">
+
+                <div className="h-40 bg-gray-700 rounded mb-3 overflow-hidden">
+                  {p.image && (
+                    <img src={p.image} className="w-full h-full object-cover" />
+                  )}
+                </div>
+
+                <p className="text-sm font-semibold">
+                  {p.name}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  {role === "wholesale" && approved
+                    ? `$${p.price}`
+                    : "Login to view pricing"}
+                </p>
+
               </div>
-              <div style={contentStyle}>
-                <h3>Schooling Products</h3>
-                <p style={descStyle}>Institutional demand items</p>
-              </div>
-            </div>
+            ))}
+
+          </div>
+        </div>
+
+        {/* 🔥 FINAL CTA */}
+        <div className="mt-20 bg-[#111827] p-10 rounded-xl text-center">
+
+          <h2 className="text-2xl font-bold mb-4">
+            Apply for Wholesale Access
+          </h2>
+
+          <p className="text-gray-400 mb-6">
+            Access is limited to qualified buyers and partners.
+          </p>
+
+          <Link href="/apply">
+            <button className="bg-[#D4AF37] text-black px-8 py-3 rounded font-semibold">
+              Apply Now
+            </button>
           </Link>
 
         </div>
-      </section>
 
+      </div>
     </div>
   );
 }
-
-const cardStyle = {
-  background: "#111827",
-  border: "1px solid #1A2235",
-  borderRadius: "16px",
-  overflow: "hidden"
-};
-
-const contentStyle = {
-  padding: "28px"
-};
-
-const descStyle = {
-  opacity: 0.6
-};
-
-const imgCover = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover"
-};

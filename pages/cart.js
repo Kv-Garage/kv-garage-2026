@@ -1,183 +1,325 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
+import { supabase } from "../lib/supabase";
 
 export default function CartPage() {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const {
+    cart,
+    removeFromCart,
+    clearCart,
+    updateQuantity,
+    addToCart,
+  } = useCart();
 
-  const [loading, setLoading] = useState(false);
-  const [agreed, setAgreed] = useState(false);
-  const [error, setError] = useState("");
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .limit(4);
+
+    setProducts(data || []);
+  };
 
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  const handleCartCheckout = async () => {
+  // 🔥 TIERS
+  const tiers = [100, 250, 500];
+  const nextTier = tiers.find(t => totalPrice < t);
+  const amountToNext = nextTier ? (nextTier - totalPrice).toFixed(2) : null;
+
+  // 🔥 BULK TRIGGER
+  const bulkMode =
+    totalPrice >= 100 ||
+    cart.some(item => item.quantity >= 3);
+
+  // 🔥 PROFIT (ONLY IF BULK)
+  const estimatedRevenue = totalPrice * 2;
+  const estimatedProfit = estimatedRevenue - totalPrice;
+
+  // 🔥 STRIPE CHECKOUT (FIXED)
+  const handleCheckout = async () => {
     try {
-      if (cart.length === 0) return;
-
-      if (!agreed) {
-        setError("You must agree to the Terms & Policies before proceeding.");
-        return;
-      }
-
-      setLoading(true);
-
-      const response = await fetch("/api/create-checkout-session", {
+      const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cartItems: cart, // 🔥 THIS MUST MATCH API
-          legalAgreement: true,
-          type: "product", // 🔥 ensures no calendar popup
+          cartItems: cart, // ✅ FIX
+          legalAgreement: true, // ✅ REQUIRED
         }),
       });
 
-      const session = await response.json();
+      const data = await res.json();
 
-      if (!session.url) {
-        console.error("No checkout URL returned");
-        return;
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("Stripe error:", data);
       }
-
-      window.location.href = session.url;
-
     } catch (err) {
-      console.error("Checkout Error:", err);
-    } finally {
-      setLoading(false);
+      console.error("Checkout error:", err);
     }
   };
 
   return (
     <main className="min-h-screen bg-[#05070D] text-white px-6 py-16">
-      <div className="max-w-4xl mx-auto">
 
-        <h1 className="text-4xl font-bold mb-12">
-          Secure Checkout
+      <div className="max-w-7xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-10">
+          Order Review
         </h1>
 
-        {cart.length === 0 ? (
-          <div>
-            <p className="text-gray-400 mb-6">Your cart is empty.</p>
+        <div className="grid md:grid-cols-3 gap-10">
 
-            <Link
-              href="/shop"
-              className="bg-blue-600 px-6 py-3 rounded-md font-semibold"
-            >
-              Continue Shopping
-            </Link>
-          </div>
-        ) : (
-          <>
-            {/* ITEMS */}
-            <div className="space-y-6 mb-10">
-              {cart.map((item, index) => (
-                <div
-                  key={index}
-                  className="border border-[#1C2233] bg-[#111827] rounded-xl p-6 flex justify-between items-center"
-                >
-                  <div>
-                    <h2 className="font-semibold text-lg">{item.name}</h2>
-                    <p className="text-sm text-gray-400">
-                      ${item.price.toFixed(2)} × {item.quantity}
-                    </p>
+          {/* LEFT */}
+          <div className="md:col-span-2 space-y-6">
+
+            {cart.length === 0 && (
+              <div className="text-gray-400">
+                Your cart is empty — start adding products below.
+              </div>
+            )}
+
+            {cart.map((item, index) => (
+              <div
+                key={index}
+                className="bg-[#111827] border border-[#1C2233] rounded-xl p-6 flex gap-6 items-center"
+              >
+
+                <div className="w-20 h-20 bg-gray-700 rounded-md overflow-hidden">
+                  {item.image && (
+                    <img src={item.image} className="w-full h-full object-cover" />
+                  )}
+                </div>
+
+                <div className="flex-1">
+
+                  <h2 className="font-semibold">
+                    {item.name}
+                  </h2>
+
+                  <p className="text-sm text-gray-400">
+                    ${item.price.toFixed(2)} per unit
+                  </p>
+
+                  <div className="flex items-center gap-3 mt-3">
+
+                    <button
+                      onClick={() => updateQuantity(index, item.quantity - 1)}
+                      className="bg-gray-700 px-3 py-1 rounded"
+                    >
+                      -
+                    </button>
+
+                    <span>{item.quantity}</span>
+
+                    <button
+                      onClick={() => updateQuantity(index, item.quantity + 1)}
+                      className="bg-gray-700 px-3 py-1 rounded"
+                    >
+                      +
+                    </button>
+
                   </div>
 
-                  <div className="flex items-center gap-6">
-                    <p className="font-semibold text-lg">
-                      ${(item.price * item.quantity).toFixed(2)}
+                </div>
+
+                <div className="text-right">
+
+                  <p className="font-semibold text-lg">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </p>
+
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="text-red-400 text-sm mt-2"
+                  >
+                    Remove
+                  </button>
+
+                </div>
+
+              </div>
+            ))}
+
+            {/* ADD MORE */}
+            <div className="mt-12">
+
+              <h2 className="text-xl font-semibold mb-4">
+                Add More to Your Order
+              </h2>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                {products.map((p) => (
+                  <div
+                    key={p.id}
+                    className="bg-[#111827] border border-[#1C2233] rounded-lg p-4"
+                  >
+
+                    <div className="bg-gray-700 h-24 mb-3 rounded overflow-hidden">
+                      {p.image && (
+                        <img src={p.image} className="w-full h-full object-cover" />
+                      )}
+                    </div>
+
+                    <p className="text-sm font-medium">
+                      {p.name}
+                    </p>
+
+                    <p className="text-xs text-gray-400 mb-2">
+                      ${p.price}
                     </p>
 
                     <button
-                      onClick={() => removeFromCart(index)}
-                      className="text-red-400 text-sm"
+                      onClick={() =>
+                        addToCart({
+                          name: p.name,
+                          price: p.price,
+                          quantity: 1,
+                          image: p.image,
+                          id: p.id,
+                        })
+                      }
+                      className="w-full bg-[#D4AF37] text-black py-1 rounded text-sm font-semibold"
                     >
-                      Remove
+                      Add
                     </button>
+
                   </div>
-                </div>
-              ))}
+                ))}
+
+              </div>
+
             </div>
 
-            {/* TOTAL */}
-            <div className="border-t border-[#1C2233] pt-10">
+          </div>
 
-              <h2 className="text-2xl font-bold mb-8">
+          {/* RIGHT */}
+          <div className="space-y-6">
+
+            <div className="bg-[#111827] border border-[#1C2233] rounded-xl p-6">
+
+              <h3 className="font-semibold mb-3">
+                Pricing Progress
+              </h3>
+
+              {amountToNext ? (
+                <p className="text-sm text-gray-300 mb-2">
+                  Add <strong>${amountToNext}</strong> more to unlock better pricing
+                </p>
+              ) : (
+                <p className="text-green-400 text-sm mb-2">
+                  Highest pricing tier reached
+                </p>
+              )}
+
+              <div className="text-xs text-gray-400 space-y-1">
+                <p>$100+ → improved pricing</p>
+                <p>$250+ → stronger margins</p>
+                <p>$500+ → bulk pricing</p>
+              </div>
+
+            </div>
+
+            {bulkMode && (
+              <div className="bg-[#111827] border border-[#1C2233] rounded-xl p-6">
+
+                <h3 className="font-semibold mb-3">
+                  Resell Potential
+                </h3>
+
+                <p className="text-sm text-gray-300">
+                  Estimated Revenue: <strong>${estimatedRevenue.toFixed(2)}</strong>
+                </p>
+
+                <p className="text-green-400 text-sm">
+                  Estimated Profit: ${estimatedProfit.toFixed(2)}
+                </p>
+
+              </div>
+            )}
+
+            <div className="bg-[#111827] border border-[#1C2233] rounded-xl p-6">
+
+              <h2 className="text-2xl font-bold mb-4">
                 Total: ${totalPrice.toFixed(2)}
               </h2>
 
-              {/* AGREEMENT */}
-              <div className="mb-8 bg-[#111827] border border-[#1C2233] rounded-xl p-6">
-                <label className="flex items-start space-x-3 text-sm text-gray-300">
-                  <input
-                    type="checkbox"
-                    checked={agreed}
-                    onChange={() => {
-                      setAgreed(!agreed);
-                      setError("");
-                    }}
-                    className="mt-1"
-                  />
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-[#D4AF37] text-black py-3 rounded-md font-semibold"
+              >
+                Checkout
+              </button>
 
-                  <span>
-                    I agree to the{" "}
-                    <Link href="/terms-and-conditions" className="underline">
-                      Terms
-                    </Link>
-                    ,{" "}
-                    <Link href="/refund-policy" className="underline">
-                      Refund Policy
-                    </Link>
-                    , and{" "}
-                    <Link href="/privacy-policy" className="underline">
-                      Privacy Policy
-                    </Link>
-                    .
-                  </span>
-                </label>
+              <Link
+                href="/shop"
+                className="block mt-4 text-center text-sm text-gray-400"
+              >
+                Continue Shopping
+              </Link>
 
-                {error && (
-                  <p className="text-red-500 text-sm mt-3">{error}</p>
-                )}
-              </div>
-
-              {/* ACTIONS */}
-              <div className="flex flex-wrap gap-4">
-
-                <Link
-                  href="/shop"
-                  className="bg-blue-600 px-6 py-3 rounded-md font-semibold"
-                >
-                  Continue Shopping
-                </Link>
-
-                <button
-                  onClick={clearCart}
-                  className="bg-gray-600 px-6 py-3 rounded-md font-semibold"
-                >
-                  Clear Cart
-                </button>
-
-                <button
-                  onClick={handleCartCheckout}
-                  disabled={loading}
-                  className="bg-[#D4AF37] text-black px-8 py-3 rounded-md font-semibold text-lg"
-                >
-                  {loading ? "Processing..." : "Proceed to Payment"}
-                </button>
-
-              </div>
+              <button
+                onClick={clearCart}
+                className="w-full mt-3 bg-gray-700 py-2 rounded text-sm"
+              >
+                Clear Cart
+              </button>
 
             </div>
-          </>
-        )}
+
+          </div>
+
+        </div>
+
+        <section className="mt-20">
+
+          <div className="bg-[#111827] border border-[#1C2233] rounded-2xl p-10">
+
+            <h2 className="text-2xl font-bold mb-4">
+              Partner With KV Garage
+            </h2>
+
+            <p className="text-gray-300 mb-6 max-w-3xl">
+              Looking to move beyond retail buying? KV Garage provides a structured path
+              into reselling and scalable supply access.
+            </p>
+
+            <div className="flex gap-4 flex-wrap">
+
+              <Link href="/signup">
+                <button className="bg-[#D4AF37] text-black px-6 py-3 rounded-md font-semibold">
+                  Apply for Access
+                </button>
+              </Link>
+
+              <Link href="/mentorship">
+                <button className="border border-white px-6 py-3 rounded-md font-semibold">
+                  Learn System
+                </button>
+              </Link>
+
+            </div>
+
+          </div>
+
+        </section>
 
       </div>
+
     </main>
   );
 }

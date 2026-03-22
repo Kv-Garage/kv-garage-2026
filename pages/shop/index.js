@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
-export default function Shop() {
+export default function Shop({ profile }) {
 
   const [products, setProducts] = useState([]);
 
@@ -15,7 +15,7 @@ export default function Shop() {
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("active", true) // 🔥 ONLY CHANGE (soft delete system)
+      .eq("active", true)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -25,32 +25,71 @@ export default function Shop() {
     }
   };
 
+  const role = profile?.role || "retail";
+
   return (
     <>
       <Head>
-        <title>Shop | KV Garage</title>
+        <title>Shop Inventory | KV Garage Supply</title>
         <meta
           name="description"
-          content="Premium retail inventory. Fast fulfillment. Structured checkout."
+          content="Shop premium inventory ready for immediate purchase. Retail buyers, resellers, and wholesale partners can access structured pricing and scalable supply."
         />
       </Head>
 
-      <main className="bg-white">
+      <main className="bg-white text-black">
+
+        {/* 🔥 ACCOUNT PANEL (PREMIUM) */}
+        <div className="max-w-7xl mx-auto px-6 pt-8">
+          <div className="border border-gray-200 rounded-xl p-5 bg-gray-50">
+
+            <p className="text-xs uppercase text-gray-500 mb-1">
+              Account Access
+            </p>
+
+            <p className="text-sm font-semibold mb-2">
+              {role === "retail" && "Retail Buyer"}
+              {role === "student" && "Reseller Account"}
+              {role === "wholesale" && "Wholesale Account"}
+            </p>
+
+            <p className="text-xs text-gray-600 leading-relaxed">
+              {role === "retail" &&
+                "You are browsing with standard retail access. Pricing reflects single-unit purchasing. Create an account to unlock structured pricing and better margins."}
+
+              {role === "student" &&
+                "Your account is optimized for reselling. Pricing improves as order size increases, allowing for better margins."}
+
+              {role === "wholesale" &&
+                "You are accessing supply-level pricing designed for volume purchasing and scalable operations."}
+            </p>
+
+            {role === "retail" && (
+              <Link href="/signup">
+                <button className="mt-3 text-sm bg-black text-white px-4 py-2 rounded-md">
+                  Unlock Better Pricing
+                </button>
+              </Link>
+            )}
+
+          </div>
+        </div>
 
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-8 py-20">
-          <h1 className="text-5xl font-extrabold text-royal mb-6">
-            SHOP
+          <h1 className="text-5xl font-extrabold mb-6">
+            Shop Inventory
           </h1>
-          <div className="w-20 h-[3px] bg-gold mb-6"></div>
 
-          <p className="text-gray-600 max-w-2xl">
-            Carefully sourced inventory designed for quality, value,
-            and fast fulfillment. Every item ready to purchase now.
+          <div className="w-20 h-[3px] bg-black mb-6"></div>
+
+          <p className="text-gray-600 max-w-2xl leading-relaxed">
+            Browse ready-to-ship inventory sourced for quality, consistency, and resale potential.
+            Purchase directly at retail or scale into structured pricing through volume and account access.
           </p>
         </section>
 
-        {/* CATEGORY QUICK NAV */}
+        {/* CATEGORY NAV */}
         <section className="max-w-7xl mx-auto px-6 md:px-8 pb-12">
           <div className="flex flex-wrap gap-4 text-sm font-medium text-gray-700">
             {[
@@ -64,7 +103,7 @@ export default function Shop() {
             ].map((cat) => (
               <button
                 key={cat}
-                className="border px-4 py-2 rounded hover:border-royal hover:text-royal transition"
+                className="border px-4 py-2 rounded hover:border-black hover:text-black transition"
               >
                 {cat}
               </button>
@@ -76,44 +115,50 @@ export default function Shop() {
         <section className="max-w-7xl mx-auto px-6 md:px-8 pb-24">
 
           {products.length === 0 ? (
-            <p className="text-gray-500">No products yet...</p>
+            <p className="text-gray-500">No products available.</p>
           ) : (
 
             <div className="grid md:grid-cols-4 gap-10">
 
-              {products.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/shop/${product.slug}`}
-                  className="group border border-gray-200 rounded-xl p-6 hover:shadow-xl transition duration-300"
-                >
+              {products.map((product) => {
 
-                  <div className="bg-gray-100 aspect-square rounded-lg overflow-hidden mb-6">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                // 🔥 BASE PRICE ONLY (NO LOGIC HERE)
+                const displayPrice = product.price || (product.cost * 2);
 
-                  <h3 className="text-lg font-semibold text-royal mb-2 group-hover:underline">
-                    {product.name}
-                  </h3>
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/shop/${product.slug}`}
+                    className="group border border-gray-200 rounded-xl p-6 hover:shadow-xl transition duration-300 bg-white"
+                  >
 
-                  <p className="text-sm text-gray-600 mb-2">
-                    Ready to ship. Limited inventory.
-                  </p>
+                    <div className="bg-gray-100 aspect-square rounded-lg overflow-hidden mb-6">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                  <p className="text-sm font-semibold text-royal mb-4">
-                    ${product.price}
-                  </p>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:underline">
+                      {product.name}
+                    </h3>
 
-                  <span className="text-sm font-medium text-royal">
-                    View Product →
-                  </span>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Ready to ship. Limited inventory.
+                    </p>
 
-                </Link>
-              ))}
+                    <p className="text-sm font-semibold mb-4">
+                      ${displayPrice}
+                    </p>
+
+                    <span className="text-sm font-medium">
+                      View Product →
+                    </span>
+
+                  </Link>
+                );
+              })}
 
             </div>
 
@@ -121,74 +166,49 @@ export default function Shop() {
 
         </section>
 
-        {/* LIMITED DROPS */}
+        {/* TRUST SECTION */}
         <section className="bg-gray-50 py-20">
           <div className="max-w-7xl mx-auto px-6 md:px-8">
-            <h2 className="text-3xl font-bold text-royal mb-6">
-              Limited Time Drops
+
+            <h2 className="text-3xl font-bold mb-6">
+              Built for Buyers & Resellers
             </h2>
 
-            <div className="w-16 h-[3px] bg-gold mb-10"></div>
+            <div className="w-16 h-[3px] bg-black mb-10"></div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="border rounded-xl p-8 bg-white hover:shadow-lg transition">
-                <h3 className="font-semibold text-lg mb-3">
-                  Streamline Pallet Drop
+            <div className="grid md:grid-cols-3 gap-8 text-sm text-gray-700">
+
+              <div className="border rounded-xl p-6 bg-white">
+                <h3 className="font-semibold mb-3">
+                  Direct Retail Access
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Limited availability. Bulk-ready retail pallets.
+                <p>
+                  Purchase inventory immediately with no account required.
+                  Ideal for testing products or single-unit buying.
                 </p>
-                <button className="text-royal font-medium">
-                  Shop Drop →
-                </button>
               </div>
 
-              <div className="border rounded-xl p-8 bg-white hover:shadow-lg transition">
-                <h3 className="font-semibold text-lg mb-3">
-                  Christian Collection
+              <div className="border rounded-xl p-6 bg-white">
+                <h3 className="font-semibold mb-3">
+                  Volume-Based Pricing
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Faith-based apparel & accessories.
+                <p>
+                  Increase order size to unlock improved pricing automatically.
+                  Designed to reward scale and consistency.
                 </p>
-                <button className="text-royal font-medium">
-                  Explore →
-                </button>
               </div>
 
-              <div className="border rounded-xl p-8 bg-white hover:shadow-lg transition">
-                <h3 className="font-semibold text-lg mb-3">
-                  Outdoor Gear Release
+              <div className="border rounded-xl p-6 bg-white">
+                <h3 className="font-semibold mb-3">
+                  Scalable Supply System
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Freshly sourced seasonal inventory.
+                <p>
+                  Structured for growth. Transition from retail to reseller
+                  to wholesale with optimized pricing at each level.
                 </p>
-                <button className="text-royal font-medium">
-                  View Now →
-                </button>
               </div>
+
             </div>
-          </div>
-        </section>
-
-        {/* REVIEWS */}
-        <section className="max-w-7xl mx-auto px-6 md:px-8 py-20">
-          <h2 className="text-3xl font-bold text-royal mb-6">
-            Trusted By Buyers Nationwide
-          </h2>
-
-          <div className="w-16 h-[3px] bg-gold mb-10"></div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1,2,3].map((review) => (
-              <div key={review} className="border rounded-xl p-6">
-                <div className="bg-gray-100 h-40 mb-4 flex items-center justify-center text-gray-400">
-                  Customer Image
-                </div>
-                <p className="text-sm text-gray-600">
-                  “Fast shipping. Clean packaging. Will purchase again.”
-                </p>
-              </div>
-            ))}
           </div>
         </section>
 
