@@ -1,105 +1,185 @@
-export default function SourcingDesk() {
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
+
+export default function PrivatePreview() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    productLink: "",
+    description: "",
+    quantity: 1
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase
+      .from("sourcing_requests")
+      .insert([
+        {
+          name: form.name,
+          email: form.email,
+          product_link: form.productLink,
+          description: form.description,
+          quantity: form.quantity
+        }
+      ]);
+
+    if (error) {
+      alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setSuccess("Request submitted successfully");
+
+    setForm({
+      name: "",
+      email: "",
+      productLink: "",
+      description: "",
+      quantity: 1
+    });
+
+    setLoading(false);
+  };
+
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-20">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-        
-        {/* LEFT SIDE */}
-        <div>
-          <h1 className="text-4xl font-bold text-royal mb-6">
-            Sourcing Desk
-          </h1>
+    <div className="min-h-screen bg-[#05070D] text-white px-6 py-16">
 
-          <p className="text-gray-300 mb-6">
-            Can't find what you're looking for?
-            Submit a product request for wholesale or retail.
-          </p>
+      <div className="max-w-5xl mx-auto">
 
-          <p className="text-gray-400 mb-4">
-            Response time:
-          </p>
+        {/* 🔥 HEADER */}
+        <h1 className="text-4xl font-bold text-[#D4AF37] mb-3">
+          Private Sourcing Desk
+        </h1>
 
-          <ul className="text-gray-400 mb-6 list-disc pl-5 space-y-2">
-            <li>Within 30 minutes (9AM–6PM)</li>
-            <li>Within 24 hours outside office hours</li>
-          </ul>
+        <p className="text-gray-400 mb-8 max-w-2xl">
+          Submit a product request and our procurement team will source it directly 
+          from verified global suppliers. Designed for resellers, wholesale buyers, 
+          and high-volume operators.
+        </p>
 
-          <p className="text-gray-300">
-            If sourced successfully, you’ll receive:
-          </p>
+        {/* 🔥 INSTITUTION BLOCK */}
+        <div className="grid md:grid-cols-3 gap-4 mb-10">
 
-          <ul className="text-gray-400 list-disc pl-5 space-y-2 mt-2">
-            <li>Product photos</li>
-            <li>Pricing breakdown</li>
-            <li>Secure payment link</li>
-          </ul>
+          <div className="bg-[#111827] p-5 rounded-xl border border-white/5">
+            <p className="text-xs text-gray-400 mb-1">Response Time</p>
+            <p className="text-lg font-semibold text-[#D4AF37]">
+              Under 30 Minutes
+            </p>
+          </div>
+
+          <div className="bg-[#111827] p-5 rounded-xl border border-white/5">
+            <p className="text-xs text-gray-400 mb-1">Availability</p>
+            <p className="text-lg font-semibold">
+              9:00 AM – 6:00 PM (EST)
+            </p>
+          </div>
+
+          <div className="bg-[#111827] p-5 rounded-xl border border-white/5">
+            <p className="text-xs text-gray-400 mb-1">Network</p>
+            <p className="text-lg font-semibold">
+              Global Supplier Access
+            </p>
+          </div>
+
         </div>
 
-        {/* RIGHT SIDE FORM */}
-        <div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800">
-          
-          <form
-            name="sourcing-desk"
-            method="POST"
-            data-netlify="true"
-            data-netlify-honeypot="bot-field"
-            className="space-y-4"
-          >
-            {/* Required hidden input for Netlify */}
-            <input type="hidden" name="form-name" value="sourcing-desk" />
+        {/* 🔥 FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-[#111827] p-8 rounded-2xl border border-white/5 space-y-5"
+        >
 
-            {/* Honeypot (spam protection) */}
-            <input type="hidden" name="bot-field" />
+          <div className="grid md:grid-cols-2 gap-4">
 
             <input
-              type="text"
-              name="fullName"
+              required
               placeholder="Full Name"
-              required
-              className="w-full p-3 bg-black border border-zinc-700 rounded"
+              value={form.name}
+              onChange={(e) =>
+                setForm({ ...form, name: e.target.value })
+              }
+              className="w-full px-4 py-3 bg-[#05070D] rounded-lg outline-none"
             />
 
             <input
+              required
               type="email"
-              name="email"
-              placeholder="Email"
-              required
-              className="w-full p-3 bg-black border border-zinc-700 rounded"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
+              className="w-full px-4 py-3 bg-[#05070D] rounded-lg outline-none"
             />
 
-            <select
-              name="requestType"
-              className="w-full p-3 bg-black border border-zinc-700 rounded"
-            >
-              <option value="Wholesale">Wholesale</option>
-              <option value="Retail">Retail</option>
-            </select>
+          </div>
 
-            <input
-              type="text"
-              name="productName"
-              placeholder="Product Name"
-              required
-              className="w-full p-3 bg-black border border-zinc-700 rounded"
-            />
+          <input
+            placeholder="Product Link (Amazon, TikTok, Supplier, etc.)"
+            value={form.productLink}
+            onChange={(e) =>
+              setForm({ ...form, productLink: e.target.value })
+            }
+            className="w-full px-4 py-3 bg-[#05070D] rounded-lg outline-none"
+          />
 
-            <textarea
-              name="description"
-              placeholder="Describe what you're looking for..."
-              rows="4"
-              required
-              className="w-full p-3 bg-black border border-zinc-700 rounded"
-            />
+          <textarea
+            placeholder="Describe the product, specs, or sourcing requirements..."
+            rows="4"
+            value={form.description}
+            onChange={(e) =>
+              setForm({ ...form, description: e.target.value })
+            }
+            className="w-full px-4 py-3 bg-[#05070D] rounded-lg outline-none"
+          />
 
-            <button
-              type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 transition p-3 font-semibold rounded"
-            >
-              Submit Request
-            </button>
+          <input
+            type="number"
+            min="1"
+            placeholder="Estimated Quantity"
+            value={form.quantity}
+            onChange={(e) =>
+              setForm({ ...form, quantity: Number(e.target.value) })
+            }
+            className="w-full px-4 py-3 bg-[#05070D] rounded-lg outline-none"
+          />
 
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#D4AF37] text-black py-3 rounded-lg font-semibold"
+          >
+            {loading ? "Submitting Request..." : "Submit Request"}
+          </button>
+
+          {success && (
+            <p className="text-green-400 text-sm text-center">
+              {success}
+            </p>
+          )}
+
+        </form>
+
+        {/* 🔥 TRUST + POSITIONING */}
+        <div className="mt-10 text-sm text-gray-400 max-w-3xl">
+          KV Garage operates as a direct sourcing intermediary with access to 
+          vetted manufacturers and logistics channels. All requests are reviewed 
+          by our internal procurement team.
         </div>
+
+        {/* 🔥 CONTACT */}
+        <div className="mt-4 text-sm text-gray-500">
+          Contact: <span className="text-white">kvgarage@kvgarage.com</span>
+        </div>
+
       </div>
-    </main>
+    </div>
   );
 }

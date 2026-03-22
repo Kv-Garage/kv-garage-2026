@@ -1,90 +1,67 @@
 import Stripe from "stripe";
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(500).json({
-        error: "Stripe secret key missing",
-      });
+    const { type } = req.body;
+
+    let price = 0;
+    let name = "";
+
+    // 🔥 PRODUCT MAP
+    if (type === "course") {
+      price = 12900;
+      name = "4 Week Course";
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const {
-      cartItems,
-      name,
-      amount,
-      quantity,
-      legalAgreement,
-      type,
-    } = req.body;
-
-    if (!legalAgreement) {
-      return res.status(400).json({
-        error: "You must accept terms before checkout",
-      });
+    if (type === "mentorship") {
+      price = 50000;
+      name = "Mentorship Program";
     }
 
-    let line_items = [];
-
-    // 🔥 CART CHECKOUT (MULTIPLE ITEMS)
-    if (cartItems && Array.isArray(cartItems)) {
-      line_items = cartItems.map((item) => ({
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name,
-          },
-          unit_amount: Math.round(Number(item.price) * 100),
-        },
-        quantity: Number(item.quantity),
-      }));
+    if (type === "full") {
+      price = 100000;
+      name = "Full Advisory";
     }
 
-    // 🔥 SINGLE ITEM CHECKOUT (BUY NOW / CALL / COURSE)
-    else if (name && amount && quantity) {
-      line_items = [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name,
-            },
-            unit_amount: Math.round(Number(amount) * 100),
-          },
-          quantity: Number(quantity),
-        },
-      ];
-    } else {
-      return res.status(400).json({
-        error: "Missing checkout data",
-      });
+    if (type === "call") {
+      price = 5000;
+      name = "Qualification Call";
+    }
+
+    if (!price) {
+      return res.status(400).json({ error: "Invalid type" });
     }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+      payment_method_types: ["card"],
 
-      line_items,
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name },
+            unit_amount: price,
+          },
+          quantity: 1,
+        },
+      ],
 
-      metadata: {
-        type: type || "product", // 🔥 THIS CONTROLS CALENDAR LOGIC
-      },
-
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
+      // 🔥 THIS IS THE KEY FIX
+      success_url: "http://localhost:3000/book",
+      cancel_url: "http://localhost:3000/academy",
     });
 
     return res.status(200).json({ url: session.url });
 
-  } catch (error) {
-    console.error("STRIPE ERROR:", error);
-
-    return res.status(500).json({
-      error: error.message || "Server error",
-    });
+  } catch (err) {
+    console.error("STRIPE ERROR:", err);
+    return res.status(500).json({ error: err.message });
   }
 }

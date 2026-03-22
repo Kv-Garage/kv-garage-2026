@@ -3,23 +3,59 @@ import { calculatePrice } from "../../lib/pricing";
 
 export default async function handler(req, res) {
   try {
-    const {
-      name,
-      description,
-      images,
-      price,
-      cj_product_id,
-      cj_variant_id,
-      source_url
-    } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ error: "Missing product name" });
+    // 🔒 METHOD CHECK
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const cost = Number(price || 10);
+    // 🔒 AUTH CHECK
+    const authHeader = req.headers.authorization;
 
-    const finalPrice = calculatePrice({
+    if (!authHeader) {
+      return res.status(401).json({
+        error: "Not logged in",
+      });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser(token);
+
+    if (userError || !userData?.user) {
+      return res.status(401).json({
+        error: "Invalid user",
+      });
+    }
+
+    // 🔒 ROLE CHECK
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userData.user.id)
+      .single();
+
+    if (!profile || profile.role !== "admin") {
+      return res.status(403).json({
+        error: "Not authorized",
+      });
+    }
+
+    // 🔥 ORIGINAL LOGIC (UNCHANGED)
+    console.log("📦 BODY:", req.body);
+
+    const { product, cjProduct } = req.body;
+    const data = product || cjProduct;
+
+    if (!data) {
+      throw new Error("No product data received");
+    }
+
+    console.log("✅ USING DATA:", data);
+
+    const cost = Number(data.basePrice || data.sellPrice || 10);
+
+    const price = calculatePrice({
       cost,
       quantity: 1,
       role: "retail",
@@ -27,41 +63,53 @@ export default async function handler(req, res) {
     });
 
     const payload = {
-      name,
-      slug: name.toLowerCase().replaceAll(" ", "-"),
-      description,
+      name: data.name || data.productName,
+      slug: (data.name || data.productName)
+        ?.toLowerCase()
+        .replaceAll(" ", "-"),
+
+      description: data.description || "",
+
       category: "glass",
+      supplier: "cj",
 
       cost,
       supplier_price: cost,
-      price: finalPrice,
+      price,
 
-      image: images?.[0] || null,
-      images: images || [],
+      image: data.images?.[0] || data.productImage || "",
+      images: data.images || [data.productImage].filter(Boolean),
 
-      supplier: "cj",
-      cj_product_id,
-      cj_variant_id,
-      source_url,
+      cj_product_id: data.pid,
+
+      // 🔥 ADD WHOLESALE FIELDS
+      moq: 4,
+      wholesale_price: price * 0.7,
+      type: "single",
 
       fulfillment_type: "dropship",
       inventory_count: 0
     };
 
+    console.log("🧠 PAYLOAD:", payload);
+
     const { error } = await supabase
       .from("products")
       .insert([payload]);
 
-    if (error) throw error;
+    if (error) {
+      console.error("❌ SUPABASE ERROR:", error);
+      throw error;
+    }
 
-    return res.status(200).json({
-      success: true,
-      product: payload
-    });
+    return res.status(200).json({ success: true });
 
   } catch (err) {
+    console.error("❌ IMPORT ERROR:", err);
+
     return res.status(500).json({
-      error: err.message
+      error: err.message,
+      full: err
     });
   }
 }

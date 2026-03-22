@@ -5,9 +5,7 @@ export default function Deals() {
   const [loading, setLoading] = useState(false);
 
   const handleBooking = async () => {
-
     try {
-
       setLoading(true);
 
       const res = await fetch("/api/create-checkout-session", {
@@ -38,7 +36,6 @@ export default function Deals() {
       console.error(err);
       setLoading(false);
     }
-
   };
 
   return (
@@ -47,160 +44,154 @@ export default function Deals() {
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-6 py-28 text-center">
 
-        <h1 className="text-3xl md:text-6xl font-extrabold text-royal mb-6 tracking-tight">
+        <h1 className="text-3xl md:text-6xl font-extrabold text-black mb-6 tracking-tight">
           Business Infrastructure Engineering
         </h1>
 
-        <div className="w-20 h-[3px] bg-gold mx-auto mb-8"></div>
+        <div className="w-20 h-[3px] bg-black mx-auto mb-8"></div>
 
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-          Custom digital systems engineered and deployed in 7 days.
-          Websites, backend infrastructure, automation, and payment architecture
-          built for modern businesses.
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
+          Custom-built systems engineered for real business operations.
+        </p>
+
+        <p className="text-gray-500 max-w-2xl mx-auto mb-10">
+          Websites, backend infrastructure, automation pipelines, and payment systems 
+          built as one complete operating system.
         </p>
 
         <button
           onClick={handleBooking}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-lg"
+          className="bg-black text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-lg"
         >
-          {loading ? "Redirecting..." : "Reserve Infrastructure Strategy Session — $50"}
+          {loading ? "Redirecting..." : "Reserve Strategy Session — $50"}
         </button>
 
         <p className="text-sm text-gray-500 mt-4">
-          Consultation fee applied toward project cost if we work together.
+          Session fee is credited toward your build if we proceed.
         </p>
 
       </section>
 
+      {/* VISUAL SECTION */}
+      <section className="max-w-6xl mx-auto px-6 py-20">
 
-      {/* WHAT WE BUILD */}
-      <section className="max-w-6xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
 
-        <div>
-          <h3 className="font-bold text-lg mb-3">Custom Websites</h3>
-          <p className="text-gray-600">
-            Fully coded responsive websites designed around your business model.
-          </p>
-        </div>
+          <div>
+            <h2 className="text-3xl font-bold mb-6 text-black">
+              Full System Infrastructure
+            </h2>
 
-        <div>
-          <h3 className="font-bold text-lg mb-3">Backend Infrastructure</h3>
-          <p className="text-gray-600">
-            Payment systems, automation pipelines, database architecture and
-            scalable backend systems.
-          </p>
-        </div>
+            <p className="text-gray-600 mb-6">
+              Every build includes both frontend and backend systems designed 
+              to operate together — not separate tools.
+            </p>
 
-        <div>
-          <h3 className="font-bold text-lg mb-3">Operational Systems</h3>
-          <p className="text-gray-600">
-            CRM integration, automation tools, and digital infrastructure that
-            supports real business operations.
-          </p>
-        </div>
+            <ul className="space-y-3 text-gray-600">
+              <li>• Frontend user experience</li>
+              <li>• Backend systems + databases</li>
+              <li>• Payment + checkout infrastructure</li>
+              <li>• Automation + workflows</li>
+            </ul>
+          </div>
 
-      </section>
-
-
-      {/* BUILD TIMELINE */}
-      <section className="bg-gray-50 py-24">
-
-        <div className="max-w-4xl mx-auto px-6 text-center">
-
-          <h2 className="text-3xl font-bold mb-10 text-royal">
-            7 Day Infrastructure Build
-          </h2>
-
-          <ul className="space-y-4 text-gray-700 text-lg">
-            <li>Day 1 — Architecture planning</li>
-            <li>Day 2–4 — Platform development</li>
-            <li>Day 5 — Payment + backend integration</li>
-            <li>Day 6 — Testing + optimization</li>
-            <li>Day 7 — Deployment + launch</li>
-          </ul>
+          {/* ✅ IMAGES WORKING */}
+          <div className="grid grid-cols-2 gap-4">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71" className="rounded-xl w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f" className="rounded-xl w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692" className="rounded-xl w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4" className="rounded-xl w-full h-full object-cover" />
+          </div>
 
         </div>
 
       </section>
-
 
       {/* PRICING */}
       <section className="max-w-6xl mx-auto px-6 py-24">
 
         <div className="text-center mb-16">
 
-          <h2 className="text-4xl font-bold text-royal mb-4">
-            Infrastructure Build Pricing
+          <h2 className="text-4xl font-bold text-black mb-4">
+            Infrastructure Pricing
           </h2>
 
           <p className="text-gray-600">
-            Final pricing depends on system complexity and infrastructure requirements.
+            Transparent pricing based on system scope and complexity.
           </p>
 
         </div>
 
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
+          {/* FOUNDATION */}
           <div className="border border-gray-200 rounded-xl p-8">
-            <h3 className="font-bold text-xl mb-4">Foundation Build</h3>
-            <p className="text-3xl font-extrabold mb-6">$1,500+</p>
+            <h3 className="font-bold text-xl mb-2">Foundation</h3>
+            <p className="text-4xl font-extrabold text-black mb-6">$1,500+</p>
 
-            <ul className="space-y-3 text-gray-600 text-sm">
-              <li>Custom coded website</li>
-              <li>Payment system integration</li>
-              <li>Basic backend infrastructure</li>
+            <ul className="space-y-3 text-gray-600 text-sm mb-6">
+              <li>• Custom coded website (no templates)</li>
+              <li>• Stripe / payment integration</li>
+              <li>• Basic backend setup</li>
+              <li>• Mobile responsive design</li>
             </ul>
+
+            <p className="text-xs text-gray-500">
+              Best for simple service businesses or starting infrastructure.
+            </p>
           </div>
 
-
+          {/* GROWTH */}
           <div className="border border-gray-200 rounded-xl p-8 shadow-lg">
+            <h3 className="font-bold text-xl mb-2">Growth</h3>
+            <p className="text-4xl font-extrabold text-black mb-6">$3,000 – $4,500</p>
 
-            <h3 className="font-bold text-xl mb-4">Growth Infrastructure</h3>
-            <p className="text-3xl font-extrabold mb-6">$3,000 – $4,500</p>
-
-            <ul className="space-y-3 text-gray-600 text-sm">
-              <li>Full custom platform</li>
-              <li>Automation workflows</li>
-              <li>Database architecture</li>
-              <li>CRM integration</li>
+            <ul className="space-y-3 text-gray-600 text-sm mb-6">
+              <li>• Full custom platform</li>
+              <li>• Backend database architecture</li>
+              <li>• Automation workflows</li>
+              <li>• CRM integration</li>
+              <li>• Conversion-focused UI</li>
             </ul>
 
+            <p className="text-xs text-gray-500">
+              Designed for businesses ready to scale operations.
+            </p>
           </div>
 
-
+          {/* ENTERPRISE */}
           <div className="border border-gray-200 rounded-xl p-8">
+            <h3 className="font-bold text-xl mb-2">Enterprise</h3>
+            <p className="text-4xl font-extrabold text-black mb-6">$5,000+</p>
 
-            <h3 className="font-bold text-xl mb-4">Enterprise Systems</h3>
-            <p className="text-3xl font-extrabold mb-6">$5,000 – $6,000+</p>
-
-            <ul className="space-y-3 text-gray-600 text-sm">
-              <li>Advanced backend automation</li>
-              <li>Multi-product infrastructure</li>
-              <li>Operational dashboards</li>
-              <li>Scalable architecture</li>
+            <ul className="space-y-3 text-gray-600 text-sm mb-6">
+              <li>• Advanced backend systems</li>
+              <li>• Multi-product infrastructure</li>
+              <li>• Custom dashboards</li>
+              <li>• Full automation pipelines</li>
+              <li>• Scalable architecture design</li>
             </ul>
 
+            <p className="text-xs text-gray-500">
+              Built for high-volume or complex operations.
+            </p>
           </div>
 
         </div>
 
       </section>
 
-
-      {/* BUILD QUEUE */}
+      {/* QUEUE */}
       <section className="bg-gray-50 py-24">
 
         <div className="max-w-4xl mx-auto px-6 text-center">
 
-          <h2 className="text-3xl font-bold text-royal mb-6">
-            Limited Build Queue
+          <h2 className="text-3xl font-bold text-black mb-6">
+            Limited Build Capacity
           </h2>
 
-          <p className="text-gray-600 mb-10">
-            To maintain speed and quality we only take a limited number of
-            infrastructure builds at a time. New clients enter the queue
-            once the current project begins.
+          <p className="text-gray-600">
+            Only a limited number of builds are accepted to maintain speed and quality.
           </p>
 
         </div>
