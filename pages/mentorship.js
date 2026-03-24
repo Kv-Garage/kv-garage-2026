@@ -10,22 +10,55 @@ export default function Academy() {
       console.log("CLICKED:", type);
       setLoading(type);
 
-      const res = await fetch("/api/create-checkout-session", {
+      let checkoutConfig;
+      switch (type) {
+        case "course":
+          checkoutConfig = {
+            amount: 12900, // $129 in cents
+            success_url: "/success-course",
+            productName: "Course Access"
+          };
+          break;
+        case "mentorship":
+          checkoutConfig = {
+            amount: 50000, // $500 in cents
+            success_url: "/success-mentorship",
+            productName: "Mentorship Program"
+          };
+          break;
+        case "advisory":
+          checkoutConfig = {
+            amount: 100000, // $1000 in cents
+            success_url: "/success-advisory",
+            productName: "Full Advisory"
+          };
+          break;
+        default:
+          throw new Error("Invalid checkout type");
+      }
+
+      const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type }),
+        body: JSON.stringify(checkoutConfig),
       });
 
-      const data = await res.json();
-
-      if (!data.url) {
-        alert("Stripe failed");
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Checkout Error:", errorData);
         return;
       }
 
-      window.location.href = data.url;
+      const { url } = await response.json();
+
+      if (!url) {
+        console.error("No checkout URL returned");
+        return;
+      }
+
+      window.location.href = url;
 
     } catch (err) {
       console.error(err);
@@ -171,10 +204,10 @@ export default function Academy() {
 
               {/* 🔥 FIXED BUTTON */}
               <button
-                onClick={() => handleCheckout("full")}
+                onClick={() => handleCheckout("advisory")}
                 className="bg-[#D4AF37] text-black px-8 py-3 rounded-lg"
               >
-                {loading === "full" ? "Loading..." : "Apply"}
+                {loading === "advisory" ? "Loading..." : "Apply"}
               </button>
             </div>
 

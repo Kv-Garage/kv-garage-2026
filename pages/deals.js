@@ -2,31 +2,27 @@ import { useState } from "react";
 
 export default function Deals() {
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState("");
 
-  const handleBooking = async () => {
+  // 🔥 STRIPE BOOKING (WORKING)
+  const handleCheckout = async () => {
     try {
-      setLoading(true);
+      setLoading("booking");
 
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: "Infrastructure Strategy Session",
-          amount: 50,
-          quantity: 1,
-          legalAgreement: true,
-          booking: true
-        })
+          type: "call", // 🔥 make sure your API supports this
+        }),
       });
 
       const data = await res.json();
 
       if (!data.url) {
-        console.error("Stripe session failed");
-        setLoading(false);
+        alert("Stripe failed");
         return;
       }
 
@@ -34,7 +30,9 @@ export default function Deals() {
 
     } catch (err) {
       console.error(err);
-      setLoading(false);
+      alert("Checkout error");
+    } finally {
+      setLoading("");
     }
   };
 
@@ -60,10 +58,10 @@ export default function Deals() {
         </p>
 
         <button
-          onClick={handleBooking}
+          onClick={handleCheckout}
           className="bg-black text-white px-10 py-4 rounded-md font-semibold text-lg transition shadow-lg"
         >
-          {loading ? "Redirecting..." : "Reserve Strategy Session — $50"}
+          {loading === "booking" ? "Redirecting..." : "Reserve Strategy Session — $50"}
         </button>
 
         <p className="text-sm text-gray-500 mt-4">
@@ -95,7 +93,6 @@ export default function Deals() {
             </ul>
           </div>
 
-          {/* ✅ IMAGES WORKING */}
           <div className="grid grid-cols-2 gap-4">
             <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71" className="rounded-xl w-full h-full object-cover" />
             <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f" className="rounded-xl w-full h-full object-cover" />
@@ -136,9 +133,12 @@ export default function Deals() {
               <li>• Mobile responsive design</li>
             </ul>
 
-            <p className="text-xs text-gray-500">
-              Best for simple service businesses or starting infrastructure.
-            </p>
+            <button
+              onClick={handleCheckout}
+              className="mt-4 w-full bg-black text-white py-3 rounded"
+            >
+              Start Project
+            </button>
           </div>
 
           {/* GROWTH */}
@@ -154,9 +154,12 @@ export default function Deals() {
               <li>• Conversion-focused UI</li>
             </ul>
 
-            <p className="text-xs text-gray-500">
-              Designed for businesses ready to scale operations.
-            </p>
+            <button
+              onClick={handleCheckout}
+              className="mt-4 w-full bg-black text-white py-3 rounded"
+            >
+              Start Project
+            </button>
           </div>
 
           {/* ENTERPRISE */}
@@ -172,9 +175,12 @@ export default function Deals() {
               <li>• Scalable architecture design</li>
             </ul>
 
-            <p className="text-xs text-gray-500">
-              Built for high-volume or complex operations.
-            </p>
+            <button
+              onClick={handleCheckout}
+              className="mt-4 w-full bg-black text-white py-3 rounded"
+            >
+              Start Project
+            </button>
           </div>
 
         </div>

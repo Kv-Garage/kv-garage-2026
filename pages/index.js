@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import Head from "next/head";
 import Link from "next/link";
+import { useCart } from "../context/CartContext";
+import { useRouter } from "next/router";
 
 export default function Home() {
 
@@ -10,6 +12,19 @@ export default function Home() {
 
   const [dbProducts, setDbProducts] = useState([]);
   const [profile, setProfile] = useState(null);
+
+  const { addToCart } = useCart();
+  const router = useRouter();
+  const [addedKey, setAddedKey] = useState(null);
+
+  const liveInventoryRef = useRef(null);
+  const isHoveringRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const dragStateRef = useRef({ startX: 0, startScrollLeft: 0 });
+  const manualOverrideUntilRef = useRef(0);
+  const sequenceWidthRef = useRef(0);
+  const lastTsRef = useRef(null);
+  const rafRef = useRef(null);
 
   useEffect(() => {
     fetchProducts();
@@ -50,6 +65,23 @@ export default function Home() {
     return p.moq || 1;
   };
 
+  const getInventoryCount = (p) => {
+    const raw =
+      p?.inventory_count ??
+      p?.inventory ??
+      p?.stock ??
+      p?.quantity_available ??
+      p?.available_quantity;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const getUrgencyText = (p) => {
+    const inventory = getInventoryCount(p);
+    if (inventory != null && inventory < 10) return `Only ${inventory} left in stock`;
+    return "Selling fast";
+  };
+
   // 🔥 PROFIT TOOL
   const pricing = {
     glass: { cost: 10, sell: 30 },
@@ -64,6 +96,128 @@ export default function Home() {
   const revenue = units * sell;
   const profit = revenue - budget;
   const projected = profit * 6;
+
+  // Conveyor auto-scroll for the "Live Inventory" section:
+  // - auto scrolls horizontally
+  // - pauses on hover
+  // - supports mouse/touch drag
+  // - temporarily overrides auto scroll after manual interaction
+  useEffect(() => {
+    const el = liveInventoryRef.current;
+    if (!el) return;
+
+    const updateMetrics = () => {
+      // We render two identical sequences side-by-side.
+      // Measure the exact pixel offset where the 2nd sequence starts to avoid seam jumps.
+      const first = el.querySelector("[data-seq='a']");
+      const second = el.querySelector("[data-seq='b']");
+      if (!first || !second) return;
+      sequenceWidthRef.current = second.offsetLeft - first.offsetLeft;
+    };
+
+    updateMetrics();
+
+    const onResize = () => updateMetrics();
+    window.addEventListener("resize", onResize);
+
+    const speedPxPerSec = 60;
+
+    const tick = (ts) => {
+      const node = liveInventoryRef.current;
+      if (!node) return;
+
+      if (lastTsRef.current == null) lastTsRef.current = ts;
+      const dt = ts - lastTsRef.current;
+      lastTsRef.current = ts;
+
+      const sequenceWidth = sequenceWidthRef.current;
+      const now = Date.now();
+      const canAutoScroll =
+        !isHoveringRef.current &&
+        !isDraggingRef.current &&
+        now >= manualOverrideUntilRef.current &&
+        sequenceWidth > 0;
+
+      if (canAutoScroll) {
+        node.scrollLeft += (speedPxPerSec / 1000) * dt;
+        const maxScrollLeft = node.scrollWidth - node.clientWidth;
+
+        // Primary wrap: when we reach the start of the 2nd sequence.
+        if (sequenceWidth > 0 && node.scrollLeft >= sequenceWidth) {
+          node.scrollLeft -= sequenceWidth;
+        } else if (maxScrollLeft > 0 && node.scrollLeft >= maxScrollLeft - 1) {
+          // Wide viewport case: we might not be able to reach `sequenceWidth`.
+          // Reset to keep continuous looping.
+          node.scrollLeft = 0;
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    // Re-measure after images/layout settle when products load.
+    const t = setTimeout(updateMetrics, 250);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearTimeout(t);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      lastTsRef.current = null;
+    };
+  }, [products.length]);
+
+  const handlePointerDown = (e) => {
+    const el = liveInventoryRef.current;
+    if (!el) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    manualOverrideUntilRef.current = Date.now() + 2000;
+    isDraggingRef.current = true;
+    dragStateRef.current = { startX: e.clientX, startScrollLeft: el.scrollLeft };
+    lastTsRef.current = null;
+
+    if (e.currentTarget?.setPointerCapture) {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
+  };
+
+  const handlePointerMove = (e) => {
+    const el = liveInventoryRef.current;
+    if (!el || !isDraggingRef.current) return;
+
+    manualOverrideUntilRef.current = Date.now() + 2000;
+
+    const dx = e.clientX - dragStateRef.current.startX;
+    el.scrollLeft = dragStateRef.current.startScrollLeft - dx;
+  };
+
+  const handlePointerUp = () => {
+    isDraggingRef.current = false;
+    manualOverrideUntilRef.current = Date.now() + 2000;
+  };
+
+  const handleWheel = () => {
+    // Wheel/trackpad horizontal scrolling should temporarily override conveyor motion.
+    manualOverrideUntilRef.current = Date.now() + 2000;
+  };
+
+  const handleAddToCartFromCard = (product) => {
+    addToCart({
+      id: product.id || product.slug || product.name,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image: product.image,
+    });
+
+    const k = product.id || product.slug || product.name;
+    setAddedKey(k);
+    setTimeout(() => setAddedKey(null), 1200);
+    router.push("/cart");
+  };
 
   return (
     <>
@@ -124,7 +278,7 @@ export default function Home() {
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        ${getPrice(p)}
+                        ${Number(getPrice(p)).toFixed(2)}
                       </p>
 
                     </div>
@@ -176,17 +330,108 @@ export default function Home() {
             <h2 className="text-xl text-[#D4AF37]">Live Inventory</h2>
           </div>
 
-          <div className="flex gap-6 animate-scroll w-max">
-            {[...products, ...products].map((item, i) => (
-              <div key={i} className="min-w-[220px] bg-[#111827] rounded-xl border border-[#1C2233]">
-                <img src={item.image} className="h-40 w-full object-cover" />
-                <div className="p-4">
-                  <p>{item.name}</p>
-                  <p className="text-gray-400">${item.price}</p>
-                </div>
+          <div
+            ref={liveInventoryRef}
+            className="overflow-x-auto overflow-y-hidden scrollbar-hide"
+            onMouseEnter={() => {
+              isHoveringRef.current = true;
+            }}
+            onMouseLeave={() => {
+              isHoveringRef.current = false;
+            }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onWheel={handleWheel}
+            style={{ touchAction: "pan-y" }}
+          >
+            <div className="flex gap-6 w-max">
+              <div data-seq="a" className="flex gap-6">
+                {products.map((item, i) => (
+                  <Link
+                    key={`a-${i}`}
+                    href={`/shop/${item.slug}`}
+                    className="block min-w-[220px] bg-[#111827] rounded-xl border border-[#1C2233]"
+                  >
+                    {item.images && item.images.length > 0 ? (
+                      <img src={item.images[0]} className="h-40 w-full object-cover" />
+                    ) : (
+                      <div className="h-40 w-full bg-gray-700 flex items-center justify-center text-gray-400">
+                        No Image
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <p>{item.name}</p>
+                      <p className="text-gray-400">${Number(item.price).toFixed(2)}</p>
+                      <p className="text-xs text-[#D4AF37] mt-1">{getUrgencyText(item)}</p>
+                      <button
+                        type="button"
+                        onPointerDown={(e) => {
+                          e.stopPropagation();
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAddToCartFromCard(item);
+                        }}
+                        className="mt-3 w-full bg-[#D4AF37] text-black py-2 rounded text-xs font-semibold transition hover:opacity-90 active:scale-[0.98]"
+                      >
+                        {addedKey === (item.id || item.slug || item.name) ? "Added" : "Add to Cart"}
+                      </button>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            ))}
+              <div data-seq="b" className="flex gap-6">
+                {products.map((item, i) => (
+                  <Link
+                    key={`b-${i}`}
+                    href={`/shop/${item.slug}`}
+                    className="block min-w-[220px] bg-[#111827] rounded-xl border border-[#1C2233]"
+                  >
+                    {item.images && item.images.length > 0 ? (
+                      <img src={item.images[0]} className="h-40 w-full object-cover" />
+                    ) : (
+                      <div className="h-40 w-full bg-gray-700 flex items-center justify-center text-gray-400">
+                        No Image
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <p>{item.name}</p>
+                      <p className="text-gray-400">${Number(item.price).toFixed(2)}</p>
+                      <p className="text-xs text-[#D4AF37] mt-1">{getUrgencyText(item)}</p>
+                      <button
+                        type="button"
+                        onPointerDown={(e) => {
+                          e.stopPropagation();
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAddToCartFromCard(item);
+                        }}
+                        className="mt-3 w-full bg-[#D4AF37] text-black py-2 rounded text-xs font-semibold transition hover:opacity-90 active:scale-[0.98]"
+                      >
+                        {addedKey === (item.id || item.slug || item.name) ? "Added" : "Add to Cart"}
+                      </button>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
+
+          <style jsx>{`
+            /* Hide scrollbar while keeping overflow-x scrolling intact. */
+            .scrollbar-hide {
+              -ms-overflow-style: none; /* IE/Edge */
+              scrollbar-width: none; /* Firefox */
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none; /* Chrome/Safari */
+            }
+          `}</style>
         </section>
 
         {/* ================= PROFIT TOOL ================= */}

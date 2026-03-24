@@ -29,6 +29,8 @@ export default async function handler(req, res) {
 
     const searchData = await searchRes.json();
 
+    console.log('CJ RAW RESPONSE:', JSON.stringify(searchData, null, 2));
+
     if (!searchData?.data?.list) {
       return res.status(500).json({
         error: "CJ list fetch failed",
@@ -50,10 +52,10 @@ export default async function handler(req, res) {
 
     console.log("✅ FOUND PRODUCT:", product);
 
-    // 🔥 RETURN SAME STRUCTURE YOUR ADMIN EXPECTS
+    // 🔥 TEMPORARY: Return raw data for debugging
     return res.status(200).json({
       success: true,
-      product
+      raw: searchData
     });
 
   } catch (err) {

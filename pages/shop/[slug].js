@@ -23,22 +23,34 @@ export default function ProductPage({ profile }) {
 
   // 🔥 UPSSELL (ADDED ONLY)
   const [upsellProducts, setUpsellProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
   const [bundleSelected, setBundleSelected] = useState([]);
 
   useEffect(() => {
     if (!slug) return;
 
     const fetchData = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select("*")
         .eq("slug", slug)
         .single();
 
-      const { data: v } = await supabase
-        .from("product_variants")
-        .select("*")
-        .eq("product_id", data.id);
+      if (error || !data) {
+        console.log("Product not found");
+        return;
+      }
+
+      // 🔥 SAFE VARIANT QUERY
+      let v = [];
+      if (data && data.id) {
+        const { data: variants } = await supabase
+          .from("product_variants")
+          .select("*")
+          .eq("product_id", data.id);
+        v = variants || [];
+      }
 
       // 🔥 UPSSELL FETCH (ADDED)
       const { data: upsells } = await supabase
@@ -53,18 +65,65 @@ export default function ProductPage({ profile }) {
       setProduct(data);
       setVariants(v || []);
 
+      // 🔥 FIX: Use standardized images array
+      const productImages = data.images || [data.image].filter(Boolean);
+      
       if (v?.length > 0) {
         setSelectedVariant(v[0]);
-        setSelectedImage(v[0].image);
+        setSelectedImage(v[0].image || productImages[0]);
       } else {
-        setSelectedImage(data.image);
+        setSelectedImage(productImages[0]);
+      }
+
+      // 🔥 FETCH REVIEWS
+      if (data.cj_product_id) {
+        fetchReviews(data.cj_product_id);
+      }
+    };
+
+    const fetchReviews = async (pid) => {
+      setLoadingReviews(true);
+      try {
+        const res = await fetch(`/api/cj-reviews?pid=${pid}`);
+        const data = await res.json();
+        
+        if (data.success) {
+          setReviews(data.reviews);
+        }
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      } finally {
+        setLoadingReviews(false);
       }
     };
 
     fetchData();
   }, [slug]);
 
-  if (!product) return <p className="p-10">Loading...</p>;
+  if (!product) {
+    return (
+      <main className="bg-white text-black min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Link href="/shop" className="text-sm mb-6 inline-block hover:underline text-blue-600">
+            ← Back to Shop
+          </Link>
+          
+          <div className="text-center py-16">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
+            <p className="text-gray-600 mb-8">
+              The product you're looking for doesn't exist or has been removed.
+            </p>
+            <Link 
+              href="/shop"
+              className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+            >
+              Browse All Products
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   // 🔥 CART TOTAL
   const cartTotal = cart.reduce(
@@ -80,11 +139,42 @@ export default function ProductPage({ profile }) {
 
   const basePrice = product.price || product.cost * 2;
 
-  // 🔥 LIVE PRICING SYSTEM (UNCHANGED)
+  // 🔥 CUSTOM PRICING SYSTEM
+let pricePerUnit;
+
+// MANUAL PRODUCTS (WATCHES)
+if (product.type === "manual") {
+
+  if (role === "retail") {
+    if (quantity >= 10) pricePerUnit = 125;
+    else if (quantity >= 4) pricePerUnit = 150;
+    else pricePerUnit = 200;
+  }
+
+  if (role === "student") {
+    if (quantity < 4) {
+      pricePerUnit = 150; // still show price, MOQ handled separately
+    } else if (quantity >= 10) {
+      pricePerUnit = 125;
+    } else {
+      pricePerUnit = 150;
+    }
+  }
+
+  if (role === "wholesale") {
+    if (quantity < 10) {
+      pricePerUnit = 125; // show price, MOQ handled separately
+    } else {
+      pricePerUnit = 125;
+    }
+  }
+
+} else {
+  // EXISTING SYSTEM (DO NOT CHANGE)
   const shouldDiscount =
     quantity > 1 || cartTotal >= 100 || role !== "retail";
 
-  const pricePerUnit = shouldDiscount
+  pricePerUnit = shouldDiscount
     ? calculatePrice({
         cost: activeCost,
         quantity,
@@ -93,8 +183,16 @@ export default function ProductPage({ profile }) {
         cartTotal,
       })
     : basePrice;
+}
 
-  const totalPrice = pricePerUnit * quantity;
+const totalPrice = pricePerUnit * quantity;
+
+  // 🔥 MOQ ENFORCEMENT FOR MANUAL PRODUCTS
+  let minQty = 1;
+  if (product.type === "manual") {
+    if (role === "student") minQty = 4;
+    if (role === "wholesale") minQty = 10;
+  }
 
   // 🔥 TIERS SYSTEM (UNCHANGED)
   const tiers = [100, 250, 500];
@@ -159,208 +257,300 @@ export default function ProductPage({ profile }) {
       </Head>
 
       <main className="bg-white text-black min-h-screen">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 py-8">
 
-          <Link href="/shop" className="text-sm mb-8 inline-block hover:underline">
+          <Link href="/shop" className="text-sm mb-6 inline-block hover:underline text-blue-600">
             ← Back to Shop
           </Link>
 
-          <div className="grid md:grid-cols-2 gap-12">
+          {/* 🏪 AMAZON-STYLE 2-COLUMN LAYOUT */}
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
 
-            {/* IMAGE */}
+            {/* LEFT COLUMN - IMAGE GALLERY */}
             <div>
-              <div className="bg-gray-100 h-96 flex items-center justify-center rounded-lg mb-4">
+              {/* MAIN PRODUCT IMAGE */}
+              <div className="bg-gray-50 h-[500px] flex items-center justify-center rounded-lg mb-4 border border-gray-200">
                 {selectedImage && (
-                  <img src={selectedImage} className="h-full object-contain" />
+                  <img 
+                    src={selectedImage} 
+                    className="h-full w-full object-contain rounded-lg"
+                    alt={product.name}
+                  />
                 )}
               </div>
 
-              <div className="flex gap-3 flex-wrap">
-                {(product.images || []).map((img, i) => (
+              {/* THUMBNAIL GALLERY */}
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {(product.images || [product.image].filter(Boolean)).map((img, i) => (
                   <img
                     key={i}
                     src={img}
                     onClick={() => setSelectedImage(img)}
-                    className="h-16 w-16 object-cover border cursor-pointer hover:border-black"
+                    className={`h-20 w-20 object-cover border-2 rounded cursor-pointer transition-all ${
+                      selectedImage === img 
+                        ? 'border-orange-500 shadow-md' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    alt={`Product image ${i + 1}`}
                   />
                 ))}
               </div>
             </div>
 
-            {/* RIGHT SIDE */}
-            <div>
+            {/* RIGHT COLUMN - PRODUCT INFO */}
+            <div className="space-y-6">
 
-              <h1 className="text-3xl font-bold mb-2">
+              {/* PRODUCT TITLE */}
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
 
-              <p className="text-sm text-gray-500 mb-4">
-                ⭐ 4.7 (128 reviews) • 2,100 sold
-              </p>
+              {/* RATING & SALES */}
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center">
+                  <span className="text-yellow-500">★★★★☆</span>
+                  <span className="ml-2 text-gray-600">4.7</span>
+                </div>
+                <span className="text-gray-400">|</span>
+                <span className="text-gray-600">2,100+ sold</span>
+                <span className="text-gray-400">|</span>
+                <span className="text-green-600 font-medium">In Stock</span>
+              </div>
 
-              {/* 🔥 PRICING */}
-              <p className="text-xl mb-1">
-                Price Per Unit: <strong>${pricePerUnit.toFixed(2)}</strong>
-              </p>
-
-              <p className="text-2xl font-semibold mb-4">
-                Total: ${totalPrice.toFixed(2)}
-              </p>
-
-              {/* 🔥 RETAIL UNLOCK (BACK EXACTLY) */}
-              <div className="mb-6 border p-4 rounded-xl bg-gray-50">
-                <p className="text-xs uppercase text-gray-500">
-                  Account Status
-                </p>
-
-                <p className="font-semibold mb-2">
-                  {role === "retail" && "Retail Buyer"}
-                  {role === "student" && "Reseller"}
-                  {role === "wholesale" && "Wholesale"}
-                </p>
-
-                {role === "retail" && (
-                  <Link href="/signup">
-                    <button className="text-sm bg-black text-white px-4 py-2 rounded">
-                      Unlock Better Pricing
-                    </button>
-                  </Link>
+              {/* PRICE */}
+              <div className="border-b pb-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-gray-900">
+                    ${Number(pricePerUnit).toFixed(2)}
+                  </span>
+                  <span className="text-gray-500">per unit</span>
+                </div>
+                {quantity > 1 && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    Total: <span className="font-semibold">${Number(totalPrice).toFixed(2)}</span>
+                  </div>
                 )}
               </div>
 
-              {/* 🔥 PROGRESS SYSTEM (BACK EXACTLY) */}
-              <div className="mb-6 bg-gray-100 p-4 rounded-xl">
-
-                <p className="text-sm mb-2">
-                  {amountToNext
-                    ? `Add $${amountToNext} to unlock better pricing`
-                    : "🔥 Highest pricing tier unlocked"}
-                </p>
-
-                <div className="w-full bg-gray-200 h-2 rounded">
-                  <div
-                    className="bg-black h-2 rounded"
-                    style={{
-                      width: `${Math.min((cartTotal / 500) * 100, 100)}%`
-                    }}
-                  />
-                </div>
-
-                <div className="text-xs mt-2 text-gray-600">
-                  $100 → better • $250 → stronger • $500 → bulk
-                </div>
-              </div>
-
-              {/* SIZE */}
-              {sizes.length > 0 && (
-                <div className="mb-4">
-                  <p className="mb-2 font-medium">Size</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {sizes.map(s => (
-                      <button
-                        key={s}
-                        onClick={() => selectVariant("size", s)}
-                        className="border px-3 py-2 rounded"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+              {product.type === "manual" && (
+                <div className="mt-4 text-xs text-gray-600">
+                  <p>Buy 4+ units → $150 each</p>
+                  <p>Buy 10+ units → $125 each</p>
                 </div>
               )}
 
-              {/* COLOR */}
-              {colors.length > 0 && (
-                <div className="mb-4">
-                  <p className="mb-2 font-medium">Color</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {colors.map(c => (
-                      <button
-                        key={c}
-                        onClick={() => selectVariant("color", c)}
-                        className="border px-3 py-2 rounded"
-                      >
-                        {c}
-                      </button>
-                    ))}
-                  </div>
+              {product.type === "manual" && (
+                <div className="mt-4 text-sm border rounded-lg p-4 bg-gray-50">
+                  <p className="font-semibold mb-2">Volume Pricing</p>
+                  <ul className="space-y-1 text-gray-700">
+                    <li>1–3 units: $200 each</li>
+                    <li>4–9 units: $150 each</li>
+                    <li>10+ units: $125 each</li>
+                  </ul>
+
+                  {role === "retail" && (
+                    <p className="mt-3 text-xs text-gray-500">
+                      Create an account to unlock reseller pricing.
+                    </p>
+                  )}
+
+                  {role === "student" && (
+                    <p className="mt-3 text-xs text-gray-500">
+                      Reseller pricing active. Minimum order: 4 units.
+                    </p>
+                  )}
+
+                  {role === "wholesale" && (
+                    <p className="mt-3 text-xs text-gray-500">
+                      Wholesale pricing active. Minimum order: 10 units.
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* QTY */}
-              <div className="mb-6">
-                <label className="block mb-2 font-medium">Quantity</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="border px-4 py-2 w-24 rounded-md"
-                />
-              </div>
-
-              {addedMessage && (
-                <p className="text-green-600 text-sm mb-4">
-                  {addedMessage}
-                </p>
-              )}
-
-              <button
-                onClick={handleAddToCart}
-                className="bg-black text-white px-6 py-3 rounded-md font-semibold w-full"
-              >
-                Add to Cart
-              </button>
-
-              {/* 🔥 UPSSELL (ONLY ADDITION) */}
-              {upsellProducts.length > 0 && (
-                <div className="border p-4 rounded-xl mt-6 bg-gray-50">
-
-                  <h3 className="font-semibold mb-3">
-                    Frequently Bought Together
-                  </h3>
-
-                  {upsellProducts.map((u) => (
-                    <div key={u.id} className="flex items-center gap-3 mb-2">
-                      <input
-                        type="checkbox"
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setBundleSelected(prev => [...prev, u]);
-                          } else {
-                            setBundleSelected(prev =>
-                              prev.filter(p => p.id !== u.id)
-                            );
-                          }
-                        }}
-                      />
-                      <img src={u.image} className="h-12 w-12 object-cover" />
-                      <p className="text-sm">{u.name}</p>
-                      <span className="ml-auto text-sm font-medium">
-                        ${u.price}
-                      </span>
-                    </div>
-                  ))}
-
+              {/* QUANTITY SELECTOR */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Quantity</label>
+                <div className="flex items-center gap-3">
                   <button
-                    onClick={handleBundleAdd}
-                    className="bg-green-600 text-white px-4 py-2 mt-3 w-full rounded"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50"
                   >
-                    Add Bundle to Cart
+                    -
                   </button>
-
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-20 h-10 text-center border border-gray-300 rounded"
+                  />
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                  >
+                    +
+                  </button>
                 </div>
-              )}
+              </div>
+
+              {/* 🔥 BUY BUTTONS WITH MOQ ENFORCEMENT */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={quantity < minQty}
+                  className={`w-full py-4 px-6 font-semibold text-lg rounded-lg shadow-md transition-colors ${
+                    quantity < minQty
+                      ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                      : "bg-orange-500 hover:bg-orange-600 text-white"
+                  }`}
+                >
+                  {quantity < minQty ? `Minimum order: ${minQty}` : "Add to Cart"}
+                </button>
+                
+                <button
+                  onClick={() => router.push('/cart')}
+                  disabled={quantity < minQty}
+                  className={`w-full py-4 px-6 font-semibold text-lg rounded-lg shadow-md transition-colors ${
+                    quantity < minQty
+                      ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                      : "bg-yellow-400 hover:bg-yellow-500 text-black"
+                  }`}
+                >
+                  {quantity < minQty ? `Minimum order: ${minQty}` : "Buy Now"}
+                </button>
+              </div>
+
+              {/* 🔥 TRUST BADGES */}
+              <div className="border-t pt-6 mt-6">
+                <div className="flex justify-around text-center">
+                  <div className="text-center">
+                    <div className="text-green-600 text-xl mb-1">🔒</div>
+                    <div className="text-xs text-gray-600">Secure Checkout</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-blue-600 text-xl mb-1">🚚</div>
+                    <div className="text-xs text-gray-600">Fast Shipping</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-purple-600 text-xl mb-1">✓</div>
+                    <div className="text-xs text-gray-600">Verified Supplier</div>
+                  </div>
+                </div>
+              </div>
 
             </div>
           </div>
 
-          <div className="mt-16 max-w-3xl">
-            <h2 className="text-xl mb-4">Product Details</h2>
-            <p className="text-gray-700 whitespace-pre-line">
-              {product.description}
-            </p>
+          {/* PRODUCT DETAILS SECTION */}
+          {console.log("DESCRIPTION VALUE:", product.description)}
+          <div className="border-t pt-12">
+            <h2 className="text-3xl font-bold mb-8 text-gray-900">Product Details</h2>
+            <div
+              className="mt-6 space-y-4 text-sm text-gray-700 leading-relaxed"
+              dangerouslySetInnerHTML={{ 
+                __html: product.description || (
+                  product.type === "manual" ? `<h2>Luxury Moissanite Iced Out Watch</h2>
+
+<p>
+This moissanite watch showcases an exquisite fully iced-out design with precision-set stones 
+that deliver maximum brilliance and shine. Built for statement wear, this timepiece is perfect 
+for formal events, luxury styling, and high-end street fashion.
+</p>
+
+<h3>Premium Build Quality</h3>
+<ul>
+  <li>High-grade stainless steel construction</li>
+  <li>Scratch-resistant sapphire crystal glass</li>
+  <li>Hand-set moissanite stones with honeycomb setting</li>
+  <li>Durable, long-lasting shine and structure</li>
+</ul>
+
+<h3>Specifications</h3>
+<ul>
+  <li><strong>Movement:</strong> Mechanical Automatic</li>
+  <li><strong>Material:</strong> Stainless Steel</li>
+  <li><strong>Glass:</strong> Sapphire Crystal</li>
+  <li><strong>Water Resistance:</strong> 100M</li>
+  <li><strong>Clasp:</strong> Folding Buckle</li>
+</ul>
+
+<h3>Why Choose This Watch</h3>
+<ul>
+  <li>Passes diamond tester (moissanite stones)</li>
+  <li>Luxury appearance without inflated pricing</li>
+  <li>Perfect for resale or personal collection</li>
+</ul>
+
+<p>
+We focus on quality over cheap pricing. Every piece is crafted to meet high standards. 
+Contact us for bulk orders or customization.
+</p>` : ''
+                )
+              }}
+            />
           </div>
+
+          {/* 🌟 REVIEWS SECTION */}
+          {product.cj_product_id && (
+            <div className="border-t pt-12">
+              <h2 className="text-3xl font-bold mb-8 text-gray-900">Customer Reviews</h2>
+              
+              {loadingReviews ? (
+                <div className="text-center py-8 text-gray-500">
+                  Loading reviews...
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="space-y-6">
+                  {reviews.map((review, index) => (
+                    <div key={index} className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                      
+                      {/* STAR RATING */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex text-yellow-500">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i}>
+                              {i < review.rating ? '★' : '☆'}
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          {review.rating}/5
+                        </span>
+                      </div>
+
+                      {/* REVIEW CONTENT */}
+                      <p className="text-gray-700 mb-3 leading-relaxed">
+                        {review.comment}
+                      </p>
+
+                      {/* REVIEW META */}
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-700">
+                            {review.author}
+                          </span>
+                          <span>•</span>
+                          <span>
+                            {new Date(review.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {review.helpful > 0 && (
+                          <span>
+                            {review.helpful} found helpful
+                          </span>
+                        )}
+                      </div>
+
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  No reviews yet for this product.
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
       </main>

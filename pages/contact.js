@@ -7,16 +7,16 @@ export default function Contact() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/create-checkout-session", {
+      const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: "Strategy Call",
-          amount: 50,
-          quantity: 1,
-          legalAgreement: true, // ✅ REQUIRED
+          amount: 5000, // $50 in cents
+          success_url: "/success-call",
+          cancel_url: "/contact",
+          productName: "Strategy Call"
         }),
       });
 
@@ -26,15 +26,14 @@ export default function Contact() {
         return;
       }
 
-      const session = await response.json();
+      const { url } = await response.json();
 
-      if (!session.url) {
-        console.error("No session URL returned");
+      if (!url) {
+        console.error("No checkout URL returned");
         return;
       }
 
-      window.location.href = session.url;
-
+      window.location.href = url;
     } catch (err) {
       console.error("Checkout failed:", err);
     } finally {
@@ -74,6 +73,10 @@ export default function Contact() {
 
           <p className="text-emerald-300 text-xl font-bold mb-8">
             $50 USD
+          </p>
+
+          <p className="text-xs text-blue-300 mb-6">
+            This is a paid strategy session. After checkout, you will be able to select your time slot instantly.
           </p>
 
           <button

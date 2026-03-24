@@ -32,6 +32,23 @@ export default function CartPage() {
     0
   );
 
+  const getInventoryCount = (item) => {
+    const raw =
+      item?.inventory_count ??
+      item?.inventory ??
+      item?.stock ??
+      item?.quantity_available ??
+      item?.available_quantity;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const getUrgencyText = (item) => {
+    const inventory = getInventoryCount(item);
+    if (inventory != null && inventory < 10) return `Only ${inventory} left in stock`;
+    return "High demand";
+  };
+
   // 🔥 TIERS
   const tiers = [100, 250, 500];
   const nextTier = tiers.find(t => totalPrice < t);
@@ -56,6 +73,7 @@ export default function CartPage() {
         },
         body: JSON.stringify({
           cartItems: cart, // ✅ FIX
+          total: totalPrice,
           legalAgreement: true, // ✅ REQUIRED
         }),
       });
@@ -112,6 +130,9 @@ export default function CartPage() {
 
                   <p className="text-sm text-gray-400">
                     ${item.price.toFixed(2)} per unit
+                  </p>
+                  <p className="text-xs text-[#D4AF37] mt-1">
+                    {getUrgencyText(item)}
                   </p>
 
                   <div className="flex items-center gap-3 mt-3">
@@ -180,7 +201,7 @@ export default function CartPage() {
                     </p>
 
                     <p className="text-xs text-gray-400 mb-2">
-                      ${p.price}
+                      ${Number(p.price).toFixed(2)}
                     </p>
 
                     <button

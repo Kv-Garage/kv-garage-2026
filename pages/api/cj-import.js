@@ -8,101 +8,129 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    // 🔒 AUTH CHECK
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      return res.status(401).json({
-        error: "Not logged in",
-      });
+    // � COOKIE AUTHENTICATION (NOT LOCAL STORAGE)
+    const cookie = req.headers.cookie || "";
+    console.log("COOKIE:", req.headers.cookie);
+    
+    const isAdmin = cookie.includes("adminAuth=true");
+    
+    if (!isAdmin) {
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-
-    const { data: userData, error: userError } =
-      await supabase.auth.getUser(token);
-
-    if (userError || !userData?.user) {
-      return res.status(401).json({
-        error: "Invalid user",
-      });
-    }
-
-    // 🔒 ROLE CHECK
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userData.user.id)
-      .single();
-
-    if (!profile || profile.role !== "admin") {
-      return res.status(403).json({
-        error: "Not authorized",
-      });
-    }
-
-    // 🔥 ORIGINAL LOGIC (UNCHANGED)
+    // 🔥 DEBUG: Log incoming data
     console.log("📦 BODY:", req.body);
 
     const { product, cjProduct } = req.body;
     const data = product || cjProduct;
 
-    if (!data) {
+    if (!data || !data.pid) {
       throw new Error("No product data received");
     }
 
-    console.log("✅ USING DATA:", data);
+    console.log("📦 USING LIST DATA ONLY:", JSON.stringify(data, null, 2));
 
-    const cost = Number(data.basePrice || data.sellPrice || 10);
+    // 🔥 IMAGES: Start with main image + extract from remark HTML
+    const images = [];
+    
+    // Add main product image
+    if (data.productImage) {
+      images.push(data.productImage);
+    }
 
-    const price = calculatePrice({
-      cost,
-      quantity: 1,
-      role: "retail",
-      cartTotal: 0
-    });
+    // Extract ALL additional images from data.remark HTML
+    if (data.remark) {
+      const imgMatches = data.remark.match(/<img[^>]+src="([^">]+)"/g);
+      if (imgMatches) {
+        imgMatches.forEach(match => {
+          const srcMatch = match.match(/src="([^">]+)"/);
+          if (srcMatch && srcMatch[1]) {
+            const imgSrc = srcMatch[1];
+            // Avoid duplicates
+            if (!images.includes(imgSrc)) {
+              images.push(imgSrc);
+            }
+          }
+        });
+      }
+    }
 
+    // 🔥 TITLE: Use productNameEn
+    const title = data.productNameEn || data.productName || "Unknown Product";
+
+    // 🔥 DESCRIPTION: Use remark (HTML)
+    const description = data.remark || data.description || "";
+
+    // 🔥 PRICE: Parse sellPrice, use lowest value if range
+    let cost = 10; // fallback
+    
+    if (data.sellPrice) {
+      const sellPriceStr = String(data.sellPrice);
+      if (sellPriceStr.includes('--')) {
+        // Handle price range - use lowest value
+        const prices = sellPriceStr.split('--').map(p => parseFloat(p.trim()));
+        if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
+          cost = Math.min(prices[0], prices[1]);
+        }
+      } else {
+        // Single price
+        const singlePrice = parseFloat(sellPriceStr);
+        if (!isNaN(singlePrice)) {
+          cost = singlePrice;
+        }
+      }
+    }
+
+    // 🔥 APPLY PRICING LOGIC (simple markup)
+    const price = cost * 3; // Simple retail markup
+    
+    console.log("💰 PRICING:", { cost, price });
+
+    // 🔥 SAVE PRODUCT: Only use existing database columns
     const payload = {
-      name: data.name || data.productName,
-      slug: (data.name || data.productName)
-        ?.toLowerCase()
-        .replaceAll(" ", "-"),
-
-      description: data.description || "",
-
-      category: "glass",
+      name: title,                   // Use existing 'name' column
+      slug: title
+        .toLowerCase()
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, ""),
+      
+      description: description,       // Existing column
+      
+      image: images[0] || "",         // Keep for compatibility
+      images: images,                 // Existing column
+      
+      price: price,                   // Existing column
+      cost: cost,                     // Keep for reference
+      supplier_price: cost,           // Keep for compatibility
+      
+      category: data.category || "glass",
       supplier: "cj",
-
-      cost,
-      supplier_price: cost,
-      price,
-
-      image: data.images?.[0] || data.productImage || "",
-      images: data.images || [data.productImage].filter(Boolean),
-
       cj_product_id: data.pid,
-
-      // 🔥 ADD WHOLESALE FIELDS
-      moq: 4,
-      wholesale_price: price * 0.7,
-      type: "single",
-
+      
       fulfillment_type: "dropship",
-      inventory_count: 0
+      inventory_count: Number(data.inventory || data.stock) || 0,
+      active: true
     };
 
-    console.log("🧠 PAYLOAD:", payload);
+    console.log("🧠 SAVING PRODUCT:", JSON.stringify(payload, null, 2));
 
-    const { error } = await supabase
+    // Insert product
+    const { data: productData, error } = await supabase
       .from("products")
-      .insert([payload]);
+      .insert([payload])
+      .select()
+      .single();
 
     if (error) {
       console.error("❌ SUPABASE ERROR:", error);
       throw error;
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ 
+      success: true, 
+      product: productData,
+      imagesCount: images.length
+    });
 
   } catch (err) {
     console.error("❌ IMPORT ERROR:", err);

@@ -49,19 +49,27 @@ export default function Layout({ children }) {
       <header className="w-full bg-[#05070D] border-b border-[#1C2233] sticky top-0 z-50">
 
         {/* TOP ROW */}
-        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-6 py-4 md:py-5 flex justify-between items-center">
 
           {/* LOGO */}
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse"></div>
-
-            <h1 className="text-xl md:text-2xl font-bold tracking-wider">
-              KV GARAGE
-            </h1>
-          </div>
+          <Link href="/" aria-label="Go to homepage" className="flex items-center gap-2.5 cursor-pointer">
+            <img
+              src="/logo/Kv%20garage%20icon.png"
+              alt=""
+              className="h-8 w-8 md:h-9 md:w-9 object-contain flex-shrink-0"
+            />
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[15px] md:text-base font-semibold tracking-[0.08em] leading-none">
+                KV GARAGE
+              </span>
+              <span className="text-[10px] md:text-[11px] text-gray-500 font-normal tracking-[0.06em] uppercase">
+                Verified Supplies
+              </span>
+            </div>
+          </Link>
 
           {/* 🔥 RIGHT SIDE (AUTH + CART) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
 
             {/* AUTH */}
             {!user ? (
@@ -110,9 +118,9 @@ export default function Layout({ children }) {
 
         {/* NAV */}
         <div className="w-full border-t border-[#1C2233]">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-center overflow-x-auto">
+          <div className="max-w-7xl mx-auto px-6 py-2.5 md:py-3 flex items-center justify-center overflow-x-auto">
 
-            <nav className="flex gap-6 text-sm font-medium text-gray-300 whitespace-nowrap">
+            <nav className="flex gap-6 md:gap-8 text-[13px] md:text-sm font-medium text-gray-400 whitespace-nowrap">
 
               <NavLink href="/">Home</NavLink>
               <NavLink href="/wholesale">Wholesale</NavLink>
@@ -149,9 +157,16 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-10">
 
           <div className="col-span-2 md:col-span-1">
-            <h4 className="text-lg font-semibold text-[#D4AF37] mb-4">
-              KV GARAGE
-            </h4>
+            <Link href="/" className="flex items-center gap-2 mb-4">
+              <img
+                src="/logo/Kv%20garage%20icon.png"
+                alt=""
+                className="h-8 w-8 object-contain opacity-80"
+              />
+              <h4 className="text-lg font-semibold text-[#D4AF37]">
+                KV GARAGE
+              </h4>
+            </Link>
 
             <p className="text-gray-400 text-sm leading-relaxed">
               A structured ecosystem for supply, retail, systems, and revenue generation.

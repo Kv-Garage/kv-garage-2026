@@ -39,7 +39,7 @@ export default function Shop({ profile }) {
 
       <main className="bg-white text-black">
 
-        {/* 🔥 ACCOUNT PANEL (PREMIUM) */}
+        {/* 🔥 ACCOUNT PANEL (UNCHANGED) */}
         <div className="max-w-7xl mx-auto px-6 pt-8">
           <div className="border border-gray-200 rounded-xl p-5 bg-gray-50">
 
@@ -122,40 +122,84 @@ export default function Shop({ profile }) {
 
               {products.map((product) => {
 
-                // 🔥 BASE PRICE ONLY (NO LOGIC HERE)
+                console.log("SLUG:", product.slug);
+                console.log("IMAGES VALUE:", product.images);
+                console.log("IMAGES TYPE:", typeof product.images);
+                console.log("IS ARRAY:", Array.isArray(product.images));
+
+                // 🔥 SIMPLE SLUG CHECK FOR ALL PRODUCTS
+                console.log("SLUG CHECK:", product.slug);
+
+                // 🔥 LOG PRODUCT DATA FOR KV-CT-001
+                if (product.slug === 'kv-ct-001' || product.id === 'kv-ct-001' || product.name?.includes('kv-ct-001')) {
+                  console.log("IMAGES VALUE:", product.images);
+                  console.log("IMAGES TYPE:", typeof product.images);
+                  console.log("IS ARRAY:", Array.isArray(product.images));
+                  
+                  console.log('🔍 PRODUCT OBJECT FOR KV-CT-001:', {
+                    id: product.id,
+                    slug: product.slug,
+                    name: product.name,
+                    images: product.images,
+                    image: product.image,
+                    images_type: typeof product.images,
+                    image_type: typeof product.image,
+                    images_length: product.images?.length,
+                    full_product: product
+                  });
+                }
+
+                // 🔥 SLUG VALIDATION & FALLBACK
+                const productSlug = product.slug || product.id || `product-${product.id}`;
+                const productUrl = `/shop/${productSlug}`;
+                
+                // 🔥 LOG URL ISSUES
+                if (!product.slug || product.slug === '') {
+                  console.warn('⚠️ MISSING SLUG for product:', {
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    fallbackUrl: productUrl
+                  });
+                }
+
                 const displayPrice = product.price || (product.cost * 2);
+
+                // 🔥 ONLY CHANGE IS HERE
+                const displayImage =
+                  product.images?.[0] ||
+                  product.image ||
+                  "/placeholder.jpg";
 
                 return (
                   <Link
+                    href={productUrl}
                     key={product.id}
-                    href={`/shop/${product.slug}`}
-                    className="group border border-gray-200 rounded-xl p-6 hover:shadow-xl transition duration-300 bg-white"
+                    className="bg-white rounded-xl p-4 hover:shadow-xl transition-all cursor-pointer"
                   >
-
-                    <div className="bg-gray-100 aspect-square rounded-lg overflow-hidden mb-6">
+                    <div className="h-40 w-full object-cover mb-4 rounded-lg overflow-hidden">
                       <img
-                        src={product.image}
+                        src={displayImage}
+                        className="h-full w-full object-cover"
                         alt={product.name}
-                        className="w-full h-full object-cover"
                       />
                     </div>
 
-                    <h3 className="text-lg font-semibold mb-2 group-hover:underline">
+                    <h3 className="font-semibold mb-2 line-clamp-2">
                       {product.name}
                     </h3>
 
-                    <p className="text-sm text-gray-600 mb-2">
-                      Ready to ship. Limited inventory.
+                    <p className="text-sm text-gray-500 mb-4">
+                      {product.category}
                     </p>
 
                     <p className="text-sm font-semibold mb-4">
-                      ${displayPrice}
+                      ${Number(displayPrice).toFixed(2)}
                     </p>
 
                     <span className="text-sm font-medium">
                       View Product →
                     </span>
-
                   </Link>
                 );
               })}
@@ -166,7 +210,7 @@ export default function Shop({ profile }) {
 
         </section>
 
-        {/* TRUST SECTION */}
+        {/* TRUST SECTION (UNCHANGED) */}
         <section className="bg-gray-50 py-20">
           <div className="max-w-7xl mx-auto px-6 md:px-8">
 

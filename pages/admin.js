@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { calculatePrice } from "../lib/pricing";
 
 export default function Admin() {
@@ -8,7 +9,15 @@ export default function Admin() {
   const router = useRouter();
 
   useEffect(() => {
-    const auth = localStorage.getItem("kv_admin_auth");
+    // Check for admin auth cookie
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    };
+    
+    const auth = getCookie('adminAuth');
     if (auth !== "true") {
       router.push("/admin-login");
     }
@@ -221,25 +230,35 @@ export default function Admin() {
     setLoadingCJ(false);
   };
 
-  // 🔥 IMPORT FROM CJ
+  // 🔥 IMPORT FROM CJ (using same API as fixed import system)
   const handleImportCJ = async (p) => {
-    setMessage("Importing...");
+    try {
+      setMessage("Importing product...");
 
-    const error = await saveProduct({
-      name: p.productNameEn || p.productName,
-      description: p.productNameEn || p.productName,
-      supplier: "cj",
-      category: "glass",
-      supplier_price: p.sellPrice,
-      image: p.productImage,
-      images: [p.productImage],
-      cj_product_id: p.pid
-    });
+      // Use the fixed CJ import API
+      const res = await fetch("/api/cj-import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cjProduct: p  // Send the product data directly
+        }),
+      });
 
-    if (error) {
-      setMessage("❌ " + error.message);
-    } else {
-      setMessage("✅ Imported: " + (p.productNameEn || p.productName));
+      const result = await res.json();
+
+      if (result.error) {
+        console.error("IMPORT ERROR:", result);
+        setMessage("❌ Import failed: " + result.error);
+      } else {
+        setMessage("✅ Product imported successfully!");
+        setTimeout(() => setMessage(""), 3000);
+      }
+
+    } catch (err) {
+      console.error("IMPORT CRASH:", err);
+      setMessage("❌ Server error during import");
     }
   };
 
@@ -252,15 +271,32 @@ export default function Admin() {
 
       {/* 🔥 MODE SWITCH */}
       <div className="flex gap-4 mb-8 flex-wrap">
-        <button onClick={() => setMode("manual")}>Manual</button>
-        <button onClick={() => setMode("url")}>URL Import</button>
-        <button onClick={() => setMode("bulk")}>Bulk Import</button>
-        <button onClick={() => {
-          setMode("cj");
-          fetchCJProducts();
-        }}>
-          CJ Products
+        <button
+          onClick={() => setMode("manual")}
+          className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+            mode === "manual"
+              ? "bg-[#D4AF37] text-black"
+              : "bg-[#1C2233] text-gray-300 hover:bg-[#2A3441]"
+          }`}
+        >
+          Manual Add
         </button>
+        <button
+          onClick={() => setMode("cj")}
+          className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+            mode === "cj"
+              ? "bg-[#D4AF37] text-black"
+              : "bg-[#1C2233] text-gray-300 hover:bg-[#2A3441]"
+          }`}
+        >
+          CJ Dropshipping
+        </button>
+        <Link
+          href="/admin/bulk-import"
+          className="px-6 py-3 rounded-lg font-semibold transition-all bg-[#1C2233] text-gray-300 hover:bg-[#2A3441]"
+        >
+          Bulk Import
+        </Link>
       </div>
 
       {/* 🔥 CJ MODE */}
@@ -281,7 +317,7 @@ export default function Admin() {
                 </p>
 
                 <p className="text-[#D4AF37] mb-3">
-                  ${p.sellPrice}
+                  ${Number(p.sellPrice).toFixed(2)}
                 </p>
 
                 <button
