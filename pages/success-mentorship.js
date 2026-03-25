@@ -45,11 +45,14 @@ export default function SuccessMentorship() {
                 Schedule Your Onboarding Call
               </h2>
               
-              <div 
-                className="calendly-inline-widget"
-                data-url="https://calendly.com/kv-garage/mentorship-onboarding"
-                style={{ minWidth: '320px', height: '700px' }}
-              />
+              <iframe
+                src="https://calendly.com/kvgarage-kvgarage/60min"
+                width="100%"
+                height="700"
+                frameBorder="0"
+                scrolling="no"
+                style={{ border: 'none' }}
+              ></iframe>
             </div>
 
             {/* Additional Info */}

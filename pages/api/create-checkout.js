@@ -10,9 +10,54 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { amount, success_url, cancel_url = '/', productName = 'Product' } = req.body;
+    const { amount, success_url, cancel_url = '/', productName = 'Product', type } = req.body;
+    const origin =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "http://localhost:3000";
 
-    // Validate required parameters
+    // Handle all call types (call, mentorship, advisory) with their specific configs
+    if (type === "call" || type === "mentorship" || type === "advisory" || type === "course") {
+      let finalProductName = productName || "Strategy Call";
+      let finalAmount = amount || 5000; // Default $50
+      let finalSuccessUrl = success_url || "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}";
+
+      // Use hardcoded success URLs for specific types
+      if (type === "mentorship") {
+        finalSuccessUrl = "http://localhost:3000/success-mentorship?session_id={CHECKOUT_SESSION_ID}";
+      } else if (type === "advisory") {
+        finalSuccessUrl = "http://localhost:3000/success-advisory?session_id={CHECKOUT_SESSION_ID}";
+      } else if (type === "course") {
+        finalSuccessUrl = "http://localhost:3000/success-course?session_id={CHECKOUT_SESSION_ID}";
+      } else if (type === "call") {
+        finalSuccessUrl = "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}";
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: finalProductName,
+              },
+              unit_amount: finalAmount,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: finalSuccessUrl,
+        cancel_url: "http://localhost:3000/cancel",
+        metadata: {
+          type: type, // Keep the actual type for tracking
+        }
+      });
+
+      return res.status(200).json({ url: session.url });
+    }
+
+    // Validate required parameters for other types
     if (!amount || amount <= 0) {
       return res.status(400).json({ error: 'Invalid amount. Amount must be greater than 0.' });
     }
@@ -21,7 +66,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Success URL is required.' });
     }
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session for other types
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],

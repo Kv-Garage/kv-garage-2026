@@ -10,17 +10,13 @@ export default function BookPage() {
 
       setLoading(true);
 
-      const res = await fetch("/api/create-checkout-session", {
+      const res = await fetch("/api/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          name: "Infrastructure Strategy Session",
-          amount: 50,
-          quantity: 1,
-          booking: true,
-          legalAgreement: true
+          type: "call"
         })
       });
 

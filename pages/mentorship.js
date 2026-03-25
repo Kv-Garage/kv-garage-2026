@@ -7,42 +7,16 @@ export default function Academy() {
 
   const handleCheckout = async (type) => {
     try {
-      console.log("CLICKED:", type);
       setLoading(type);
 
-      let checkoutConfig;
-      switch (type) {
-        case "course":
-          checkoutConfig = {
-            amount: 12900, // $129 in cents
-            success_url: "/success-course",
-            productName: "Course Access"
-          };
-          break;
-        case "mentorship":
-          checkoutConfig = {
-            amount: 50000, // $500 in cents
-            success_url: "/success-mentorship",
-            productName: "Mentorship Program"
-          };
-          break;
-        case "advisory":
-          checkoutConfig = {
-            amount: 100000, // $1000 in cents
-            success_url: "/success-advisory",
-            productName: "Full Advisory"
-          };
-          break;
-        default:
-          throw new Error("Invalid checkout type");
-      }
-
-      const response = await fetch("/api/create-checkout", {
+      const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(checkoutConfig),
+        body: JSON.stringify({
+          type: type
+        }),
       });
 
       if (!response.ok) {
@@ -77,8 +51,8 @@ export default function Academy() {
       <main className="bg-[#05070D] text-white relative overflow-hidden">
 
         {/* BACKGROUND */}
-        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(#111827_1px,transparent_1px),linear-gradient(90deg,#111827_1px,transparent_1px)] bg-[size:40px_40px]" />
-        <div className="absolute top-[-200px] left-[-100px] w-[500px] h-[500px] bg-[#D4AF37]/20 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(#111827_1px,transparent_1px),linear-gradient(90deg,#111827_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="absolute top-[-200px] left-[-100px] w-[500px] h-[500px] bg-[#D4AF37]/20 blur-[120px] rounded-full pointer-events-none" />
 
         {/* HERO */}
         <section className="py-32 border-b border-[#1C2233]">
@@ -94,10 +68,10 @@ export default function Academy() {
               </p>
 
               <button
-                onClick={() => handleCheckout("course")}
+                onClick={() => handleCheckout("call")}
                 className="bg-[#D4AF37] text-black px-8 py-3 rounded-lg"
               >
-                {loading === "course" ? "Loading..." : "Start Learning"}
+                {loading === "call" ? "Loading..." : "Book $50 Strategy Call"}
               </button>
             </div>
 
@@ -131,12 +105,19 @@ export default function Academy() {
 
               <p className="text-2xl mb-6">$129</p>
 
-              {/* 🔥 FIXED BUTTON */}
+              {/* COMING SOON BADGE */}
+              <div className="mb-4">
+                <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm font-semibold">
+                  Coming Soon
+                </span>
+              </div>
+
+              {/* DISABLED BUTTON */}
               <button
-                onClick={() => handleCheckout("course")}
-                className="bg-[#D4AF37] text-black px-8 py-3 rounded-lg"
+                disabled
+                className="bg-gray-600 text-gray-400 px-8 py-3 rounded-lg cursor-not-allowed opacity-50"
               >
-                {loading === "course" ? "Loading..." : "Join Course"}
+                Join Course - Coming Soon
               </button>
             </div>
 
@@ -167,14 +148,19 @@ export default function Academy() {
                 <p>• Real-world application</p>
               </div>
 
-              <p className="text-2xl mb-6">$500</p>
+              <p 
+                className="text-2xl mb-6 cursor-pointer hover:text-[#D4AF37] transition-colors"
+                onClick={() => handleCheckout("mentorship")}
+              >
+                {loading === "mentorship" ? "Loading..." : "$500"}
+              </p>
 
               {/* 🔥 FIXED BUTTON */}
               <button
                 onClick={() => handleCheckout("mentorship")}
                 className="bg-[#D4AF37] text-black px-8 py-3 rounded-lg"
               >
-                {loading === "mentorship" ? "Loading..." : "Apply for Mentorship"}
+                {loading === "mentorship" ? "Loading..." : "Join Mentorship - $500"}
               </button>
             </div>
 
@@ -200,14 +186,19 @@ export default function Academy() {
                 Advanced strategy and execution support.
               </p>
 
-              <p className="text-2xl mb-6">$1000+</p>
+              <p 
+                className="text-2xl mb-6 cursor-pointer hover:text-[#D4AF37] transition-colors"
+                onClick={() => handleCheckout("advisory")}
+              >
+                {loading === "advisory" ? "Loading..." : "$1000"}
+              </p>
 
               {/* 🔥 FIXED BUTTON */}
               <button
                 onClick={() => handleCheckout("advisory")}
                 className="bg-[#D4AF37] text-black px-8 py-3 rounded-lg"
               >
-                {loading === "advisory" ? "Loading..." : "Apply"}
+                {loading === "advisory" ? "Loading..." : "Apply for Advisory - $1000"}
               </button>
             </div>
 

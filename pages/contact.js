@@ -13,10 +13,7 @@ export default function Contact() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: 5000, // $50 in cents
-          success_url: "/success-call",
-          cancel_url: "/contact",
-          productName: "Strategy Call"
+          type: "call"
         }),
       });
 

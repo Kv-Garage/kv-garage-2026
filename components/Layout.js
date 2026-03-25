@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { useEffect, useState } from "react";
 
 export default function Layout({ children }) {
   const { cart } = useCart();
+  const { user, signOut } = useAuth();
 
   const itemCount = cart.length;
 
@@ -13,32 +15,9 @@ export default function Layout({ children }) {
     0
   );
 
-  // 🔥 USER STATE (ADDED)
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-
-    getUser();
-
-    // 🔄 Listen for login/logout
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  // 🔥 LOGOUT
+  //  LOGOUT
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     window.location.reload();
   };
 
@@ -89,7 +68,7 @@ export default function Layout({ children }) {
             ) : (
               <>
                 <span className="text-xs text-gray-400 hidden md:block">
-                  {user.email}
+                  {user?.email}
                 </span>
 
                 <button
@@ -119,9 +98,7 @@ export default function Layout({ children }) {
         {/* NAV */}
         <div className="w-full border-t border-[#1C2233]">
           <div className="max-w-7xl mx-auto px-6 py-2.5 md:py-3 flex items-center justify-center overflow-x-auto">
-
             <nav className="flex gap-6 md:gap-8 text-[13px] md:text-sm font-medium text-gray-400 whitespace-nowrap">
-
               <NavLink href="/">Home</NavLink>
               <NavLink href="/wholesale">Wholesale</NavLink>
               <NavLink href="/shop">Retail</NavLink>
@@ -140,7 +117,6 @@ export default function Layout({ children }) {
               </Link>
 
             </nav>
-
           </div>
         </div>
 

@@ -7,28 +7,24 @@ export default function Trading() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/create-checkout-session", {
+      const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: "Strategy Call",
-          amount: 50,
-          quantity: 1,
-          booking: true,
-          legalAgreement: true,
+          type: "call"
         }),
       });
 
-      const session = await response.json();
+      const data = await response.json();
 
-      if (!session.url) {
+      if (!data.url) {
         setLoading(false);
         return;
       }
 
-      window.location.href = session.url;
+      window.location.href = data.url;
     } catch (err) {
       console.error(err);
       setLoading(false);

@@ -109,10 +109,12 @@ export default function Success() {
 
             <div className="rounded-xl overflow-hidden shadow-lg">
               <iframe
-                src="https://calendly.com/kvgarage-kvgarage/60min"
+                src="https://calendly.com/kvgarage-kvgarage/60min?hide_event_type_details=1&hide_gdpr_banner=1"
                 width="100%"
                 height="700"
                 frameBorder="0"
+                scrolling="no"
+                style={{ border: 'none' }}
               ></iframe>
             </div>
           </>

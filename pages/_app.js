@@ -1,21 +1,18 @@
 import '../styles/globals.css'
 import Layout from '../components/Layout'
 import { CartProvider } from '../context/CartContext'
+import { AuthProvider } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
 
 export default function MyApp({ Component, pageProps }) {
-
   const router = useRouter()
 
   const [authorized, setAuthorized] = useState(false)
   const [passwordInput, setPasswordInput] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-
-  const [user, setUser] = useState(null)
-  const [profile, setProfile] = useState(null)
 
   const SITE_PASSWORD = "KVgarage2026!"
 
@@ -25,53 +22,6 @@ export default function MyApp({ Component, pageProps }) {
     if (storedAuth === "true") {
       setAuthorized(true)
     }
-
-    // 🔐 GET CURRENT USER
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-
-      if (user) {
-        setUser(user)
-
-        // 🔥 GET PROFILE (ROLE)
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single()
-
-        setProfile(data)
-      }
-    }
-
-    getUser()
-
-    // 🔄 LISTEN FOR LOGIN CHANGES
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user)
-
-          const { data } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single()
-
-          setProfile(data)
-        } else {
-          setUser(null)
-          setProfile(null)
-        }
-      }
-    )
-
-    setLoading(false)
-
-    return () => {
-      listener.subscription.unsubscribe()
-    }
-
   }, [])
 
   // Allow access to these routes without password
@@ -94,7 +44,6 @@ export default function MyApp({ Component, pageProps }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white px-6">
         <div className="max-w-md w-full text-center">
-
           <h1 className="text-3xl font-bold mb-6">
             Private Access
           </h1>
@@ -126,17 +75,18 @@ export default function MyApp({ Component, pageProps }) {
           >
             Confirm Access
           </button>
-
         </div>
       </div>
     )
   }
 
   return (
-    <CartProvider>
-      <Layout user={user} profile={profile}>
-        <Component {...pageProps} user={user} profile={profile} />
-      </Layout>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </CartProvider>
+    </AuthProvider>
   )
 }

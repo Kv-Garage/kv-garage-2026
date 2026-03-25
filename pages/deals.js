@@ -9,7 +9,7 @@ export default function Deals() {
     try {
       setLoading("booking");
 
-      const res = await fetch("/api/create-checkout-session", {
+      const res = await fetch("/api/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
