@@ -22,6 +22,8 @@ export default function MyApp({ Component, pageProps }) {
     if (storedAuth === "true") {
       setAuthorized(true)
     }
+    
+    setLoading(false)
   }, [])
 
   // Allow access to these routes without password
