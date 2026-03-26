@@ -9,6 +9,7 @@ export default function Success() {
 
   const [showCalendly, setShowCalendly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [orderNumber, setOrderNumber] = useState("");
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -27,8 +28,14 @@ export default function Success() {
       try {
         const res = await fetch(`/api/get-session?session_id=${session_id}`);
         const data = await res.json();
+        const orderRes = await fetch(`/api/get-order?session_id=${session_id}`);
+        const orderData = await orderRes.json();
 
         console.log("SESSION:", data);
+
+        if (orderData?.order?.order_number) {
+          setOrderNumber(orderData.order.order_number);
+        }
 
         // 🔥 ONLY show calendar for these types
         if (
@@ -72,6 +79,12 @@ export default function Success() {
             <p className="text-gray-700 mb-6">
               Your purchase has been completed successfully.
             </p>
+
+            {orderNumber && (
+              <p className="text-lg font-semibold text-gray-900 mb-6">
+                Order #{orderNumber} confirmed
+              </p>
+            )}
 
             <div className="flex gap-4 justify-center flex-wrap">
 

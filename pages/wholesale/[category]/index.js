@@ -1,7 +1,10 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import { supabase } from "../../../lib/supabase";
+import { PUBLIC_PRODUCT_FIELDS, getPrimaryProductImage } from "../../../lib/productFields";
+import { buildCanonicalUrl } from "../../../lib/seo";
 
 export default function WholesaleCategoryPage() {
   const router = useRouter();
@@ -22,7 +25,7 @@ export default function WholesaleCategoryPage() {
   const fetchProducts = async () => {
     const { data } = await supabase
       .from("products")
-      .select("*")
+      .select(PUBLIC_PRODUCT_FIELDS)
       .eq("category", category);
 
     setProducts(data || []);
@@ -46,6 +49,15 @@ export default function WholesaleCategoryPage() {
   const approved = profile?.approved || false;
 
   return (
+    <>
+      <Head>
+        <title>{`${formattedTitle || "Wholesale"} | Bulk Inventory Sourcing — KV Garage`}</title>
+        <meta
+          name="description"
+          content={`Explore ${formattedTitle || "wholesale"} inventory sourced for resellers, retailers, and operators building a scalable supply chain through KV Garage.`}
+        />
+        <link rel="canonical" href={buildCanonicalUrl(`/wholesale/${category || ""}`)} />
+      </Head>
     <div className="min-h-screen bg-[#0B0F19] text-white px-6 py-24">
 
       <div className="max-w-6xl mx-auto">
@@ -141,7 +153,7 @@ export default function WholesaleCategoryPage() {
 
                 <div className="h-48 bg-gray-700 rounded-lg mb-4 overflow-hidden">
                   {p.image && (
-                    <img src={p.image} className="w-full h-full object-cover" />
+                    <img src={getPrimaryProductImage(p)} className="w-full h-full object-cover" loading="lazy" alt={p.name} />
                   )}
                 </div>
 
@@ -184,5 +196,6 @@ export default function WholesaleCategoryPage() {
       </div>
 
     </div>
+    </>
   );
 }

@@ -10,23 +10,76 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both email and password.");
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password: password.trim(),
     });
 
     if (error) {
-      setError(error.message);
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        setError("Email not confirmed. Please check your inbox for the confirmation link.");
+      } else {
+        setError(error.message);
+      }
       setLoading(false);
-    } else {
-      router.push("/shop");
+      return;
     }
+
+    const user = data.user;
+    if (!user) {
+      setError("Unable to log in. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Profile fetch error:", profileError);
+      setError("Account profile not found. Please contact support.");
+      setLoading(false);
+      return;
+    }
+
+    if (!profile) {
+      // Most likely wholesale pending approval path
+      await supabase.auth.signOut();
+      setError("Your account is pending approval. You cannot log in until a manager approves your application.");
+      setLoading(false);
+      return;
+    }
+
+    if (profile.role === "admin") {
+      router.push("/admin");
+      setLoading(false);
+      return;
+    }
+
+    if (profile.role === "wholesale" && !profile.approved) {
+      await supabase.auth.signOut();
+      setError("Wholesale account pending approval. Please wait for confirmation.");
+      setLoading(false);
+      return;
+    }
+
+    router.push("/shop");
   };
 
   return (
@@ -71,14 +124,23 @@ export default function Login() {
               required
             />
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full p-3 rounded bg-[#111827]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className="w-full p-3 rounded bg-[#111827]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-300 hover:text-white"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
 
             {error && (
               <p className="text-red-500 text-sm">{error}</p>

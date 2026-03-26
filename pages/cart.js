@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
+import { PUBLIC_PRODUCT_FIELDS, getPrimaryProductImage } from "../lib/productFields";
 
 export default function CartPage() {
   const {
@@ -13,22 +14,80 @@ export default function CartPage() {
   } = useCart();
 
   const [products, setProducts] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [pricingMap, setPricingMap] = useState({});
 
   useEffect(() => {
     fetchProducts();
+    fetchProfile();
   }, []);
 
   const fetchProducts = async () => {
     const { data } = await supabase
       .from("products")
-      .select("*")
+      .select(PUBLIC_PRODUCT_FIELDS)
+      .or("is_active.eq.true,is_active.is.null")
       .limit(4);
 
     setProducts(data || []);
   };
 
+  const fetchProfile = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData?.session?.user;
+
+    if (!user?.id) return;
+
+    const { data } = await supabase
+      .from("profiles")
+      .select("role,approved")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    setProfile(data || null);
+  };
+
+  useEffect(() => {
+    const loadPricing = async () => {
+      const { data } = await supabase.auth.getSession();
+      const token = data?.session?.access_token;
+      const nextPricing = {};
+
+      for (const item of cart) {
+        try {
+          const response = await fetch("/api/price-preview", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              productId: item.id,
+              quantity: item.quantity,
+            }),
+          });
+
+          const payload = await response.json();
+          if (response.ok) {
+            nextPricing[item.id] = payload;
+          }
+        } catch (error) {
+          console.error("Cart pricing failed:", error);
+        }
+      }
+
+      setPricingMap(nextPricing);
+    };
+
+    if (cart.length > 0) {
+      loadPricing();
+    } else {
+      setPricingMap({});
+    }
+  }, [cart]);
+
   const totalPrice = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + Number(pricingMap[item.id]?.display_price || item.price || 0) * item.quantity,
     0
   );
 
@@ -66,14 +125,25 @@ export default function CartPage() {
   // 🔥 STRIPE CHECKOUT (FIXED)
   const handleCheckout = async () => {
     try {
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUser = authData?.user || null;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token || null;
+
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
-          cartItems: cart, // ✅ FIX
+          cartItems: cart.map((item) => ({
+            ...item,
+            price: Number(pricingMap[item.id]?.display_price || item.price || 0),
+          })),
           total: totalPrice,
+          userId: currentUser?.id || null,
+          customerEmail: currentUser?.email || null,
           legalAgreement: true, // ✅ REQUIRED
         }),
       });
@@ -118,7 +188,7 @@ export default function CartPage() {
 
                 <div className="w-20 h-20 bg-gray-700 rounded-md overflow-hidden">
                   {item.image && (
-                    <img src={item.image} className="w-full h-full object-cover" />
+                    <img src={item.image} className="w-full h-full object-cover" loading="lazy" />
                   )}
                 </div>
 
@@ -129,8 +199,11 @@ export default function CartPage() {
                   </h2>
 
                   <p className="text-sm text-gray-400">
-                    ${item.price.toFixed(2)} per unit
+                    ${Number(pricingMap[item.id]?.display_price || item.price || 0).toFixed(2)} per unit
                   </p>
+                  {pricingMap[item.id]?.note ? (
+                    <p className="text-xs text-[#D4AF37] mt-1">{pricingMap[item.id].note}</p>
+                  ) : null}
                   <p className="text-xs text-[#D4AF37] mt-1">
                     {getUrgencyText(item)}
                   </p>
@@ -160,7 +233,7 @@ export default function CartPage() {
                 <div className="text-right">
 
                   <p className="font-semibold text-lg">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ${(Number(pricingMap[item.id]?.display_price || item.price || 0) * item.quantity).toFixed(2)}
                   </p>
 
                   <button
@@ -191,8 +264,8 @@ export default function CartPage() {
                   >
 
                     <div className="bg-gray-700 h-24 mb-3 rounded overflow-hidden">
-                      {p.image && (
-                        <img src={p.image} className="w-full h-full object-cover" />
+                      {getPrimaryProductImage(p) && (
+                        <img src={getPrimaryProductImage(p)} className="w-full h-full object-cover" loading="lazy" alt={p.name} />
                       )}
                     </div>
 
@@ -210,8 +283,9 @@ export default function CartPage() {
                           name: p.name,
                           price: p.price,
                           quantity: 1,
-                          image: p.image,
+                          image: getPrimaryProductImage(p),
                           id: p.id,
+                          category: p.category || "general",
                         })
                       }
                       className="w-full bg-[#D4AF37] text-black py-1 rounded text-sm font-semibold"
@@ -269,6 +343,23 @@ export default function CartPage() {
                 <p className="text-green-400 text-sm">
                   Estimated Profit: ${estimatedProfit.toFixed(2)}
                 </p>
+                {profile?.role === "wholesale" && cart.some((item) => pricingMap[item.id]?.volume_pricing?.length) ? (
+                  <div className="mt-4 space-y-2 text-xs text-gray-300">
+                    {cart
+                      .map((item) => pricingMap[item.id])
+                      .filter((entry) => entry?.volume_pricing?.length)
+                      .slice(0, 1)
+                      .map((entry) => (
+                        <div key={entry.productId}>
+                          {entry.volume_pricing.map((row) => (
+                            <p key={row.range}>
+                              {row.range}: ${Number(row.price || 0).toFixed(2)} {row.note ? `(${row.note})` : ""}
+                            </p>
+                          ))}
+                        </div>
+                      ))}
+                  </div>
+                ) : null}
 
               </div>
             )}

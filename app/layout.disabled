@@ -1,0 +1,2 @@
+// This file is intentionally empty to avoid conflicts with Pages Router
+// Admin routes use their own layout in app/admin/layout.js

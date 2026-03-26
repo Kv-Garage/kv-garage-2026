@@ -35,6 +35,9 @@ export default function Signup() {
     const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/login`,
+      },
     });
 
     if (error) {
@@ -45,9 +48,35 @@ export default function Signup() {
 
     const user = data.user;
 
-    await supabase.from("profiles").insert([
+    // Wholesale users are reviewed via the applications table and require manual approval
+    if (form.role === "wholesale") {
+      const { error: applicationError } = await supabase.from("applications").insert([
+        {
+          user_id: user?.id,
+          name: form.full_name,
+          email: form.email,
+          business_type: form.role,
+          volume: form.monthly_volume,
+          sales_channel: form.website || "",
+          experience: form.reseller,
+          status: "pending",
+        },
+      ]);
+
+      if (applicationError) {
+        setError(applicationError.message);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      router.push("/login?message=waiting_approval");
+      return;
+    }
+
+    const { error: profileError } = await supabase.from("profiles").insert([
       {
-        id: user.id,
+        id: user?.id,
         email: form.email,
         full_name: form.full_name,
         phone: form.phone,
@@ -57,10 +86,18 @@ export default function Signup() {
         reseller: form.reseller === "yes",
         monthly_volume: form.monthly_volume,
         has_license: form.has_license === "yes",
+        approved: true,
       },
     ]);
 
-    router.push("/shop");
+    if (profileError) {
+      setError(profileError.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    router.push("/login?message=check_email");
   };
 
   return (

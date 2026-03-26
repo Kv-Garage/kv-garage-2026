@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { getProgramByStripeType } from '../../lib/programCatalog';
 
 // Initialize Stripe with secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -17,20 +18,10 @@ export default async function handler(req, res) {
 
     // Handle all call types (call, mentorship, advisory) with their specific configs
     if (type === "call" || type === "mentorship" || type === "advisory" || type === "course") {
-      let finalProductName = productName || "Strategy Call";
-      let finalAmount = amount || 5000; // Default $50
-      let finalSuccessUrl = success_url || "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}";
-
-      // Use hardcoded success URLs for specific types
-      if (type === "mentorship") {
-        finalSuccessUrl = "http://localhost:3000/success-mentorship?session_id={CHECKOUT_SESSION_ID}";
-      } else if (type === "advisory") {
-        finalSuccessUrl = "http://localhost:3000/success-advisory?session_id={CHECKOUT_SESSION_ID}";
-      } else if (type === "course") {
-        finalSuccessUrl = "http://localhost:3000/success-course?session_id={CHECKOUT_SESSION_ID}";
-      } else if (type === "call") {
-        finalSuccessUrl = "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}";
-      }
+      const program = getProgramByStripeType(type);
+      let finalProductName = productName || program?.label || "Strategy Call";
+      let finalAmount = amount || Math.round(Number(program?.amount || 50) * 100);
+      let finalSuccessUrl = success_url || `${origin}${program?.checkoutSuccessPath || "/success"}?session_id={CHECKOUT_SESSION_ID}`;
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
@@ -48,7 +39,7 @@ export default async function handler(req, res) {
           },
         ],
         success_url: finalSuccessUrl,
-        cancel_url: "http://localhost:3000/cancel",
+        cancel_url: `${origin}${program?.checkoutCancelPath || "/cancel"}`,
         metadata: {
           type: type, // Keep the actual type for tracking
         }

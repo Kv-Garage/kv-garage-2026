@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import { supabase } from "../../lib/supabase";
+import { PUBLIC_PRODUCT_FIELDS, getPrimaryProductImage } from "../../lib/productFields";
+import { buildCanonicalUrl } from "../../lib/seo";
 
 export default function WholesalePage() {
   const [products, setProducts] = useState([]);
@@ -14,7 +17,8 @@ export default function WholesalePage() {
   const fetchProducts = async () => {
     const { data } = await supabase
       .from("products")
-      .select("*")
+      .select(PUBLIC_PRODUCT_FIELDS)
+      .or("is_active.eq.true,is_active.is.null")
       .limit(6);
 
     setProducts(data || []);
@@ -38,6 +42,15 @@ export default function WholesalePage() {
   const approved = profile?.approved || false;
 
   return (
+    <>
+      <Head>
+        <title>Wholesale Products | Bulk Inventory Sourcing — KV Garage</title>
+        <meta
+          name="description"
+          content="Access wholesale-priced inventory with verified supplier relationships. Ideal for resellers, retailers, and business owners ready to scale their supply chain."
+        />
+        <link rel="canonical" href={buildCanonicalUrl("/wholesale")} />
+      </Head>
     <div className="min-h-screen bg-[#0B0F19] text-white px-6 py-24">
 
       <div className="max-w-6xl mx-auto">
@@ -149,7 +162,7 @@ export default function WholesalePage() {
 
                 <div className="h-40 bg-gray-700 rounded mb-3 overflow-hidden">
                   {p.image && (
-                    <img src={p.image} className="w-full h-full object-cover" />
+                    <img src={getPrimaryProductImage(p)} className="w-full h-full object-cover" loading="lazy" alt={p.name} />
                   )}
                 </div>
 
@@ -190,5 +203,6 @@ export default function WholesalePage() {
 
       </div>
     </div>
+    </>
   );
 }

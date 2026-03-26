@@ -1,39 +1,80 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import Head from "next/head";
 import Link from "next/link";
-import { useCart } from "../context/CartContext";
-import { useRouter } from "next/router";
+import { getPrimaryProductImage } from "../lib/productFields";
+import { buildCanonicalUrl } from "../lib/seo";
+import { getSiteSettingsClient } from "../lib/siteSettings";
+
+async function getAuthHeaders() {
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 export default function Home() {
 
-  const [budget, setBudget] = useState(500);
-  const [type, setType] = useState("glass");
-
   const [dbProducts, setDbProducts] = useState([]);
   const [profile, setProfile] = useState(null);
-
-  const { addToCart } = useCart();
-  const router = useRouter();
-  const [addedKey, setAddedKey] = useState(null);
-
-  const liveInventoryRef = useRef(null);
-  const isHoveringRef = useRef(false);
-  const isDraggingRef = useRef(false);
-  const dragStateRef = useRef({ startX: 0, startScrollLeft: 0 });
-  const manualOverrideUntilRef = useRef(0);
-  const sequenceWidthRef = useRef(0);
-  const lastTsRef = useRef(null);
-  const rafRef = useRef(null);
+  const [siteSettings, setSiteSettings] = useState(null);
+  const [calculatorProducts, setCalculatorProducts] = useState([]);
+  const [selectedProfitProductId, setSelectedProfitProductId] = useState("");
+  const [profitQuantity, setProfitQuantity] = useState(1);
+  const [profitSearch, setProfitSearch] = useState("");
+  const [profitResult, setProfitResult] = useState(null);
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [productDropdownOpen, setProductDropdownOpen] = useState(false);
+  const productSelectRef = useRef(null);
+  const productSearchInputRef = useRef(null);
 
   useEffect(() => {
     fetchProducts();
     fetchProfile();
+    loadSiteSettings();
+    fetchCalculatorProducts();
+
+    const interval = setInterval(() => {
+      fetchProducts();
+      fetchCalculatorProducts();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchProducts = async () => {
-    const { data } = await supabase.from("products").select("*");
-    setDbProducts(data || []);
+    try {
+      const response = await fetch("/api/products/public?limit=200", {
+        headers: await getAuthHeaders(),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Could not load live inventory");
+      }
+
+      setDbProducts(payload.products || []);
+    } catch (error) {
+      console.error("Products fetch error:", error);
+      setDbProducts([]);
+    }
+  };
+
+  const fetchCalculatorProducts = async () => {
+    try {
+      const response = await fetch("/api/products/public", {
+        headers: await getAuthHeaders(),
+      });
+      const payload = await response.json();
+      setCalculatorProducts(payload.products || []);
+    } catch (error) {
+      console.error("Calculator inventory failed:", error);
+      setCalculatorProducts([]);
+    }
+  };
+
+  const loadSiteSettings = async () => {
+    const settings = await getSiteSettingsClient();
+    setSiteSettings(settings);
   };
 
   const fetchProfile = async () => {
@@ -51,13 +92,38 @@ export default function Home() {
   };
 
   const products = dbProducts.length > 0 ? dbProducts : [];
+  const topPicks = products.filter((product) => product.top_pick).slice(0, 4);
+  const newArrivals = products.filter((product) => !product.top_pick).slice(0, 8);
+  const liveInventory = products.slice(0, 30);
+  const selectedProfitProduct =
+    calculatorProducts.find((product) => product.id === selectedProfitProductId) ||
+    calculatorProducts[0] ||
+    null;
+  const filteredCalculatorProducts = useMemo(
+    () =>
+      calculatorProducts.filter((product) =>
+        String(product.name || "")
+          .toLowerCase()
+          .includes(profitSearch.toLowerCase())
+      ),
+    [calculatorProducts, profitSearch]
+  );
 
   // 🔥 PRICING LOGIC
   const getPrice = (p) => {
+    if (p?.display_price != null) {
+      return p.display_price;
+    }
+
+    if (profile?.role === "student") {
+      return p.student_price || p.price;
+    }
+
     if (profile?.role === "wholesale" && profile?.approved) {
       return p.wholesale_price || p.price;
     }
-    return p.price;
+
+    return p.retail_price || p.price;
   };
 
   const getMOQ = (p) => {
@@ -82,147 +148,100 @@ export default function Home() {
     return "Selling fast";
   };
 
-  // 🔥 PROFIT TOOL
-  const pricing = {
-    glass: { cost: 10, sell: 30 },
-    accessories: { cost: 5, sell: 20 },
-    jewelry: { cost: 8, sell: 35 },
-  };
-
-  const cost = pricing[type].cost;
-  const sell = pricing[type].sell;
-
-  const units = Math.floor(budget / cost);
-  const revenue = units * sell;
-  const profit = revenue - budget;
-  const projected = profit * 6;
-
-  // Conveyor auto-scroll for the "Live Inventory" section:
-  // - auto scrolls horizontally
-  // - pauses on hover
-  // - supports mouse/touch drag
-  // - temporarily overrides auto scroll after manual interaction
   useEffect(() => {
-    const el = liveInventoryRef.current;
-    if (!el) return;
-
-    const updateMetrics = () => {
-      // We render two identical sequences side-by-side.
-      // Measure the exact pixel offset where the 2nd sequence starts to avoid seam jumps.
-      const first = el.querySelector("[data-seq='a']");
-      const second = el.querySelector("[data-seq='b']");
-      if (!first || !second) return;
-      sequenceWidthRef.current = second.offsetLeft - first.offsetLeft;
-    };
-
-    updateMetrics();
-
-    const onResize = () => updateMetrics();
-    window.addEventListener("resize", onResize);
-
-    const speedPxPerSec = 60;
-
-    const tick = (ts) => {
-      const node = liveInventoryRef.current;
-      if (!node) return;
-
-      if (lastTsRef.current == null) lastTsRef.current = ts;
-      const dt = ts - lastTsRef.current;
-      lastTsRef.current = ts;
-
-      const sequenceWidth = sequenceWidthRef.current;
-      const now = Date.now();
-      const canAutoScroll =
-        !isHoveringRef.current &&
-        !isDraggingRef.current &&
-        now >= manualOverrideUntilRef.current &&
-        sequenceWidth > 0;
-
-      if (canAutoScroll) {
-        node.scrollLeft += (speedPxPerSec / 1000) * dt;
-        const maxScrollLeft = node.scrollWidth - node.clientWidth;
-
-        // Primary wrap: when we reach the start of the 2nd sequence.
-        if (sequenceWidth > 0 && node.scrollLeft >= sequenceWidth) {
-          node.scrollLeft -= sequenceWidth;
-        } else if (maxScrollLeft > 0 && node.scrollLeft >= maxScrollLeft - 1) {
-          // Wide viewport case: we might not be able to reach `sequenceWidth`.
-          // Reset to keep continuous looping.
-          node.scrollLeft = 0;
-        }
-      }
-
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-
-    // Re-measure after images/layout settle when products load.
-    const t = setTimeout(updateMetrics, 250);
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      clearTimeout(t);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-      lastTsRef.current = null;
-    };
-  }, [products.length]);
-
-  const handlePointerDown = (e) => {
-    const el = liveInventoryRef.current;
-    if (!el) return;
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-
-    manualOverrideUntilRef.current = Date.now() + 2000;
-    isDraggingRef.current = true;
-    dragStateRef.current = { startX: e.clientX, startScrollLeft: el.scrollLeft };
-    lastTsRef.current = null;
-
-    if (e.currentTarget?.setPointerCapture) {
-      e.currentTarget.setPointerCapture(e.pointerId);
+    if (!selectedProfitProductId && calculatorProducts[0]?.id) {
+      setSelectedProfitProductId(calculatorProducts[0].id);
     }
-  };
+  }, [selectedProfitProductId, calculatorProducts]);
 
-  const handlePointerMove = (e) => {
-    const el = liveInventoryRef.current;
-    if (!el || !isDraggingRef.current) return;
+  useEffect(() => {
+    const calculateProfit = async () => {
+      if (!selectedProfitProductId) return;
 
-    manualOverrideUntilRef.current = Date.now() + 2000;
+      try {
+        const response = await fetch("/api/calculator/profit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(await getAuthHeaders()),
+          },
+          body: JSON.stringify({
+            productId: selectedProfitProductId,
+            quantity: profitQuantity,
+          }),
+        });
 
-    const dx = e.clientX - dragStateRef.current.startX;
-    el.scrollLeft = dragStateRef.current.startScrollLeft - dx;
-  };
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.error || "Could not calculate profit");
+        }
 
-  const handlePointerUp = () => {
-    isDraggingRef.current = false;
-    manualOverrideUntilRef.current = Date.now() + 2000;
-  };
+        setProfitResult(payload);
+      } catch (error) {
+        console.error(error);
+        setProfitResult(null);
+      }
+    };
 
-  const handleWheel = () => {
-    // Wheel/trackpad horizontal scrolling should temporarily override conveyor motion.
-    manualOverrideUntilRef.current = Date.now() + 2000;
-  };
+    calculateProfit();
+  }, [selectedProfitProductId, profitQuantity]);
 
-  const handleAddToCartFromCard = (product) => {
-    addToCart({
-      id: product.id || product.slug || product.name,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image: product.image,
-    });
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!productSelectRef.current?.contains(event.target)) {
+        setProductDropdownOpen(false);
+      }
+    };
 
-    const k = product.id || product.slug || product.name;
-    setAddedKey(k);
-    setTimeout(() => setAddedKey(null), 1200);
-    router.push("/cart");
-  };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (productDropdownOpen) {
+      window.requestAnimationFrame(() => {
+        productSearchInputRef.current?.focus();
+      });
+    }
+  }, [productDropdownOpen]);
 
   return (
     <>
       <Head>
-        <title>KV Garage</title>
+        <title>KV Garage — Verified Wholesale Supplier | Retail, Mentorship & Trade Education</title>
+        <meta
+          name="description"
+          content="KV Garage is your premier source for verified wholesale products, retail inventory, supplier sourcing, trade education, and business mentorship. Build your supply chain from the ground up."
+        />
+        <link rel="canonical" href={buildCanonicalUrl("/")} />
+        <meta property="og:title" content="KV Garage — Verified Wholesale Supplier | Retail, Mentorship & Trade Education" />
+        <meta
+          property="og:description"
+          content="KV Garage is your premier source for verified wholesale products, retail inventory, supplier sourcing, trade education, and business mentorship. Build your supply chain from the ground up."
+        />
+        <meta property="og:url" content={buildCanonicalUrl("/")} />
+        <meta property="og:image" content={buildCanonicalUrl("/logo/Kv%20garage%20icon.png")} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="KV Garage — Verified Wholesale Supplier | Retail, Mentorship & Trade Education" />
+        <meta
+          name="twitter:description"
+          content="Wholesale supplier, verified products, retail inventory, dropshipping, supply chain, trade education, and business mentorship in one structured ecosystem."
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: siteSettings?.site_name || "KV Garage",
+              url: buildCanonicalUrl("/"),
+              logo: buildCanonicalUrl(siteSettings?.logo_url || "/logo/Kv%20garage%20icon.png"),
+              description:
+                "KV Garage is a verified wholesale supplier and retail inventory platform built for supply chain growth, trade education, and business mentorship.",
+              sameAs: [],
+            }),
+          }}
+        />
       </Head>
 
       <div className="min-h-screen text-white relative overflow-hidden">
@@ -264,11 +283,11 @@ export default function Home() {
 
               {/* 🔥 TOP PICKS */}
               <div className="grid grid-cols-2 gap-4">
-                {products.slice(0, 2).map((p, i) => (
+                {(topPicks.slice(0, 2).length > 0 ? topPicks.slice(0, 2) : products.slice(0, 2)).map((p, i) => (
                   <Link key={i} href={`/shop/${p.slug}`}>
                     <div className="bg-[#111827] p-4 rounded-xl border border-[#1C2233] hover:border-[#D4AF37] transition">
 
-                      <img src={p.image} className="h-24 w-full object-cover rounded mb-2" />
+                      <img src={getPrimaryProductImage(p)} className="h-24 w-full object-cover rounded mb-2" loading="lazy" alt={p.name} />
 
                       <p className="text-xs text-[#D4AF37]">Top Pick</p>
                       <p className="font-semibold">{p.name}</p>
@@ -324,112 +343,157 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="py-16 border-b border-[#1C2233]">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-gray-500">Featured Inventory</p>
+                <h2 className="mt-2 text-3xl font-semibold">Top Picks</h2>
+              </div>
+              <Link href="/shop" className="text-sm text-[#D4AF37]">
+                Shop All
+              </Link>
+            </div>
+
+            {topPicks.length === 0 ? (
+              <div className="rounded-3xl border border-[#D4AF37]/40 bg-[#111827] px-6 py-10 text-center text-[#F4D67A]">
+                Top picks coming soon
+              </div>
+            ) : (
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {topPicks.map((product) => (
+                  <Link
+                    key={product.id}
+                    href={`/shop/${product.slug || product.id}`}
+                    className="group rounded-[28px] border border-[#1C2233] bg-[#111827] p-4 transition hover:-translate-y-1 hover:border-[#D4AF37]/60"
+                  >
+                    <div className="relative overflow-hidden rounded-[22px]">
+                      <img
+                        src={getPrimaryProductImage(product)}
+                        alt={product.name}
+                        className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <span className="absolute left-3 top-3 rounded-full bg-[#D4AF37] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-black">
+                        Top Pick
+                      </span>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-[#94A3B8]">{product.category || "General"}</p>
+                      <p className="mt-2 line-clamp-2 text-lg font-semibold">{product.name}</p>
+                      <p className="mt-3 text-lg font-semibold text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="border-b border-[#1C2233] py-12">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#D4AF37]">Just In</p>
+                <h2 className="mt-2 text-2xl font-semibold">Fresh Inventory</h2>
+              </div>
+              <Link href="/shop" className="text-sm text-[#D4AF37]">
+                See All Inventory →
+              </Link>
+            </div>
+
+            {newArrivals.length > 0 ? (
+              <div className="flex gap-4 overflow-x-auto pb-3">
+                {newArrivals.map((product) => {
+                  const isNew = Date.now() - new Date(product.created_at || Date.now()).getTime() <= 7 * 24 * 60 * 60 * 1000;
+                  return (
+                    <Link
+                      key={`${product.id}-strip`}
+                      href={`/shop/${product.slug || product.id}`}
+                      className="flex min-w-[280px] items-center gap-4 rounded-2xl border border-[#1C2233] bg-[#111827] p-4"
+                    >
+                      <img
+                        src={getPrimaryProductImage(product)}
+                        alt={product.name}
+                        className="h-20 w-20 rounded-2xl object-cover"
+                        loading="lazy"
+                      />
+                      <div className="min-w-0">
+                        <p className="line-clamp-2 text-sm font-semibold text-white">{product.name}</p>
+                        <p className="mt-2 text-sm text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
+                      </div>
+                      {isNew ? (
+                        <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase text-emerald-300">
+                          New
+                        </span>
+                      ) : null}
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        </section>
+
         {/* ================= LIVE INVENTORY ================= */}
         <section className="py-16 border-t border-[#1C2233] overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 mb-6">
-            <h2 className="text-xl text-[#D4AF37]">Live Inventory</h2>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D4AF37]">Live Inventory</p>
           </div>
 
-          <div
-            ref={liveInventoryRef}
-            className="overflow-x-auto overflow-y-hidden scrollbar-hide"
-            onMouseEnter={() => {
-              isHoveringRef.current = true;
-            }}
-            onMouseLeave={() => {
-              isHoveringRef.current = false;
-            }}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onWheel={handleWheel}
-            style={{ touchAction: "pan-y" }}
-          >
-            <div className="flex gap-6 w-max">
-              <div data-seq="a" className="flex gap-6">
-                {products.map((item, i) => (
-                  <Link
-                    key={`a-${i}`}
-                    href={`/shop/${item.slug}`}
-                    className="block min-w-[220px] bg-[#111827] rounded-xl border border-[#1C2233]"
-                  >
-                    {item.images && item.images.length > 0 ? (
-                      <img src={item.images[0]} className="h-40 w-full object-cover" />
-                    ) : (
-                      <div className="h-40 w-full bg-gray-700 flex items-center justify-center text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                    <div className="p-4">
-                      <p>{item.name}</p>
-                      <p className="text-gray-400">${Number(item.price).toFixed(2)}</p>
-                      <p className="text-xs text-[#D4AF37] mt-1">{getUrgencyText(item)}</p>
-                      <button
-                        type="button"
-                        onPointerDown={(e) => {
-                          e.stopPropagation();
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleAddToCartFromCard(item);
-                        }}
-                        className="mt-3 w-full bg-[#D4AF37] text-black py-2 rounded text-xs font-semibold transition hover:opacity-90 active:scale-[0.98]"
-                      >
-                        {addedKey === (item.id || item.slug || item.name) ? "Added" : "Add to Cart"}
-                      </button>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              <div data-seq="b" className="flex gap-6">
-                {products.map((item, i) => (
-                  <Link
-                    key={`b-${i}`}
-                    href={`/shop/${item.slug}`}
-                    className="block min-w-[220px] bg-[#111827] rounded-xl border border-[#1C2233]"
-                  >
-                    {item.images && item.images.length > 0 ? (
-                      <img src={item.images[0]} className="h-40 w-full object-cover" />
-                    ) : (
-                      <div className="h-40 w-full bg-gray-700 flex items-center justify-center text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                    <div className="p-4">
-                      <p>{item.name}</p>
-                      <p className="text-gray-400">${Number(item.price).toFixed(2)}</p>
-                      <p className="text-xs text-[#D4AF37] mt-1">{getUrgencyText(item)}</p>
-                      <button
-                        type="button"
-                        onPointerDown={(e) => {
-                          e.stopPropagation();
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleAddToCartFromCard(item);
-                        }}
-                        className="mt-3 w-full bg-[#D4AF37] text-black py-2 rounded text-xs font-semibold transition hover:opacity-90 active:scale-[0.98]"
-                      >
-                        {addedKey === (item.id || item.slug || item.name) ? "Added" : "Add to Cart"}
-                      </button>
-                    </div>
-                  </Link>
-                ))}
+          {liveInventory.length === 0 ? (
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="rounded-2xl border border-[#1C2233] bg-[#111827] px-6 py-4 text-sm text-gray-300">
+                New inventory dropping soon
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#05070D] to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#05070D] to-transparent" />
+              <div className="group overflow-hidden">
+                <div className="flex w-max animate-[inventoryMarquee_60s_linear_infinite] gap-4 group-hover:[animation-play-state:paused]">
+                  {[...liveInventory, ...liveInventory].map((item, index) => {
+                  const isNew = Date.now() - new Date(item.created_at || Date.now()).getTime() <= 7 * 24 * 60 * 60 * 1000;
+                  return (
+                    <Link
+                      key={`${item.id}-${index}`}
+                      href={`/shop/${item.slug || item.id}`}
+                      className="flex min-h-[120px] min-w-[210px] max-w-[220px] items-center gap-4 rounded-[22px] border border-[#1C2233] bg-[#111827] px-4 py-4"
+                    >
+                      <img
+                        src={getPrimaryProductImage(item)}
+                        className="h-20 w-20 rounded-2xl object-cover"
+                        loading="lazy"
+                        alt={item.name}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-2 text-[14px] font-semibold leading-5 text-white">
+                          {String(item.name || "Inventory").slice(0, 48)}
+                        </p>
+                        <p className="mt-2 text-base font-bold text-[#D4AF37]">${Number(getPrice(item)).toFixed(2)}</p>
+                      </div>
+                      {isNew ? (
+                        <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase text-emerald-300">
+                          New
+                        </span>
+                      ) : null}
+                    </Link>
+                  );
+                })}
+                </div>
+              </div>
+            </div>
+          )}
 
           <style jsx>{`
-            /* Hide scrollbar while keeping overflow-x scrolling intact. */
-            .scrollbar-hide {
-              -ms-overflow-style: none; /* IE/Edge */
-              scrollbar-width: none; /* Firefox */
-            }
-            .scrollbar-hide::-webkit-scrollbar {
-              display: none; /* Chrome/Safari */
+            @keyframes inventoryMarquee {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
             }
           `}</style>
         </section>
@@ -442,32 +506,135 @@ export default function Home() {
           </div>
 
           <div className="relative z-10">
-            <h2 className="text-2xl mb-6 text-[#D4AF37]">
-              Profit System Tool
-            </h2>
+            <div className="mx-auto max-w-[560px] rounded-[28px] border border-[#1C2233] bg-[#111827] p-4 text-left shadow-2xl shadow-black/20">
+              <button
+                type="button"
+                onClick={() => setCalculatorOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between rounded-2xl bg-[#D4AF37] px-5 py-4 text-base font-semibold text-black"
+              >
+                <span>📊 Profit Calculator</span>
+                <span className={`transition-transform duration-300 ${calculatorOpen ? "rotate-180" : ""}`}>▾</span>
+              </button>
 
-            <div className="flex justify-center gap-3 mb-6">
-              {["glass","accessories","jewelry"].map(t => (
-                <button key={t}
-                  onClick={() => setType(t)}
-                  className={`px-4 py-2 rounded ${type===t ? "bg-[#D4AF37] text-black":"border"}`}>
-                  {t}
-                </button>
-              ))}
-            </div>
+              <div className={`overflow-hidden transition-all duration-500 ${calculatorOpen ? "max-h-[600px] pt-5" : "max-h-0"}`}>
+                <p className="mb-5 text-sm text-gray-300">
+                  Model live inventory opportunities using KV Garage retail pricing. Profit math is calculated server-side so supplier cost never appears in the browser.
+                </p>
 
-            <input
-              type="number"
-              value={budget}
-              onChange={(e)=>setBudget(Number(e.target.value))}
-              className="bg-[#111827] px-6 py-4 rounded-xl mb-10 text-center"
-            />
+                <div ref={productSelectRef} className="relative w-full max-w-[560px]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+                    Product
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setProductDropdownOpen((prev) => !prev)}
+                    className={`flex w-full items-center gap-3 rounded-md border border-[#1A1A16] bg-white/5 px-4 py-[14px] text-left transition ${productDropdownOpen ? "border-[#C9A84C]/40" : "hover:border-[#C9A84C]/40"}`}
+                  >
+                    {selectedProfitProduct ? (
+                      <img
+                        src={getPrimaryProductImage(selectedProfitProduct)}
+                        alt={selectedProfitProduct.name}
+                        className="h-9 w-9 rounded-md object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="h-9 w-9 rounded-md bg-white/5" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-white">
+                        {selectedProfitProduct?.name || "Select a product..."}
+                      </p>
+                    </div>
+                    <span className="text-sm font-bold text-[#C9A84C]">
+                      {selectedProfitProduct ? `$${Number(getPrice(selectedProfitProduct)).toFixed(2)}` : ""}
+                    </span>
+                    <span className={`transition-transform duration-200 ${productDropdownOpen ? "rotate-180" : ""}`}>▾</span>
+                  </button>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-              <Stat label="Units" value={units}/>
-              <Stat label="Revenue" value={`$${revenue}`}/>
-              <Stat label="Profit" value={`$${profit}`}/>
-              <Stat label="6 Month" value={`$${projected}`}/>
+                  <div
+                    className={`absolute left-0 right-0 top-[calc(100%+4px)] z-50 overflow-hidden rounded-md border border-[#C9A84C]/25 bg-[#0D0D0D] shadow-[0_16px_40px_rgba(0,0,0,0.6)] transition-all duration-200 ${productDropdownOpen ? "max-h-[320px]" : "max-h-0 border-transparent"}`}
+                  >
+                    <input
+                      ref={productSearchInputRef}
+                      type="text"
+                      value={profitSearch}
+                      onChange={(event) => setProfitSearch(event.target.value)}
+                      placeholder="Search products..."
+                      className="w-full border-b border-[#1A1A16] bg-white/5 px-4 py-3 text-[13px] text-[#F4F2EC] outline-none"
+                    />
+                    <div className="max-h-[260px] overflow-y-auto">
+                      {(filteredCalculatorProducts || []).length === 0 ? (
+                        <div className="px-4 py-6 text-sm text-[#6B6B5E]">No products found</div>
+                      ) : (
+                        (filteredCalculatorProducts || []).map((product) => (
+                          <button
+                            key={product.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedProfitProductId(product.id);
+                              setProductDropdownOpen(false);
+                            }}
+                            className={`flex h-14 w-full items-center gap-3 border-b border-white/5 px-4 text-left transition last:border-b-0 ${selectedProfitProductId === product.id ? "border-l-2 border-l-[#C9A84C] bg-[#C9A84C]/10" : "hover:bg-[#C9A84C]/[0.06]"}`}
+                          >
+                            <img src={getPrimaryProductImage(product)} alt={product.name} className="h-9 w-9 rounded-md object-cover" loading="lazy" />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium text-white">{product.name}</p>
+                              <p className="truncate text-[11px] text-[#6B6B5E]">{product.category || "General"}</p>
+                            </div>
+                            <p className="text-sm font-bold text-[#C9A84C]">${Number(getPrice(product)).toFixed(2)}</p>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+                    How many units?
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={profitQuantity}
+                    onChange={(event) => setProfitQuantity(Math.max(1, Number(event.target.value) || 1))}
+                    className="w-full rounded-xl border border-white/10 bg-[#0B1020] px-4 py-3 text-sm text-white"
+                  />
+                </div>
+
+                {profitResult?.product ? (
+                  <>
+                    <div className="mt-5 flex items-center gap-4 rounded-2xl border border-white/10 bg-[#0B1020] p-4">
+                      <img src={getPrimaryProductImage(profitResult.product)} alt={profitResult.product.name} className="h-16 w-16 rounded-2xl object-cover" loading="lazy" />
+                      <div className="min-w-0">
+                        <p className="truncate text-lg font-semibold text-white">{profitResult.product.name}</p>
+                        <p className="mt-1 text-sm text-[#D4AF37]">Based on KV Garage retail pricing: ${Number(profitResult.sell_price || 0).toFixed(2)}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      <Stat label="Sell Price / Unit" value={`$${Number(profitResult.sell_price || 0).toFixed(2)}`} />
+                      <Stat label="Total Revenue" value={`$${Number(profitResult.total_revenue || 0).toFixed(2)}`} />
+                      <Stat label="Estimated Profit" value={`$${Number(profitResult.estimated_total_profit || 0).toFixed(2)}`} />
+                      <Stat label="Profit Margin %" value={`${Number(profitResult.margin_percent || 0).toFixed(1)}%`} />
+                    </div>
+
+                    <div className="mt-5 rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/10 p-4 text-sm text-[#F8E8A6]">
+                      {Number(profitResult.margin_percent || 0) > 60
+                        ? "🔥 Exceptional margin — high profit potential"
+                        : Number(profitResult.margin_percent || 0) >= 40
+                          ? "Strong margin — solid opportunity"
+                          : Number(profitResult.margin_percent || 0) >= 20
+                            ? "Healthy margin — consistent at volume"
+                            : "Thin margin — best at high volume"}
+                    </div>
+                  </>
+                ) : null}
+
+                <p className="mt-5 text-sm leading-relaxed text-[#94A3B8]">
+                  Based on avg KV Garage retail pricing. Many resellers achieve margins well above these estimates.
+                </p>
+              </div>
             </div>
           </div>
         </section>

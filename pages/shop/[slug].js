@@ -5,6 +5,14 @@ import Link from "next/link";
 import { calculatePrice } from "../../lib/pricing";
 import { useCart } from "../../context/CartContext";
 import { supabase } from "../../lib/supabase";
+import { getPrimaryProductImage, getProductImageArray } from "../../lib/productFields";
+import { buildCanonicalUrl, buildProductDescription, stripHtml } from "../../lib/seo";
+
+async function getAuthHeaders() {
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 export default function ProductPage({ profile }) {
   const router = useRouter();
@@ -17,6 +25,7 @@ export default function ProductPage({ profile }) {
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [pricingPreview, setPricingPreview] = useState(null);
 
   const [quantity, setQuantity] = useState(1);
   const [addedMessage, setAddedMessage] = useState("");
@@ -27,17 +36,41 @@ export default function ProductPage({ profile }) {
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [bundleSelected, setBundleSelected] = useState([]);
 
+  const getProductImages = (record) => {
+    return getProductImageArray(record);
+  };
+
+  const getAdaptiveVariants = (record, tableVariants) => {
+    if (Array.isArray(tableVariants) && tableVariants.length > 0) {
+      return tableVariants;
+    }
+
+    if (Array.isArray(record?.variants) && record.variants.length > 0) {
+      return record.variants.map((variant) => ({
+        id: variant.id || variant.vid || variant.sku,
+        option1: variant.name || variant.variantName || variant.option1 || variant.sku,
+        option2: variant.option2 || null,
+        image: variant.image || variant.variantImage || null,
+        cost: variant.supplier_cost || variant.cost || null,
+        price: variant.price || null,
+        sku: variant.sku || null,
+      }));
+    }
+
+    return [];
+  };
+
   useEffect(() => {
     if (!slug) return;
 
     const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("slug", slug)
-        .single();
+      const response = await fetch(`/api/public-products?slug=${encodeURIComponent(slug)}`, {
+        headers: await getAuthHeaders(),
+      });
+      const payload = await response.json();
+      const data = payload.product;
 
-      if (error || !data) {
+      if (!response.ok || !data) {
         console.log("Product not found");
         return;
       }
@@ -47,30 +80,27 @@ export default function ProductPage({ profile }) {
       if (data && data.id) {
         const { data: variants } = await supabase
           .from("product_variants")
-          .select("*")
+          .select("id,option1,option2,image,price,sku")
           .eq("product_id", data.id);
         v = variants || [];
       }
 
-      // 🔥 UPSSELL FETCH (ADDED)
-      const { data: upsells } = await supabase
-        .from("products")
-        .select("*")
-        .eq("category", data.category)
-        .neq("id", data.id)
-        .limit(3);
+      const upsellResponse = await fetch(
+        `/api/public-products?category=${encodeURIComponent(data.category || "")}&limit=12`,
+        { headers: await getAuthHeaders() }
+      );
+      const upsellPayload = await upsellResponse.json();
+      setUpsellProducts((upsellPayload.products || []).filter((item) => item.id !== data.id).slice(0, 3));
 
-      setUpsellProducts(upsells || []);
+      const adaptiveVariants = getAdaptiveVariants(data, v || []);
+      const productImages = getProductImages(data);
 
       setProduct(data);
-      setVariants(v || []);
+      setVariants(adaptiveVariants);
 
-      // 🔥 FIX: Use standardized images array
-      const productImages = data.images || [data.image].filter(Boolean);
-      
-      if (v?.length > 0) {
-        setSelectedVariant(v[0]);
-        setSelectedImage(v[0].image || productImages[0]);
+      if (adaptiveVariants?.length > 0) {
+        setSelectedVariant(adaptiveVariants[0]);
+        setSelectedImage(adaptiveVariants[0].image || productImages[0]);
       } else {
         setSelectedImage(productImages[0]);
       }
@@ -78,6 +108,24 @@ export default function ProductPage({ profile }) {
       // 🔥 FETCH REVIEWS
       if (data.cj_product_id) {
         fetchReviews(data.cj_product_id);
+      }
+
+      try {
+        const existing = JSON.parse(localStorage.getItem("recentlyViewedProducts") || "[]");
+        const next = [
+          {
+            id: data.id,
+            slug: data.slug,
+            name: data.name,
+            image: getPrimaryProductImage(data),
+            price: data.price,
+          },
+          ...existing.filter((item) => item.id !== data.id),
+        ].slice(0, 10);
+
+        localStorage.setItem("recentlyViewedProducts", JSON.stringify(next));
+      } catch (storageError) {
+        console.error("Recently viewed tracking failed:", storageError);
       }
     };
 
@@ -99,6 +147,64 @@ export default function ProductPage({ profile }) {
 
     fetchData();
   }, [slug]);
+
+  useEffect(() => {
+    const loadPricing = async () => {
+      if (!product?.id) return;
+
+      const { data } = await supabase.auth.getSession();
+      const token = data?.session?.access_token;
+
+      try {
+        const response = await fetch("/api/price-preview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            productId: product.id,
+            quantity,
+          }),
+        });
+
+        const payload = await response.json();
+        if (response.ok) {
+          setPricingPreview(payload);
+        }
+      } catch (error) {
+        console.error("Price preview failed:", error);
+      }
+    };
+
+    loadPricing();
+  }, [product?.id, quantity]);
+
+  useEffect(() => {
+    if (!product?.id) return;
+
+    const trackProductView = async () => {
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+
+        await fetch("/api/traffic-event", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: authData?.user?.id || null,
+            page: `product:${product.id}`,
+            event_type: "product_view",
+          }),
+        });
+      } catch (error) {
+        console.error("Product view tracking failed:", error);
+      }
+    };
+
+    trackProductView();
+  }, [product?.id]);
 
   if (!product) {
     return (
@@ -137,7 +243,13 @@ export default function ProductPage({ profile }) {
   const activeCost =
     selectedVariant?.cost || product.cost || product.price;
 
-  const basePrice = product.price || product.cost * 2;
+  const basePrice = pricingPreview?.display_price || product.retail_price || product.price || product.cost * 2;
+  const productImages = getProductImages(product);
+  const showThumbnailRow = productImages.length > 1;
+  const showComparePrice =
+    product.compare_price && Number(product.compare_price) > Number(pricePerUnit || 0);
+  const descriptionHtml = typeof product.description === "string" ? product.description.trim() : "";
+  const displaySku = selectedVariant?.sku || product.sku || null;
 
   // 🔥 CUSTOM PRICING SYSTEM
 let pricePerUnit;
@@ -185,6 +297,10 @@ if (product.type === "manual") {
     : basePrice;
 }
 
+if (pricingPreview?.display_price) {
+  pricePerUnit = pricingPreview.display_price;
+}
+
 const totalPrice = pricePerUnit * quantity;
 
   // 🔥 MOQ ENFORCEMENT FOR MANUAL PRODUCTS
@@ -224,10 +340,12 @@ const totalPrice = pricePerUnit * quantity;
 
   const handleAddToCart = () => {
     addToCart({
+      id: product.id,
       name: product.name,
-      price: pricePerUnit,
+      price: pricingPreview?.display_price || pricePerUnit,
       quantity,
       image: selectedImage,
+      category: product.category || "general",
     });
 
     setAddedMessage("Added to cart");
@@ -240,10 +358,12 @@ const totalPrice = pricePerUnit * quantity;
 
     bundleSelected.forEach((p) => {
       addToCart({
+        id: p.id,
         name: p.name,
         price: p.price,
         quantity: 1,
         image: p.image,
+        category: p.category || "general",
       });
     });
 
@@ -253,7 +373,39 @@ const totalPrice = pricePerUnit * quantity;
   return (
     <>
       <Head>
-        <title>{product.name} | KV Garage</title>
+        <title>{product.meta_title || `${product.name} | Buy Wholesale or Retail — KV Garage`}</title>
+        <meta name="description" content={product.meta_description || buildProductDescription(product)} />
+        <link rel="canonical" href={buildCanonicalUrl(`/shop/${product.slug || product.id}`)} />
+        <meta property="og:title" content={product.meta_title || `${product.name} | Buy Wholesale or Retail — KV Garage`} />
+        <meta property="og:description" content={product.meta_description || buildProductDescription(product)} />
+        <meta property="og:image" content={getPrimaryProductImage(product)} />
+        <meta property="og:url" content={buildCanonicalUrl(`/shop/${product.slug || product.id}`)} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product.meta_title || `${product.name} | Buy Wholesale or Retail — KV Garage`} />
+        <meta name="twitter:description" content={product.meta_description || buildProductDescription(product)} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              name: product.name,
+              image: productImages,
+              description: stripHtml(product.description || ""),
+              sku: displaySku || undefined,
+              offers: {
+                "@type": "Offer",
+                availability:
+                  Number(product.inventory_count || 0) > 0
+                    ? "https://schema.org/InStock"
+                    : "https://schema.org/OutOfStock",
+                priceCurrency: "USD",
+                price: Number(pricePerUnit || product.price || 0).toFixed(2),
+                url: buildCanonicalUrl(`/shop/${product.slug || product.id}`),
+              },
+            }),
+          }}
+        />
       </Head>
 
       <main className="bg-white text-black min-h-screen">
@@ -275,13 +427,15 @@ const totalPrice = pricePerUnit * quantity;
                     src={selectedImage} 
                     className="h-full w-full object-contain rounded-lg"
                     alt={product.name}
+                    loading="lazy"
                   />
                 )}
               </div>
 
               {/* THUMBNAIL GALLERY */}
+              {showThumbnailRow && (
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {(product.images || [product.image].filter(Boolean)).map((img, i) => (
+                {productImages.map((img, i) => (
                   <img
                     key={i}
                     src={img}
@@ -292,18 +446,27 @@ const totalPrice = pricePerUnit * quantity;
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                     alt={`Product image ${i + 1}`}
+                    loading="lazy"
                   />
                 ))}
               </div>
+              )}
             </div>
 
             {/* RIGHT COLUMN - PRODUCT INFO */}
             <div className="space-y-6">
 
               {/* PRODUCT TITLE */}
-              <h1 className="text-3xl font-bold text-gray-900 leading-tight">
-                {product.name}
-              </h1>
+              <div className="space-y-3">
+                {product.top_pick === true && (
+                  <span className="inline-flex rounded-full bg-[#D4AF37]/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A6800]">
+                    Top Pick
+                  </span>
+                )}
+                <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                  {product.name}
+                </h1>
+              </div>
 
               {/* RATING & SALES */}
               <div className="flex items-center gap-4 text-sm">
@@ -321,16 +484,54 @@ const totalPrice = pricePerUnit * quantity;
               <div className="border-b pb-6">
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-gray-900">
-                    ${Number(pricePerUnit).toFixed(2)}
+                    ${Number(pricingPreview?.display_price || pricePerUnit).toFixed(2)}
                   </span>
                   <span className="text-gray-500">per unit</span>
+                  {showComparePrice && (
+                    <span className="text-lg text-gray-400 line-through">
+                      ${Number(product.compare_price).toFixed(2)}
+                    </span>
+                  )}
                 </div>
                 {quantity > 1 && (
                   <div className="mt-2 text-sm text-gray-600">
                     Total: <span className="font-semibold">${Number(totalPrice).toFixed(2)}</span>
                   </div>
                 )}
+                {pricingPreview?.note ? (
+                  <div className="mt-2 text-sm font-medium text-[#B78B16]">{pricingPreview.note}</div>
+                ) : null}
               </div>
+
+              {variants.length > 0 && (
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-700">Variant</label>
+                  <div className="flex flex-wrap gap-3">
+                    {variants.map((variant) => (
+                      <button
+                        key={variant.id || variant.sku || variant.option1}
+                        onClick={() => {
+                          setSelectedVariant(variant);
+                          if (variant.image) setSelectedImage(variant.image);
+                        }}
+                        className={`rounded-lg border px-4 py-2 text-sm transition ${
+                          selectedVariant?.id === variant.id
+                            ? "border-black bg-black text-white"
+                            : "border-gray-300 text-gray-700 hover:border-black"
+                        }`}
+                      >
+                        {variant.option1 || variant.name || variant.sku || "Variant"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {displaySku && (
+                <div className="text-sm text-gray-500">
+                  SKU: <span className="font-medium text-gray-700">{displaySku}</span>
+                </div>
+              )}
 
               {product.type === "manual" && (
                 <div className="mt-4 text-xs text-gray-600">
@@ -420,6 +621,22 @@ const totalPrice = pricePerUnit * quantity;
                 </button>
               </div>
 
+              {pricingPreview?.volume_pricing?.length ? (
+                <div className="rounded-lg border bg-gray-50 p-4">
+                  <p className="mb-3 text-sm font-semibold text-gray-800">Wholesale Volume Pricing</p>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {pricingPreview.volume_pricing.map((row) => (
+                      <div key={row.range} className="flex items-center justify-between">
+                        <span>{row.range}</span>
+                        <span>
+                          ${Number(row.price || 0).toFixed(2)} {row.note ? `(${row.note})` : ""}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
               {/* 🔥 TRUST BADGES */}
               <div className="border-t pt-6 mt-6">
                 <div className="flex justify-around text-center">
@@ -442,53 +659,23 @@ const totalPrice = pricePerUnit * quantity;
           </div>
 
           {/* PRODUCT DETAILS SECTION */}
-          {console.log("DESCRIPTION VALUE:", product.description)}
+          {descriptionHtml && (
           <div className="border-t pt-12">
             <h2 className="text-3xl font-bold mb-8 text-gray-900">Product Details</h2>
-            <div
-              className="mt-6 space-y-4 text-sm text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ 
-                __html: product.description || (
-                  product.type === "manual" ? `<h2>Luxury Moissanite Iced Out Watch</h2>
-
-<p>
-This moissanite watch showcases an exquisite fully iced-out design with precision-set stones 
-that deliver maximum brilliance and shine. Built for statement wear, this timepiece is perfect 
-for formal events, luxury styling, and high-end street fashion.
-</p>
-
-<h3>Premium Build Quality</h3>
-<ul>
-  <li>High-grade stainless steel construction</li>
-  <li>Scratch-resistant sapphire crystal glass</li>
-  <li>Hand-set moissanite stones with honeycomb setting</li>
-  <li>Durable, long-lasting shine and structure</li>
-</ul>
-
-<h3>Specifications</h3>
-<ul>
-  <li><strong>Movement:</strong> Mechanical Automatic</li>
-  <li><strong>Material:</strong> Stainless Steel</li>
-  <li><strong>Glass:</strong> Sapphire Crystal</li>
-  <li><strong>Water Resistance:</strong> 100M</li>
-  <li><strong>Clasp:</strong> Folding Buckle</li>
-</ul>
-
-<h3>Why Choose This Watch</h3>
-<ul>
-  <li>Passes diamond tester (moissanite stones)</li>
-  <li>Luxury appearance without inflated pricing</li>
-  <li>Perfect for resale or personal collection</li>
-</ul>
-
-<p>
-We focus on quality over cheap pricing. Every piece is crafted to meet high standards. 
-Contact us for bulk orders or customization.
-</p>` : ''
-                )
-              }}
-            />
+            {descriptionHtml.includes("<") ? (
+              <div
+                className="mt-6 space-y-4 text-sm text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+              />
+            ) : (
+              <div className="mt-6 space-y-4 text-sm text-gray-700 leading-relaxed">
+                {descriptionHtml.split(/\n+/).filter(Boolean).map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            )}
           </div>
+          )}
 
           {/* 🌟 REVIEWS SECTION */}
           {product.cj_product_id && (

@@ -1,0 +1,21 @@
+// Minimal app root page: admin and existing pages are split router.
+
+export default function HomePage() {
+  return (
+    <main className="min-h-screen bg-[#05070D] text-white flex items-center justify-center p-6">
+      <div className="max-w-xl text-center">
+        <h1 className="text-3xl font-bold mb-4">KV Garage App Router</h1>
+        <p className="mb-4">
+          This app router path is reserved for admin and new App pages.
+          Use <code>/admin</code> for the admin dashboard.
+        </p>
+        <a
+          className="inline-block px-5 py-3 bg-[#D4AF37] text-black font-semibold rounded-lg"
+          href="/admin"
+        >
+          Go to Admin
+        </a>
+      </div>
+    </main>
+  );
+}

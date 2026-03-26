@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "../../../lib/supabase";
 import { useCart } from "../../../context/CartContext";
+import { PUBLIC_PRODUCT_FIELDS, getProductImageArray } from "../../../lib/productFields";
+import { buildCanonicalUrl, buildProductDescription } from "../../../lib/seo";
 
 export default function ProductPage() {
   const router = useRouter();
@@ -27,7 +29,7 @@ export default function ProductPage() {
   const fetchProduct = async () => {
     const { data } = await supabase
       .from("products")
-      .select("*")
+      .select(PUBLIC_PRODUCT_FIELDS)
       .eq("slug", slug)
       .single();
 
@@ -58,6 +60,7 @@ export default function ProductPage() {
   const approved = profile?.approved || false;
 
   const isBundle = product.type === "bundle";
+  const images = getProductImageArray(product);
 
   const perUnit = isBundle
     ? (product.bundle_price / product.bundle_quantity).toFixed(2)
@@ -71,10 +74,12 @@ export default function ProductPage() {
     }
 
     addToCart({
+      id: product.id,
       name: product.name,
       price: isBundle ? product.bundle_price : product.price,
       quantity: isBundle ? 1 : quantity,
       image: product.image,
+      category: product.category || "wholesale",
     });
   };
 
@@ -82,6 +87,8 @@ export default function ProductPage() {
     <>
       <Head>
         <title>{product.name} | KV Garage Wholesale</title>
+        <meta name="description" content={buildProductDescription(product)} />
+        <link rel="canonical" href={buildCanonicalUrl(`/wholesale/${category}/${slug}`)} />
       </Head>
 
       <main className="max-w-7xl mx-auto px-8 py-16">
@@ -92,11 +99,20 @@ export default function ProductPage() {
           <div>
             <div className="bg-gray-100 aspect-square flex items-center justify-center border rounded">
               {product.image ? (
-                <img src={product.image} className="h-full object-contain" />
+                <img src={images[activeImage] || product.image} className="h-full object-contain" loading="lazy" alt={product.name} />
               ) : (
                 <span>Image</span>
               )}
             </div>
+            {images.length > 1 ? (
+              <div className="mt-4 flex gap-3 overflow-x-auto">
+                {images.map((image, index) => (
+                  <button key={image} onClick={() => setActiveImage(index)} className={`overflow-hidden rounded-xl border ${activeImage === index ? "border-black" : "border-gray-300"}`}>
+                    <img src={image} alt={`${product.name} ${index + 1}`} className="h-16 w-16 object-cover" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           {/* RIGHT */}
