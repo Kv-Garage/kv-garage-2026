@@ -142,6 +142,34 @@ const DASHBOARD_PRODUCTS = [
 ];
 
 const VIDEO_URL = process.env.NEXT_PUBLIC_MENTORSHIP_VIDEO_URL || "";
+const MENTORSHIP_SIGNUP_ID = "mentorship-signup";
+const INITIAL_SIGNUP_FORM = {
+  name: "",
+  email: "",
+  phone: "",
+  stage: "",
+  goal: "",
+  question: "",
+};
+
+function buildApplicationPayload(form, selectedTierLabel) {
+  const notes = [
+    form.phone ? `Phone: ${form.phone}` : "",
+    form.goal ? `Goal: ${form.goal}` : "",
+    form.question ? `Question: ${form.question}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return {
+    name: form.name.trim(),
+    email: form.email.trim(),
+    business_type: "Mentorship Applicant",
+    volume: selectedTierLabel || "General mentorship interest",
+    sales_channel: form.stage.trim() || "Not provided",
+    experience: notes || "No extra notes provided.",
+  };
+}
 
 function Counter({ target, prefix = "", suffix = "", active }) {
   const [value, setValue] = useState(0);
@@ -174,6 +202,11 @@ export default function MentorshipPage() {
   const [activeWin, setActiveWin] = useState(0);
   const [activityShift, setActivityShift] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [signupForm, setSignupForm] = useState(INITIAL_SIGNUP_FORM);
+  const [selectedTierKey, setSelectedTierKey] = useState(PROGRAM_CATALOG.growth.key);
+  const [signupMessage, setSignupMessage] = useState("");
+  const [signupState, setSignupState] = useState("idle");
+  const [checkoutTierKey, setCheckoutTierKey] = useState("");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -216,6 +249,109 @@ export default function MentorshipPage() {
     PROGRAM_CATALOG.growth,
     PROGRAM_CATALOG.elite,
   ];
+
+  const selectedTier = pricingTiers.find((tier) => tier.key === selectedTierKey) || PROGRAM_CATALOG.growth;
+
+  const updateSignupForm = (event) => {
+    const { name, value } = event.target;
+    setSignupForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const scrollToSignup = () => {
+    const node = document.getElementById(MENTORSHIP_SIGNUP_ID);
+    node?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const submitApplication = async (tierOverride = selectedTier) => {
+    const payload = buildApplicationPayload(signupForm, tierOverride?.label);
+
+    const response = await fetch("/api/apply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not save your mentorship application.");
+    }
+
+    return data;
+  };
+
+  const handleApplicationOnly = async () => {
+    if (!signupForm.name.trim() || !signupForm.email.trim()) {
+      setSignupState("error");
+      setSignupMessage("Add your name and email so we can follow up with you.");
+      scrollToSignup();
+      return;
+    }
+
+    try {
+      setSignupState("saving");
+      setSignupMessage("");
+      await submitApplication(selectedTier);
+      setSignupState("success");
+      setSignupMessage("Your mentorship application is in. We will follow up with next steps shortly.");
+    } catch (error) {
+      setSignupState("error");
+      setSignupMessage(error.message || "Could not send your application.");
+    }
+  };
+
+  const handleTierCheckout = async (tier) => {
+    setSelectedTierKey(tier.key);
+
+    if (!signupForm.name.trim() || !signupForm.email.trim()) {
+      setSignupState("error");
+      setSignupMessage("Complete the mentorship form first so Stripe and follow-up are tied together.");
+      scrollToSignup();
+      return;
+    }
+
+    try {
+      setCheckoutTierKey(tier.key);
+      setSignupState("saving");
+      setSignupMessage("");
+      await submitApplication(tier);
+
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: tier.stripeType,
+          customerEmail: signupForm.email.trim(),
+          lead: {
+            name: signupForm.name.trim(),
+            email: signupForm.email.trim(),
+            phone: signupForm.phone.trim(),
+            stage: signupForm.stage.trim(),
+            goal: signupForm.goal.trim(),
+            question: signupForm.question.trim(),
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || "Could not open Stripe checkout.");
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      setSignupState("error");
+      setSignupMessage(error.message || "Could not start checkout.");
+      scrollToSignup();
+    } finally {
+      setCheckoutTierKey("");
+    }
+  };
 
   return (
     <>
@@ -267,9 +403,9 @@ export default function MentorshipPage() {
                 Verified supplier access. Proven supply chain systems. The exact framework serious entrepreneurs use to build real, scalable revenue.
               </p>
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <Link href="/apply" className="inline-flex items-center justify-center rounded-[3px] bg-[#C9A84C] px-10 py-4 font-['DM_Sans'] text-base font-medium text-[#060606]">
-                  Apply for Mentorship →
-                </Link>
+                <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="inline-flex items-center justify-center rounded-[3px] bg-[#C9A84C] px-10 py-4 font-['DM_Sans'] text-base font-medium text-[#060606]">
+                  Start Your Mentorship Setup →
+                </a>
                 <a href="#live-media" className="inline-flex items-center justify-center rounded-[3px] border border-[#C9A84C]/30 px-10 py-4 font-['DM_Sans'] text-base font-medium text-[#C9A84C]">
                   Watch How It Works ↓
                 </a>
@@ -436,9 +572,9 @@ export default function MentorshipPage() {
 
           <div className="animate mt-8 border border-[#C9A84C]/20 bg-[#121212] px-6 py-5 text-center">
             <p className="font-['DM_Sans'] text-base text-white">Ready to be the next success story? Apply in 2 minutes.</p>
-            <Link href="/apply" className="mt-4 inline-flex rounded-[3px] bg-[#C9A84C] px-8 py-3 font-['DM_Sans'] font-medium text-[#060606]">
-              Apply Now →
-            </Link>
+            <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="mt-4 inline-flex rounded-[3px] bg-[#C9A84C] px-8 py-3 font-['DM_Sans'] font-medium text-[#060606]">
+              Start Now →
+            </a>
           </div>
         </section>
 
@@ -515,9 +651,9 @@ export default function MentorshipPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/apply" className="mt-8 inline-flex rounded-[3px] bg-[#C9A84C] px-8 py-3 font-['DM_Sans'] font-medium text-[#060606]">
-                Apply Now →
-              </Link>
+              <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="mt-8 inline-flex rounded-[3px] bg-[#C9A84C] px-8 py-3 font-['DM_Sans'] font-medium text-[#060606]">
+                Start Your Setup →
+              </a>
             </div>
           </div>
         </section>
@@ -590,20 +726,156 @@ export default function MentorshipPage() {
                       Everything in Growth, plus:
                     </p>
                   ) : null}
-                  <Link
-                    href="/apply"
-                    className={`mt-8 inline-flex w-full justify-center rounded-[3px] px-6 py-4 font-['DM_Sans'] text-sm font-semibold ${featured ? "bg-[#C9A84C] text-[#060606]" : "border border-[#C9A84C]/30 text-[#C9A84C]"}`}
+                  <button
+                    type="button"
+                    onClick={() => handleTierCheckout(tier)}
+                    disabled={checkoutTierKey === tier.key}
+                    className={`mt-8 inline-flex w-full justify-center rounded-[3px] px-6 py-4 font-['DM_Sans'] text-sm font-semibold transition ${featured ? "bg-[#C9A84C] text-[#060606]" : "border border-[#C9A84C]/30 text-[#C9A84C]"} ${checkoutTierKey === tier.key ? "cursor-not-allowed opacity-70" : ""}`}
                   >
-                    Apply Now →
-                  </Link>
+                    {checkoutTierKey === tier.key ? "Opening Stripe..." : `Choose ${tier.label} →`}
+                  </button>
                 </div>
               );
             })}
           </div>
 
           <p className="mt-8 text-center font-['DM_Sans'] text-sm italic text-[#8C8C82]">
-            Unsure which tier fits? Your strategy call will determine the best level for you.
+            Fill out the form below once, then any pricing button takes you straight into Stripe checkout for that tier.
           </p>
+        </section>
+
+        <section id={MENTORSHIP_SIGNUP_ID} className="mx-auto max-w-7xl px-6 py-20">
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_420px]">
+            <div className="animate border border-[#C9A84C]/20 bg-[#0D0D0D] p-8 md:p-10">
+              <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">Mentorship Signup</p>
+              <h2 className="mt-5 font-['Cormorant_Garamond'] text-[42px] leading-none text-white md:text-[58px]">
+                One form.
+                <br />
+                <span className="italic text-[#C9A84C]">Direct path</span> to checkout and scheduling.
+              </h2>
+              <p className="mt-6 max-w-2xl font-['DM_Sans'] text-sm leading-8 text-[#8C8C82]">
+                Share your details, tell us your current stage, and ask anything you need answered. Once this is filled out, your mentorship tier buttons above route straight into Stripe and then into a Calendly popup after payment.
+              </p>
+
+              <div className="mt-10 grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Full Name</span>
+                  <input
+                    name="name"
+                    value={signupForm.name}
+                    onChange={updateSignupForm}
+                    placeholder="Your name"
+                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Email</span>
+                  <input
+                    name="email"
+                    type="email"
+                    value={signupForm.email}
+                    onChange={updateSignupForm}
+                    placeholder="you@example.com"
+                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Phone</span>
+                  <input
+                    name="phone"
+                    value={signupForm.phone}
+                    onChange={updateSignupForm}
+                    placeholder="Optional"
+                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Current Stage</span>
+                  <select
+                    name="stage"
+                    value={signupForm.stage}
+                    onChange={updateSignupForm}
+                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
+                  >
+                    <option value="">Select where you are</option>
+                    <option value="Just getting started">Just getting started</option>
+                    <option value="Already selling online">Already selling online</option>
+                    <option value="Moving from retail to wholesale">Moving from retail to wholesale</option>
+                    <option value="Scaling an existing store">Scaling an existing store</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="mt-4 grid gap-4">
+                <label className="block">
+                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Main Goal</span>
+                  <textarea
+                    name="goal"
+                    value={signupForm.goal}
+                    onChange={updateSignupForm}
+                    rows={4}
+                    placeholder="What are you trying to build over the next 90 days?"
+                    className="w-full resize-none border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Questions</span>
+                  <textarea
+                    name="question"
+                    value={signupForm.question}
+                    onChange={updateSignupForm}
+                    rows={4}
+                    placeholder="Ask anything you want covered before you join."
+                    className="w-full resize-none border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
+                  />
+                </label>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={handleApplicationOnly}
+                  disabled={signupState === "saving" && !checkoutTierKey}
+                  className="inline-flex items-center justify-center rounded-[3px] border border-[#C9A84C]/35 px-8 py-4 font-['DM_Sans'] text-sm font-semibold text-[#C9A84C] transition hover:border-[#C9A84C]"
+                >
+                  {signupState === "saving" && !checkoutTierKey ? "Sending..." : "Submit Questions Only"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTierCheckout(selectedTier)}
+                  disabled={Boolean(checkoutTierKey)}
+                  className="inline-flex items-center justify-center rounded-[3px] bg-[#C9A84C] px-8 py-4 font-['DM_Sans'] text-sm font-semibold text-[#060606] transition hover:brightness-105"
+                >
+                  {checkoutTierKey === selectedTier.key ? "Opening Stripe..." : `Continue with ${selectedTier.label} →`}
+                </button>
+              </div>
+
+              {signupMessage ? (
+                <p className={`mt-5 font-['DM_Sans'] text-sm ${signupState === "error" ? "text-[#F28B82]" : "text-[#9DD7A8]"}`}>
+                  {signupMessage}
+                </p>
+              ) : null}
+            </div>
+
+            <aside className="animate border border-[#C9A84C]/20 bg-[#121212] p-8">
+              <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">Selected Tier</p>
+              <h3 className="mt-5 font-['Cormorant_Garamond'] text-[48px] leading-none text-white">{selectedTier.label}</h3>
+              <p className="mt-4 font-['DM_Sans'] text-5xl text-[#C9A84C]">${selectedTier.amount}</p>
+              <div className="mt-8 space-y-3">
+                {(selectedTier.features || []).map((feature) => (
+                  <div key={feature} className="flex items-start gap-3 font-['DM_Sans'] text-sm text-[#F4F2EC]">
+                    <span className="text-[#C9A84C]">✓</span>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 border-t border-[#C9A84C]/15 pt-6">
+                <p className="font-['DM_Sans'] text-sm leading-7 text-[#8C8C82]">
+                  Checkout flow: mentorship form → Stripe payment → Calendly popup scheduling on the success page.
+                </p>
+              </div>
+            </aside>
+          </div>
         </section>
 
         <section className="border-y border-[#C9A84C]/20 bg-[#121212] py-20">
@@ -644,9 +916,9 @@ export default function MentorshipPage() {
             <p className="mx-auto mt-8 max-w-[440px] font-['DM_Sans'] text-[18px] leading-8 text-[#8C8C82]">
               Every week without the right supplier relationships and systems is revenue left on the table. Apply today. Build tomorrow.
             </p>
-            <Link href="/apply" className="mt-10 inline-flex animate-[pulseCta_3s_infinite] rounded-[3px] bg-[#C9A84C] px-16 py-5 font-['DM_Sans'] text-base font-semibold text-[#060606]">
-              Apply for KV Garage Mentorship →
-            </Link>
+            <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="mt-10 inline-flex animate-[pulseCta_3s_infinite] rounded-[3px] bg-[#C9A84C] px-16 py-5 font-['DM_Sans'] text-base font-semibold text-[#060606]">
+              Start Mentorship Checkout →
+            </a>
             <p className="mt-6 font-['DM_Mono'] text-[11px] uppercase tracking-[0.18em] text-[#8C8C82]">
               ● Limited spots · Reviewed weekly · No obligation
             </p>

@@ -16,6 +16,8 @@ export default function CartPage() {
   const [products, setProducts] = useState([]);
   const [profile, setProfile] = useState(null);
   const [pricingMap, setPricingMap] = useState({});
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -124,11 +126,55 @@ export default function CartPage() {
 
   // 🔥 STRIPE CHECKOUT (FIXED)
   const handleCheckout = async () => {
+    console.log("🔷 Checkout button clicked");
+    
+    if (cart.length === 0) {
+      setCheckoutError("Your cart is empty. Add items to continue.");
+      return;
+    }
+
+    if (checkoutLoading) {
+      console.log("⏳ Checkout already in progress");
+      return;
+    }
+
     try {
+      setCheckoutLoading(true);
+      setCheckoutError("");
+      
+      console.log("🔍 Cart items:", cart);
+      console.log("🔍 Pricing map:", pricingMap);
+      console.log("🔍 Total price:", totalPrice);
+
+      // Validate that all items have prices
+      const itemsWithoutPrices = cart.filter(item => {
+        const price = Number(pricingMap[item.id]?.display_price || item.price || 0);
+        return price === 0;
+      });
+
+      if (itemsWithoutPrices.length > 0) {
+        throw new Error("Unable to load prices. Please refresh the page and try again.");
+      }
+
       const { data: authData } = await supabase.auth.getUser();
       const currentUser = authData?.user || null;
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token || null;
+
+      const checkoutPayload = {
+        cartItems: cart.map((item) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          image: item.image,
+          price: Number(pricingMap[item.id]?.display_price || item.price || 0),
+        })),
+        total: Number(totalPrice.toFixed(2)),
+        userId: currentUser?.id || null,
+        customerEmail: currentUser?.email || null,
+      };
+
+      console.log("📤 Sending checkout payload:", checkoutPayload);
 
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
@@ -136,27 +182,32 @@ export default function CartPage() {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: JSON.stringify({
-          cartItems: cart.map((item) => ({
-            ...item,
-            price: Number(pricingMap[item.id]?.display_price || item.price || 0),
-          })),
-          total: totalPrice,
-          userId: currentUser?.id || null,
-          customerEmail: currentUser?.email || null,
-          legalAgreement: true, // ✅ REQUIRED
-        }),
+        body: JSON.stringify(checkoutPayload),
       });
 
-      const data = await res.json();
+      console.log("📥 Response status:", res.status);
 
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        console.error("Stripe error:", data);
+      const data = await res.json();
+      console.log("📥 Response data:", data);
+
+      if (!res.ok) {
+        const errorMsg = data.error || `Server error: ${res.status}`;
+        throw new Error(errorMsg);
       }
+
+      if (!data.url) {
+        throw new Error("No checkout URL received. Please try again.");
+      }
+
+      console.log("✅ Redirecting to Stripe:", data.url);
+      window.location.href = data.url;
     } catch (err) {
-      console.error("Checkout error:", err);
+      console.error("❌ Checkout error:", err);
+      const errorMessage = err.message || "An unexpected error occurred. Please try again.";
+      setCheckoutError(errorMessage);
+      console.error("Full error details:", err);
+    } finally {
+      setCheckoutLoading(false);
     }
   };
 
@@ -168,6 +219,11 @@ export default function CartPage() {
         <h1 className="text-4xl font-bold mb-10">
           Order Review
         </h1>
+
+        {/* DEBUG INFO - Shows if checkout is ready */}
+        <div className="mb-6 p-4 bg-blue-900/20 border border-blue-700 rounded-lg text-sm text-blue-300">
+          <p>✓ Cart Items: {cart.length} | Total: ${totalPrice.toFixed(2)} | Prices Loaded: {Object.keys(pricingMap).length > 0 ? "Yes" : "Loading..."}</p>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-10">
 
@@ -370,23 +426,30 @@ export default function CartPage() {
                 Total: ${totalPrice.toFixed(2)}
               </h2>
 
+              {checkoutError && (
+                <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-md">
+                  <p className="text-red-400 text-sm font-medium">⚠️ Error: {checkoutError}</p>
+                </div>
+              )}
+
               <button
                 onClick={handleCheckout}
-                className="w-full bg-[#D4AF37] text-black py-3 rounded-md font-semibold"
+                disabled={cart.length === 0 || checkoutLoading}
+                className={`w-full py-3 rounded-md font-semibold transition ${cart.length === 0 || checkoutLoading ? "cursor-not-allowed bg-[#D4AF37]/60 text-black/70" : "bg-[#D4AF37] text-black hover:bg-[#E5C158]"}`}
               >
-                Checkout
+                {checkoutLoading ? "🔄 Redirecting to Stripe..." : "💳 Checkout"}
               </button>
 
               <Link
                 href="/shop"
-                className="block mt-4 text-center text-sm text-gray-400"
+                className="block mt-4 text-center text-sm text-gray-400 hover:text-white transition"
               >
                 Continue Shopping
               </Link>
 
               <button
                 onClick={clearCart}
-                className="w-full mt-3 bg-gray-700 py-2 rounded text-sm"
+                className="w-full mt-3 bg-gray-700 py-2 rounded text-sm hover:bg-gray-600 transition"
               >
                 Clear Cart
               </button>
