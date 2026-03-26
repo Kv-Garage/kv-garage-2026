@@ -7,7 +7,7 @@ export default function Trading() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/create-checkout", {
+      const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

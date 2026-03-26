@@ -62,7 +62,7 @@ export default async function handler(req, res) {
 
     console.log("📝 Checkout request:", { type, cartItems: cartItems?.length, total, userId, customerEmail });
 
-    const origin = req.headers.origin || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const origin = req.headers.origin || process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://kvgarage.com";
     console.log("🌐 Origin:", origin);
 
     const program = getProgramByStripeType(type);

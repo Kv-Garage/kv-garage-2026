@@ -9,8 +9,7 @@ export default function PrivacyPolicy() {
       <p className="mb-8 text-sm text-gray-500">
         Effective Date: January 1, 2026 <br />
         KV Garage LLC <br />
-        Email: kvgarage@kvgarage.com <br />
-        Phone: 616-404-0751
+        Email: kvgarage@kvgarage.com
       </p>
 
       <section className="mb-12">

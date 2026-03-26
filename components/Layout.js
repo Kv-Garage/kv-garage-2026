@@ -431,7 +431,6 @@ export default function Layout({ children }) {
             KV Garage helps buyers, resellers, and students source verified products, unlock wholesale supplier relationships, improve profit margins, and build repeatable systems around retail inventory and supply chain growth.
           </p>
           <p>kvgarage@kvgarage.com</p>
-          <p>616-404-0751</p>
           <p className="mt-4">
             © 2026 KV Garage LLC. All rights reserved.
           </p>

@@ -24,6 +24,9 @@ export default function Home() {
   const [profitResult, setProfitResult] = useState(null);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [productDropdownOpen, setProductDropdownOpen] = useState(false);
+  const [emailPopupOpen, setEmailPopupOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
   const productSelectRef = useRef(null);
   const productSearchInputRef = useRef(null);
 
@@ -40,6 +43,44 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Email popup logic
+  useEffect(() => {
+    const hasSeenPopup = localStorage.getItem('emailPopupSeen');
+    if (!hasSeenPopup) {
+      const timer = setTimeout(() => {
+        setEmailPopupOpen(true);
+      }, 3000); // Show after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setEmailSubmitted(true);
+        localStorage.setItem('emailPopupSeen', 'true');
+        setTimeout(() => {
+          setEmailPopupOpen(false);
+          setEmailSubmitted(false);
+          setEmail('');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Email subscription failed:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -649,6 +690,52 @@ export default function Home() {
 
           </div>
         </section>
+
+        {/* ================= EMAIL POPUP ================= */}
+        {emailPopupOpen && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white text-black rounded-2xl max-w-md w-full p-6 relative">
+              <button
+                onClick={() => setEmailPopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+              
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold mb-2">Join Our Community</h3>
+                <p className="text-gray-600">Get exclusive updates, product drops, and wholesale opportunities.</p>
+              </div>
+
+              {emailSubmitted ? (
+                <div className="text-center py-4">
+                  <div className="text-green-600 mb-2">✓</div>
+                  <p className="text-sm text-gray-600">Thanks for subscribing!</p>
+                </div>
+              ) : (
+                <form onSubmit={handleEmailSubmit} className="space-y-4">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Your email address"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#D4AF37]"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="w-full bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
+                  >
+                    Subscribe
+                  </button>
+                  <p className="text-xs text-gray-500 text-center">
+                    We respect your privacy. Unsubscribe anytime.
+                  </p>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
 
       </div>
     </>
