@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -180,12 +181,6 @@ export default function Layout({ children }) {
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={seo.title} />
           <meta name="twitter:description" content={seo.description} />
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono&display=swap"
-            rel="stylesheet"
-          />
         </Head>
       ) : null}
 
@@ -197,11 +192,7 @@ export default function Layout({ children }) {
 
           {/* LOGO */}
           <Link href="/" aria-label="Go to homepage" className="flex items-center gap-2.5 cursor-pointer">
-            <img
-              src="/logo/Kv%20garage%20icon.png"
-              alt=""
-              className="h-8 w-8 md:h-9 md:w-9 object-contain flex-shrink-0"
-            />
+            <Image src="/logo/Kv%20garage%20icon.png" alt="" width={36} height={36} className="h-8 w-8 md:h-9 md:w-9 object-contain flex-shrink-0" priority={router.pathname === "/"} />
             <div className="flex flex-col gap-0.5">
               <span className="text-[15px] md:text-base font-semibold tracking-[0.08em] leading-none">
                 KV GARAGE
@@ -395,11 +386,7 @@ export default function Layout({ children }) {
 
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <img
-                src="/logo/Kv%20garage%20icon.png"
-                alt=""
-                className="h-8 w-8 object-contain opacity-80"
-              />
+              <Image src="/logo/Kv%20garage%20icon.png" alt="" width={32} height={32} className="h-8 w-8 object-contain opacity-80" loading="lazy" />
               <h4 className="text-lg font-semibold text-[#D4AF37]">
                 KV GARAGE
               </h4>

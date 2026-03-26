@@ -31,11 +31,18 @@ export default function Success() {
         const orderRes = await fetch(`/api/get-order?session_id=${session_id}`);
         const orderData = await orderRes.json();
 
-        console.log("SESSION:", data);
-
         if (orderData?.order?.order_number) {
           setOrderNumber(orderData.order.order_number);
         }
+
+        await fetch("/api/traffic-event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            page: "/success",
+            event_type: "conversion",
+          }),
+        }).catch(() => {});
 
         // 🔥 ONLY show calendar for these types
         if (

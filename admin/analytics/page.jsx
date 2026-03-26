@@ -140,6 +140,7 @@ export default function AdminAnalyticsPage() {
 
         const pageViews = (trafficEvents || []).filter((event) => event.event_type === "page_view");
         const productViews = (trafficEvents || []).filter((event) => event.event_type === "product_view");
+        const conversions = (trafficEvents || []).filter((event) => event.event_type === "conversion");
 
         const topPages = Object.entries(
           pageViews.reduce((accumulator, event) => {
@@ -170,6 +171,7 @@ export default function AdminAnalyticsPage() {
             grouping
           ),
           totalPageViews30d: pageViews.length,
+          totalConversions30d: conversions.length,
           topPages,
           topProducts,
         });
@@ -342,11 +344,12 @@ export default function AdminAnalyticsPage() {
             <AdminEmptyState title="No analytics available" description="Analytics will appear once orders and traffic events exist." />
           ) : (
             <>
-              <AdminStatGrid columns="xl:grid-cols-4">
+              <AdminStatGrid columns="xl:grid-cols-5">
                 <AdminMetricCard label="Total Revenue" value={`$${metrics.totalRevenue.toFixed(2)}`} hint="Sum of orders.total" />
                 <AdminMetricCard label="Total Orders" value={metrics.totalOrders} hint="All order records" />
                 <AdminMetricCard label="Total Customers" value={metrics.totalCustomers} hint="Distinct order user_ids" />
                 <AdminMetricCard label="Page Views (30d)" value={metrics.totalPageViews30d} hint="Traffic events in last 30 days" />
+                <AdminMetricCard label="Conversions (30d)" value={metrics.totalConversions30d} hint="Tracked checkout success events" />
               </AdminStatGrid>
 
               <div className="grid gap-6 xl:grid-cols-2">

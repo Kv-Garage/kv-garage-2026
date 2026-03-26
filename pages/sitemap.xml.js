@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "../lib/supabaseAdmin";
+import { fetchAllLearnPostSlugs } from "../lib/learnPosts";
 
 const PUBLIC_ROUTES = [
   "",
@@ -16,6 +17,7 @@ const PUBLIC_ROUTES = [
 
 export async function getServerSideProps({ res }) {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "https://www.kvgarage.com";
+  const postSlugs = await fetchAllLearnPostSlugs();
   const { data: products } = await supabaseAdmin
     .from("products")
     .select("slug,updated_at,created_at,active,is_active")
@@ -24,6 +26,7 @@ export async function getServerSideProps({ res }) {
 
   const urls = [
     ...PUBLIC_ROUTES.map((route) => `<url><loc>${base}${route}</loc></url>`),
+    ...postSlugs.map((slug) => `<url><loc>${base}/learn/posts/${slug}</loc></url>`),
     ...(products || [])
       .filter((product) => product.slug)
       .map(
