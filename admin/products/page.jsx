@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminGuard from "../../components/AdminGuard";
 import AdminLayout from "../layout";
 import { supabase } from "../../lib/supabase";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {
   AdminEmptyState,
   AdminErrorState,

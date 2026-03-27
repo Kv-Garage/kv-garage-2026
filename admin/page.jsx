@@ -16,20 +16,6 @@ import { deriveTierPrices } from "../lib/serverPricing";
 export default function AdminDashboardPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    const getCookie = (name) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(";").shift();
-      return null;
-    };
-
-    const auth = getCookie("adminAuth");
-    if (auth !== "true") {
-      router.push("/admin-login");
-    }
-  }, [router]);
-
   const [mode, setMode] = useState("manual");
   const [url, setUrl] = useState("");
   const [bulkUrls, setBulkUrls] = useState("");

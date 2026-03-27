@@ -43,6 +43,8 @@ export default function AdminLogin() {
       if (error) {
         if (error.message.toLowerCase().includes("email not confirmed")) {
           setError("Email not confirmed. Check your email for the confirmation link.");
+        } else if (error.message.toLowerCase().includes("invalid login credentials")) {
+          setError("Invalid email or password. Please try again.");
         } else {
           setError(error.message);
         }
@@ -59,7 +61,7 @@ export default function AdminLogin() {
 
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("role")
         .eq("id", user.id)
         .single();
 
@@ -78,7 +80,7 @@ export default function AdminLogin() {
 
       router.push("/admin");
     } catch (err) {
-      console.error(err);
+      console.error("Admin login error:", err);
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
