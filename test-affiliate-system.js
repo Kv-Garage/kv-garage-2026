@@ -5,7 +5,7 @@
  * Run this script to verify the affiliate system is working correctly
  */
 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const BASE_URL = 'http://localhost:3000';
 

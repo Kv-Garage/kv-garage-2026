@@ -22,12 +22,13 @@ export default async function handler(req, res) {
     // Return affiliate data (excluding password hash)
     const { password_hash, ...affiliateData } = result.data;
 
-    res.status(200).json({ 
+    return res.status(200).json({ 
+      success: true,
       message: "Login successful", 
       affiliate: affiliateData 
     });
   } catch (error) {
     console.error("Error during affiliate login:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 }

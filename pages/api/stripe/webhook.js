@@ -2,9 +2,6 @@ import Stripe from "stripe";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { deriveStudentSpendCategory, generateUniqueOrderNumber } from "../../../lib/orderUtils";
 
-// Load environment variables
-require('dotenv').config();
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // FORCE LIVE MODE VALIDATION - CRITICAL

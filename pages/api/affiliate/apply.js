@@ -1,4 +1,4 @@
-import { submitAffiliateApplication } from "../../../lib/affiliates";
+import { submitAffiliateApplication, getAffiliateApplicationByEmail } from "../../../lib/affiliates";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -20,15 +20,9 @@ export default async function handler(req, res) {
     }
 
     // Check if email already has an application
-    const existingApplication = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/affiliate_applications?email=eq.${encodeURIComponent(email)}`, {
-      headers: {
-        'apikey': process.env.SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    }).then(r => r.json());
+    const existingApplication = await getAffiliateApplicationByEmail(email);
 
-    if (existingApplication && existingApplication.length > 0) {
+    if (existingApplication) {
       return res.status(400).json({ error: "An application with this email already exists" });
     }
 
