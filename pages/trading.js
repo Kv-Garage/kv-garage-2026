@@ -13,7 +13,7 @@ export default function Trading() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: "call"
+          type: "call",
         }),
       });
 

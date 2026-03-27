@@ -7,13 +7,13 @@ export default function Contact() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/create-checkout", {
+      const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: "call"
+          type: "call",
         }),
       });
 
