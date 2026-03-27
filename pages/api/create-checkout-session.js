@@ -136,10 +136,21 @@ export default async function handler(req, res) {
       for (const item of cartItems) {
         console.log(`  🔍 Validating item: ${item.name} (${item.id})`);
         
+        // CRITICAL FIX: Ensure product_id is numeric
+        const productId = Number(item.id);
+        if (!productId || isNaN(productId) || productId <= 0) {
+          console.error(`  ❌ Invalid product ID: ${item.id} (not a valid number)`);
+          return res.status(400).json({ 
+            error: `Invalid product ID: ${item.id}. Product ID must be a valid number.` 
+          });
+        }
+
+        console.log(`  ✅ Product ID validated: ${productId}`);
+        
         const { data: product, error: productError } = await supabaseAdmin
           .from("products")
           .select("*")
-          .eq("id", item.id)
+          .eq("id", productId)
           .maybeSingle();
 
         if (productError) {
