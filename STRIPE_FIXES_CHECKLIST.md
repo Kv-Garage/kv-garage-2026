@@ -143,7 +143,7 @@ const res = await fetch("/api/create-checkout-session", {
 ```bash
 # Install Stripe CLI
 # Run:
-stripe listen --forward-to localhost:3000/api/stripe/webhook
+stripe listen --forward-to https://kvgarage.com/api/stripe/webhook
 
 # In another terminal:
 stripe trigger payment_intent.succeeded
@@ -197,7 +197,7 @@ npm install resend
 
 # 4. Test locally
 npm run dev
-# Go to http://localhost:3000/mentorship
+# Go to https://kvgarage.com/mentorship
 # Complete a test checkout
 
 # 5. Deploy
