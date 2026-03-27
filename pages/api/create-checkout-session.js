@@ -4,6 +4,9 @@ import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { getAuthenticatedViewer, getPriceForUser } from "../../lib/serverPricing";
 import { getProgramByStripeType } from "../../lib/programCatalog";
 
+// Load environment variables
+require('dotenv').config();
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // FORCE LIVE MODE VALIDATION - CRITICAL

@@ -1,6 +1,9 @@
 import Stripe from 'stripe';
 import { getProgramByStripeType } from '../../lib/programCatalog';
 
+// Load environment variables
+require('dotenv').config();
+
 // Initialize Stripe with secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
