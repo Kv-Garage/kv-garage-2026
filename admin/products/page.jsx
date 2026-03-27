@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
 import AdminGuard from "../../components/AdminGuard";
 import AdminLayout from "../layout";
 import { supabase } from "../../lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -52,8 +53,11 @@ function slugify(value = "") {
     .replace(/^-|-$/g, "");
 }
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminProductsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -63,7 +67,7 @@ export default function AdminProductsPage() {
   const [editingProductId, setEditingProductId] = useState(null);
   const [draft, setDraft] = useState(buildEmptyProduct());
   const [newImageUrl, setNewImageUrl] = useState("");
-  const page = Math.max(1, Number(router.query.page) || 1);
+  const page = Math.max(1, Number(searchParams?.get('page')) || 1);
   const pageSize = 20;
 
   useEffect(() => {
@@ -228,14 +232,9 @@ export default function AdminProductsPage() {
   };
 
   const goToPage = (nextPage) => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: nextPage },
-      },
-      undefined,
-      { shallow: true }
-    );
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', nextPage.toString());
+    router.push(`${router.pathname}?${params.toString()}`);
   };
 
   const stockStatusLabel = (inventoryCount) => {
