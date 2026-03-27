@@ -400,7 +400,7 @@ export default function AdminSettings() {
                     value={settings.stripePublishableKey}
                     onChange={(e) => updateSetting("stripePublishableKey", e.target.value)}
                     className="w-full bg-[#1A2132] border border-[#2A3441] text-white px-3 py-2 rounded-lg"
-                    placeholder="pk_live_..."
+                    placeholder="Enter Stripe Publishable Key"
                   />
                 </div>
                 <div>
@@ -410,7 +410,7 @@ export default function AdminSettings() {
                     value={settings.stripeSecretKey}
                     onChange={(e) => updateSetting("stripeSecretKey", e.target.value)}
                     className="w-full bg-[#1A2132] border border-[#2A3441] text-white px-3 py-2 rounded-lg"
-                    placeholder="sk_live_..."
+                    placeholder="Enter Stripe Secret Key"
                   />
                 </div>
               </div>

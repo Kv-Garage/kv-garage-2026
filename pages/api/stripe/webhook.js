@@ -4,6 +4,19 @@ import { deriveStudentSpendCategory, generateUniqueOrderNumber } from "../../../
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// FORCE LIVE MODE VALIDATION - CRITICAL
+console.log("🚨 STRIPE KEY VALIDATION:", {
+  keyPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 8),
+  isLive: process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_"),
+  isTest: process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_"),
+  fullKeyLength: process.env.STRIPE_SECRET_KEY?.length
+});
+
+if (!process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_")) {
+  console.error("🚨 CRITICAL ERROR: NOT IN LIVE MODE!");
+  throw new Error("Stripe is not in LIVE mode - check environment variables");
+}
+
 export const config = {
   api: {
     bodyParser: false,
