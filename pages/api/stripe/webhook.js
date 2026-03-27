@@ -86,10 +86,20 @@ export default async function handler(req, res) {
         const items = JSON.parse(session.metadata?.items || "[]");
         const total = Number(session.metadata?.total || session.amount_total / 100 || 0);
 
+        // Convert user_id to number if it's a string, or null if invalid
+        let userId = null;
+        const rawUserId = session.metadata?.user_id || session.client_reference_id;
+        if (rawUserId) {
+          const numericUserId = Number(rawUserId);
+          if (!isNaN(numericUserId) && isFinite(numericUserId)) {
+            userId = numericUserId;
+          }
+        }
+
         const { data: insertedOrder, error } = await supabaseAdmin.from("orders").insert([
           {
             order_number: orderNumber,
-            user_id: session.metadata?.user_id || session.client_reference_id || null,
+            user_id: userId,
             items,
             total,
             status: "confirmed",
@@ -109,7 +119,7 @@ export default async function handler(req, res) {
         }
 
         await maybeTrackStudentSpend({
-          userId: session.metadata?.user_id || session.client_reference_id || null,
+          userId: userId,
           orderId: insertedOrder?.id,
           items,
           total,

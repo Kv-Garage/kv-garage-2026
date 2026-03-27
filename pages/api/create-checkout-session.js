@@ -60,7 +60,18 @@ export default async function handler(req, res) {
       lead = null,
     } = req.body;
 
-    console.log("📝 Checkout request:", { type, cartItems: cartItems?.length, total, userId, customerEmail });
+    // Validate and sanitize userId to prevent database errors
+    let sanitizedUserId = null;
+    if (userId) {
+      const numericUserId = Number(userId);
+      if (!isNaN(numericUserId) && isFinite(numericUserId)) {
+        sanitizedUserId = numericUserId;
+      } else {
+        console.warn("⚠️ Invalid userId provided, ignoring:", userId);
+      }
+    }
+
+    console.log("📝 Checkout request:", { type, cartItems: cartItems?.length, total, userId: sanitizedUserId, customerEmail });
 
     const origin = req.headers.origin || process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://kvgarage.com";
     console.log("🌐 Origin:", origin);
@@ -204,12 +215,12 @@ export default async function handler(req, res) {
         line_items,
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/cart`,
-        client_reference_id: userId || undefined,
+        client_reference_id: sanitizedUserId || undefined,
         customer_email: customerEmail || undefined,
         metadata: {
           items: JSON.stringify(orderItems),
           total: String(Number(orderTotal.toFixed(2))),
-          user_id: userId || "",
+          user_id: sanitizedUserId || "",
           customer_email: customerEmail || "",
           checkout_type: "cart",
           role: viewer.role || "retail",
