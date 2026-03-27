@@ -91,8 +91,10 @@ export default async function handler(req, res) {
         const rawUserId = session.metadata?.user_id || session.client_reference_id;
         if (rawUserId) {
           const numericUserId = Number(rawUserId);
-          if (!isNaN(numericUserId) && isFinite(numericUserId)) {
+          if (!isNaN(numericUserId) && isFinite(numericUserId) && numericUserId > 0) {
             userId = numericUserId;
+          } else {
+            console.warn("⚠️ Invalid user_id in webhook:", rawUserId);
           }
         }
 
@@ -115,7 +117,8 @@ export default async function handler(req, res) {
         ]).select("id").single();
 
         if (error) {
-          throw error;
+          console.error("❌ Order insertion failed:", error);
+          throw new Error(`Order creation failed: ${error.message}`);
         }
 
         await maybeTrackStudentSpend({

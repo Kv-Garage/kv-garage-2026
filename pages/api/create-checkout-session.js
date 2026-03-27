@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
     console.log("📝 Checkout request:", { type, cartItems: cartItems?.length, total, userId: sanitizedUserId, customerEmail });
 
-    const origin = req.headers.origin || process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://kvgarage.com";
+    const origin = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://kvgarage.com";
     console.log("🌐 Origin:", origin);
 
     const program = getProgramByStripeType(type);
@@ -169,10 +169,13 @@ export default async function handler(req, res) {
         const clientPrice = Number(item.price || 0);
         console.log(`  💵 Prices - Server: $${serverPrice}, Client: $${clientPrice}`);
 
-        // Allow small price differences due to floating point
-        if (Math.abs(clientPrice - serverPrice) > 1.00) {
-          console.warn(`  ⚠️ Price difference is large but continuing: Server ${serverPrice} vs Client ${clientPrice}`);
-          // Changed from error to warning to allow checkout to proceed
+        // Validate price differences - prevent checkout if prices are too different
+        const priceDiff = Math.abs(clientPrice - serverPrice);
+        if (priceDiff > 1.00) {
+          console.error(`  ❌ Price difference too large: Server $${serverPrice} vs Client $${clientPrice} (diff: $${priceDiff.toFixed(2)})`);
+          return res.status(400).json({ 
+            error: `Price validation failed: Server price ($${serverPrice.toFixed(2)}) differs from client price ($${clientPrice.toFixed(2)}) by $${priceDiff.toFixed(2)}` 
+          });
         }
 
         validatedCart.push({
@@ -220,7 +223,7 @@ export default async function handler(req, res) {
         metadata: {
           items: JSON.stringify(orderItems),
           total: String(Number(orderTotal.toFixed(2))),
-          user_id: sanitizedUserId || "",
+          user_id: sanitizedUserId ? String(sanitizedUserId) : "",
           customer_email: customerEmail || "",
           checkout_type: "cart",
           role: viewer.role || "retail",

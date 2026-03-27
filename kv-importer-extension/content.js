@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       console.log("🚀 SENDING:", payload);
 
-      fetch("http://127.0.0.1:3000/api/import-extension", {
+      fetch("https://kvgarage.com/api/import-extension", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

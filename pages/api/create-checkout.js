@@ -12,9 +12,7 @@ export default async function handler(req, res) {
     }
 
     const { amount, success_url, cancel_url = '/', productName = 'Product', type } = req.body;
-    const origin =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      process.env.NEXT_PUBLIC_SITE_URL || "https://kvgarage.com";
+    const origin = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://kvgarage.com";
 
     // Handle all call types (call, mentorship, advisory) with their specific configs
     if (type === "call" || type === "mentorship" || type === "advisory" || type === "course") {
