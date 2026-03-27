@@ -134,27 +134,36 @@ export default function AdminProductsPage() {
 
   const openEditPanel = async (productId) => {
     setError("");
-    const { data, error: loadError } = await supabase
-      .from("products")
-      .select("*")
-      .eq("id", productId)
-      .single();
+    setLoading(true);
+    
+    try {
+      const { data, error: loadError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", productId)
+        .single();
 
-    if (loadError || !data) {
-      setError("Could not load product details.");
-      return;
+      if (loadError || !data) {
+        setError("Could not load product details.");
+        return;
+      }
+
+      setEditingProductId(productId);
+      setDraft({
+        ...buildEmptyProduct(),
+        ...data,
+        images: Array.isArray(data.images) ? data.images : [],
+        variants: Array.isArray(data.variants) ? data.variants : [],
+        is_active: typeof data.is_active === "boolean" ? data.is_active : data.active !== false,
+        active: data.active !== false,
+      });
+      setPanelOpen(true);
+    } catch (error) {
+      console.error("Error loading product:", error);
+      setError("Failed to load product details.");
+    } finally {
+      setLoading(false);
     }
-
-    setEditingProductId(productId);
-    setDraft({
-      ...buildEmptyProduct(),
-      ...data,
-      images: Array.isArray(data.images) ? data.images : [],
-      variants: Array.isArray(data.variants) ? data.variants : [],
-      is_active: typeof data.is_active === "boolean" ? data.is_active : data.active !== false,
-      active: data.active !== false,
-    });
-    setPanelOpen(true);
   };
 
   const saveProduct = async () => {
@@ -207,12 +216,13 @@ export default function AdminProductsPage() {
 
       if (response.error) throw response.error;
 
+      // Success: Close panel and reset state
       setPanelOpen(false);
       setEditingProductId(null);
       setDraft(buildEmptyProduct());
-      router.replace(router.asPath, undefined, { scroll: false });
-      setLoading(true);
-
+      setNewImageUrl("");
+      
+      // Refresh data with optimistic update
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
       const { data, count } = await supabase
@@ -222,13 +232,39 @@ export default function AdminProductsPage() {
         .range(from, to);
       setProducts(data || []);
       setTotalCount(count || 0);
+      
+      // Trigger frontend revalidation for product pages
+      if (editingProductId) {
+        try {
+          await fetch(`/api/revalidate-product?productId=${editingProductId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        } catch (revalError) {
+          console.warn('Product revalidation failed:', revalError);
+        }
+      }
+      
+      // Show success message
+      setError("Product saved successfully!");
+      setTimeout(() => setError(""), 3000);
     } catch (saveError) {
       console.error(saveError);
       setError(saveError.message || "Could not save product.");
     } finally {
       setSaving(false);
-      setLoading(false);
     }
+  };
+
+  // Add cancel function to properly reset state
+  const cancelEdit = () => {
+    setPanelOpen(false);
+    setEditingProductId(null);
+    setDraft(buildEmptyProduct());
+    setNewImageUrl("");
+    setError("");
   };
 
   const goToPage = (nextPage) => {
@@ -406,30 +442,59 @@ export default function AdminProductsPage() {
                 <div className="space-y-4">
                   <label className="block text-sm">
                     <span className="mb-2 block text-[#CBD5E1]">Name</span>
-                    <input value={draft.name} onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                    <input 
+                      value={draft.name || ""} 
+                      onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))} 
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                    />
                   </label>
                   <div className="grid gap-4 md:grid-cols-3">
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Retail Price — public customers</span>
-                      <input type="number" value={draft.retail_price || draft.price} onChange={(event) => setDraft((prev) => ({ ...prev, retail_price: event.target.value, price: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        type="number" 
+                        value={draft.retail_price || draft.price || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, retail_price: event.target.value, price: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Wholesale Price — account holders</span>
-                      <input type="number" value={draft.wholesale_price} onChange={(event) => setDraft((prev) => ({ ...prev, wholesale_price: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        type="number" 
+                        value={draft.wholesale_price || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, wholesale_price: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Student Price — enrolled students</span>
-                      <input type="number" value={draft.student_price} onChange={(event) => setDraft((prev) => ({ ...prev, student_price: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        type="number" 
+                        value={draft.student_price || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, student_price: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Compare At Price — shown as crossed-out original price</span>
-                      <input type="number" value={draft.compare_price} onChange={(event) => setDraft((prev) => ({ ...prev, compare_price: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        type="number" 
+                        value={draft.compare_price || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, compare_price: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Supplier Cost — INTERNAL ONLY, never shown to customers</span>
-                      <input type="number" value={draft.supplier_cost} onChange={(event) => setDraft((prev) => ({ ...prev, supplier_cost: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        type="number" 
+                        value={draft.supplier_cost || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, supplier_cost: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                   </div>
                   <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/10 px-4 py-3 text-sm text-[#F8E8A6]">
@@ -459,12 +524,21 @@ export default function AdminProductsPage() {
                   </div>
                   <label className="block text-sm">
                     <span className="mb-2 block text-[#CBD5E1]">Description (HTML supported)</span>
-                    <textarea value={draft.description} onChange={(event) => setDraft((prev) => ({ ...prev, description: event.target.value }))} rows={8} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                    <textarea 
+                      value={draft.description || ""} 
+                      onChange={(event) => setDraft((prev) => ({ ...prev, description: event.target.value }))} 
+                      rows={8} 
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                    />
                   </label>
                   <div className="grid gap-4 md:grid-cols-2">
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Category</span>
-                      <select value={draft.category} onChange={(event) => setDraft((prev) => ({ ...prev, category: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
+                      <select 
+                        value={draft.category || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, category: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white"
+                      >
                         <option value="">General</option>
                         {CATEGORY_ORDER.map((category) => (
                           <option key={category} value={category}>
@@ -475,31 +549,56 @@ export default function AdminProductsPage() {
                     </label>
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Slug</span>
-                      <input value={draft.slug} onChange={(event) => setDraft((prev) => ({ ...prev, slug: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        value={draft.slug || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, slug: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Meta Title</span>
-                      <input value={draft.meta_title} onChange={(event) => setDraft((prev) => ({ ...prev, meta_title: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        value={draft.meta_title || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, meta_title: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Meta Description</span>
-                      <input value={draft.meta_description} onChange={(event) => setDraft((prev) => ({ ...prev, meta_description: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        value={draft.meta_description || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, meta_description: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white">
-                      <input type="checkbox" checked={Boolean(draft.top_pick)} onChange={(event) => setDraft((prev) => ({ ...prev, top_pick: event.target.checked }))} />
+                      <input 
+                        type="checkbox" 
+                        checked={Boolean(draft.top_pick)} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, top_pick: event.target.checked }))} 
+                      />
                       Top Pick
                     </label>
                     <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white">
-                      <input type="checkbox" checked={Boolean(draft.is_active)} onChange={(event) => setDraft((prev) => ({ ...prev, is_active: event.target.checked, active: event.target.checked }))} />
+                      <input 
+                        type="checkbox" 
+                        checked={Boolean(draft.is_active)} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, is_active: event.target.checked, active: event.target.checked }))} 
+                      />
                       Visible on Storefront
                     </label>
                     <label className="block text-sm">
                       <span className="mb-2 block text-[#CBD5E1]">Inventory Count</span>
-                      <input type="number" value={draft.inventory_count} onChange={(event) => setDraft((prev) => ({ ...prev, inventory_count: event.target.value }))} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" />
+                      <input 
+                        type="number" 
+                        value={draft.inventory_count || ""} 
+                        onChange={(event) => setDraft((prev) => ({ ...prev, inventory_count: event.target.value }))} 
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white" 
+                      />
                     </label>
                   </div>
                 </div>
@@ -509,7 +608,12 @@ export default function AdminProductsPage() {
                     <div className="mb-4 flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-white">Images</h3>
                       <div className="flex gap-2">
-                        <input value={newImageUrl} onChange={(event) => setNewImageUrl(event.target.value)} placeholder="Paste image URL" className="rounded-xl border border-white/10 bg-[#0B1020] px-3 py-2 text-sm text-white" />
+                        <input 
+                          value={newImageUrl} 
+                          onChange={(event) => setNewImageUrl(event.target.value)} 
+                          placeholder="Paste image URL" 
+                          className="rounded-xl border border-white/10 bg-[#0B1020] px-3 py-2 text-sm text-white" 
+                        />
                         <button
                           onClick={() => {
                             if (!newImageUrl.trim()) return;
@@ -518,16 +622,48 @@ export default function AdminProductsPage() {
                           }}
                           className="rounded-xl bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-black"
                         >
-                          Add
+                          Add URL
                         </button>
                       </div>
                     </div>
+                    
+                    {/* Image Upload Section */}
+                    <div className="mb-4 p-4 border border-white/20 rounded-lg bg-white/5">
+                      <p className="text-sm text-gray-300 mb-2">Upload Images</p>
+                      <div className="flex gap-2">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={(event) => {
+                            const files = Array.from(event.target.files || []);
+                            if (files.length > 0) {
+                              // For now, just show a message since we don't have a file upload endpoint
+                              alert("File upload would require a server endpoint. For now, please use the URL input above to add images.");
+                            }
+                          }}
+                          className="text-sm text-gray-300"
+                        />
+                        <button
+                          onClick={() => {
+                            alert("File upload would require a server endpoint. For now, please use the URL input above to add images.");
+                          }}
+                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700"
+                        >
+                          Upload
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Tip: Upload images to your preferred hosting service (Cloudinary, S3, etc.) and paste the URLs above.
+                      </p>
+                    </div>
+
                     <div className="space-y-3">
                       {(draft.images || []).map((image, index) => (
                         <div key={`${image}-${index}`} className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0B1020] p-3">
                           <img src={image} alt={`Product ${index + 1}`} className="h-12 w-12 rounded-xl object-cover" />
                           <input
-                            value={image}
+                            value={image || ""}
                             onChange={(event) =>
                               setDraft((prev) => {
                                 const nextImages = [...(prev.images || [])];
@@ -598,33 +734,53 @@ export default function AdminProductsPage() {
                         Add Variant
                       </button>
                     </div>
-                    <div className="space-y-3">
-                      {(draft.variants || []).map((variant, index) => (
-                        <div key={`${variant.sku || "variant"}-${index}`} className="grid gap-3 rounded-xl border border-white/10 bg-[#0B1020] p-3 md:grid-cols-5">
-                          <input value={variant.option1 || ""} onChange={(event) => updateVariant(index, "option1", event.target.value)} placeholder="Size / Option" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" />
-                          <input value={variant.option2 || ""} onChange={(event) => updateVariant(index, "option2", event.target.value)} placeholder="Color / Option" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" />
-                          <input value={variant.sku || ""} onChange={(event) => updateVariant(index, "sku", event.target.value)} placeholder="SKU" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" />
-                          <input value={variant.price || ""} onChange={(event) => updateVariant(index, "price", event.target.value)} placeholder="Price" className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" />
-                          <button
-                            onClick={() =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                variants: (prev.variants || []).filter((_, variantIndex) => variantIndex !== index),
-                              }))
-                            }
-                            className="rounded-xl border border-red-400/30 px-3 py-2 text-sm text-red-300"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="space-y-3">
+                    {(draft.variants || []).map((variant, index) => (
+                      <div key={`${variant.sku || "variant"}-${index}`} className="grid gap-3 rounded-xl border border-white/10 bg-[#0B1020] p-3 md:grid-cols-5">
+                        <input 
+                          value={variant.option1 || ""} 
+                          onChange={(event) => updateVariant(index, "option1", event.target.value)} 
+                          placeholder="Size / Option" 
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" 
+                        />
+                        <input 
+                          value={variant.option2 || ""} 
+                          onChange={(event) => updateVariant(index, "option2", event.target.value)} 
+                          placeholder="Color / Option" 
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" 
+                        />
+                        <input 
+                          value={variant.sku || ""} 
+                          onChange={(event) => updateVariant(index, "sku", event.target.value)} 
+                          placeholder="SKU" 
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" 
+                        />
+                        <input 
+                          value={variant.price || ""} 
+                          onChange={(event) => updateVariant(index, "price", event.target.value)} 
+                          placeholder="Price" 
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white" 
+                        />
+                        <button
+                          onClick={() =>
+                            setDraft((prev) => ({
+                              ...prev,
+                              variants: (prev.variants || []).filter((_, variantIndex) => variantIndex !== index),
+                            }))
+                          }
+                          className="rounded-xl border border-red-400/30 px-3 py-2 text-sm text-red-300"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
-                <button onClick={() => setPanelOpen(false)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white">
+                <button onClick={cancelEdit} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white">
                   Cancel
                 </button>
                 <button onClick={saveProduct} disabled={saving} className="rounded-xl bg-[#D4AF37] px-5 py-2 text-sm font-semibold text-black disabled:opacity-50">

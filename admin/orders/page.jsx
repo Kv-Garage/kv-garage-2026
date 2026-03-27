@@ -39,7 +39,7 @@ export default function AdminOrdersPage() {
 
         const { data, error: queryError, count } = await supabase
           .from("orders")
-          .select("id,order_number,customer_email,total,status,tracking_number,created_at", { count: "exact" })
+          .select("id,customer_name,customer_email,total,status,tracking_number,created_at", { count: "exact" })
           .order("created_at", { ascending: false })
           .range(from, to);
 
@@ -114,21 +114,23 @@ export default function AdminOrdersPage() {
                   title="Recent orders"
                   description="A focused live view of the latest order records from the `orders` table."
                 />
-                <AdminDataTable columns={["Order", "Customer", "Status", "Tracking", "Total", "Placed"]}>
+                <AdminDataTable columns={["Order ID", "Customer", "Status", "Tracking", "Total", "Placed"]}>
                   {orders.map((order) => (
                     <tr key={order.id} className="border-t border-white/5">
                       <td className="px-6 py-4">
-                        <div className="font-medium text-white">{order.order_number || order.id}</div>
-                        <div className="mt-1 text-xs text-[#64748B]">{order.id}</div>
+                        <div className="font-medium text-white">{order.id}</div>
                       </td>
-                      <td className="px-6 py-4">{order.customer_email || "Unknown customer"}</td>
+                      <td className="px-6 py-4">
+                        <div className="text-white">{order.customer_name || "Customer"}</div>
+                        <div className="mt-1 text-xs text-[#64748B]">{order.customer_email || "No email"}</div>
+                      </td>
                       <td className="px-6 py-4">
                         <select
-                          value={order.status || "pending"}
+                          value={order.status || "processing"}
                           onChange={(event) => updateOrder(order.id, { status: event.target.value })}
                           className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
                         >
-                          {["pending", "confirmed", "shipped", "delivered", "cancelled"].map((status) => (
+                          {["processing", "shipped", "delivered", "cancelled"].map((status) => (
                             <option key={status} value={status} className="bg-[#111827]">
                               {status}
                             </option>

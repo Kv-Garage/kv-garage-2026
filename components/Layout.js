@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { buildCanonicalUrl } from "../lib/seo";
+import AffiliateTracker from "./AffiliateTracker";
 
 const SEO_BY_PATH = {
   "/": {
@@ -435,8 +436,33 @@ export default function Layout({ children }) {
             © 2026 KV Garage LLC. All rights reserved.
           </p>
           <p className="text-xs text-gray-400">
-            123 Main Street, Suite 456 • Anytown, CA 90210 • United States
+            Grand Rapids, Michigan • United States
           </p>
+          
+          {/* Small Map */}
+          <div className="mt-6 flex justify-center">
+            <div className="w-full max-w-md">
+              <div className="bg-gray-800 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-gray-300 mb-2">Our Location</h4>
+                <div className="w-full h-40 bg-gradient-to-br from-blue-900 to-green-800 rounded relative overflow-hidden">
+                  {/* Simple map representation */}
+                  <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full shadow-lg"></div>
+                  <div className="absolute top-8 left-12 w-2 h-2 bg-white rounded-full"></div>
+                  <div className="absolute top-16 left-8 w-2 h-2 bg-white rounded-full"></div>
+                  <div className="absolute bottom-8 right-8 w-2 h-2 bg-white rounded-full"></div>
+                  <div className="absolute bottom-4 left-16 w-2 h-2 bg-white rounded-full"></div>
+                  
+                  {/* State outline */}
+                  <div className="absolute inset-0 border-2 border-gray-600 rounded opacity-20"></div>
+                  
+                  {/* Label */}
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-xs text-white bg-black bg-opacity-50 px-2 py-1 rounded">
+                    Grand Rapids, MI
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </footer>

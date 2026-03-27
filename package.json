@@ -14,7 +14,8 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "stripe": "^20.3.1"
+    "stripe": "^20.3.1",
+    "swr": "^2.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",

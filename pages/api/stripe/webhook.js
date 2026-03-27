@@ -117,19 +117,18 @@ export default async function handler(req, res) {
 
         const { data: insertedOrder, error } = await supabaseAdmin.from("orders").insert([
           {
-            order_number: orderNumber,
-            user_id: userId,
-            items,
-            total,
-            status: "confirmed",
-            tracking_number: null,
             stripe_session_id: session.id,
-            stripe_event_id: event.id,
+            customer_name: session.customer_details?.name || "Customer",
             customer_email:
               session.metadata?.customer_email ||
               session.customer_details?.email ||
               session.customer_email ||
               null,
+            products: items,
+            total: total,
+            status: "processing",
+            tracking_number: null,
+            stripe_event_id: event.id,
           },
         ]).select("id").single();
 

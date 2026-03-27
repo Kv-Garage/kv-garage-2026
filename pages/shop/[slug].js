@@ -2,11 +2,13 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import useSWR from "swr";
 import { calculatePrice } from "../../lib/pricing";
 import { useCart } from "../../context/CartContext";
 import { supabase } from "../../lib/supabase";
 import { getPrimaryProductImage, getProductImageArray } from "../../lib/productFields";
 import { buildCanonicalUrl, buildProductDescription, stripHtml } from "../../lib/seo";
+import GoogleReviews from "../../components/GoogleReviews";
 
 async function getAuthHeaders() {
   const { data } = await supabase.auth.getSession();
@@ -60,72 +62,88 @@ export default function ProductPage({ profile }) {
     return [];
   };
 
+  // SWR fetcher function
+  const fetcher = async (url) => {
+    const response = await fetch(url, {
+      headers: await getAuthHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch product');
+    }
+    return response.json();
+  };
+
+  // SWR hook for product data with revalidation
+  const { data: productData, error: productError, mutate } = useSWR(
+    slug ? `/api/public-products?slug=${encodeURIComponent(slug)}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      revalidateIfStale: true,
+      dedupingInterval: 2000,
+    }
+  );
+
+  // SWR hook for upsell products
+  const { data: upsellData } = useSWR(
+    productData?.product?.category 
+      ? `/api/public-products?category=${encodeURIComponent(productData.product.category || "")}&limit=12`
+      : null,
+    fetcher
+  );
+
   useEffect(() => {
     if (!slug) return;
 
     const fetchData = async () => {
-      const response = await fetch(`/api/public-products?slug=${encodeURIComponent(slug)}`, {
-        headers: await getAuthHeaders(),
-      });
-      const payload = await response.json();
-      const data = payload.product;
+      if (productData?.product) {
+        const data = productData.product;
 
-      if (!response.ok || !data) {
-        console.log("Product not found");
-        return;
-      }
+        // 🔥 SAFE VARIANT QUERY
+        let v = [];
+        if (data && data.id) {
+          const { data: variants } = await supabase
+            .from("product_variants")
+            .select("id,option1,option2,image,price,sku")
+            .eq("product_id", data.id);
+          v = variants || [];
+        }
 
-      // 🔥 SAFE VARIANT QUERY
-      let v = [];
-      if (data && data.id) {
-        const { data: variants } = await supabase
-          .from("product_variants")
-          .select("id,option1,option2,image,price,sku")
-          .eq("product_id", data.id);
-        v = variants || [];
-      }
+        const adaptiveVariants = getAdaptiveVariants(data, v || []);
+        const productImages = getProductImages(data);
 
-      const upsellResponse = await fetch(
-        `/api/public-products?category=${encodeURIComponent(data.category || "")}&limit=12`,
-        { headers: await getAuthHeaders() }
-      );
-      const upsellPayload = await upsellResponse.json();
-      setUpsellProducts((upsellPayload.products || []).filter((item) => item.id !== data.id).slice(0, 3));
+        setProduct(data);
+        setVariants(adaptiveVariants);
 
-      const adaptiveVariants = getAdaptiveVariants(data, v || []);
-      const productImages = getProductImages(data);
+        if (adaptiveVariants?.length > 0) {
+          setSelectedVariant(adaptiveVariants[0]);
+          setSelectedImage(adaptiveVariants[0].image || productImages[0]);
+        } else {
+          setSelectedImage(productImages[0]);
+        }
 
-      setProduct(data);
-      setVariants(adaptiveVariants);
+        // 🔥 FETCH REVIEWS
+        if (data.cj_product_id) {
+          fetchReviews(data.cj_product_id);
+        }
 
-      if (adaptiveVariants?.length > 0) {
-        setSelectedVariant(adaptiveVariants[0]);
-        setSelectedImage(adaptiveVariants[0].image || productImages[0]);
-      } else {
-        setSelectedImage(productImages[0]);
-      }
+        try {
+          const existing = JSON.parse(localStorage.getItem("recentlyViewedProducts") || "[]");
+          const next = [
+            {
+              id: data.id,
+              slug: data.slug,
+              name: data.name,
+              image: getPrimaryProductImage(data),
+              price: data.price,
+            },
+            ...existing.filter((item) => item.id !== data.id),
+          ].slice(0, 10);
 
-      // 🔥 FETCH REVIEWS
-      if (data.cj_product_id) {
-        fetchReviews(data.cj_product_id);
-      }
-
-      try {
-        const existing = JSON.parse(localStorage.getItem("recentlyViewedProducts") || "[]");
-        const next = [
-          {
-            id: data.id,
-            slug: data.slug,
-            name: data.name,
-            image: getPrimaryProductImage(data),
-            price: data.price,
-          },
-          ...existing.filter((item) => item.id !== data.id),
-        ].slice(0, 10);
-
-        localStorage.setItem("recentlyViewedProducts", JSON.stringify(next));
-      } catch (storageError) {
-        console.error("Recently viewed tracking failed:", storageError);
+          localStorage.setItem("recentlyViewedProducts", JSON.stringify(next));
+        } catch (storageError) {
+          console.error("Recently viewed tracking failed:", storageError);
+        }
       }
     };
 
@@ -146,12 +164,20 @@ export default function ProductPage({ profile }) {
     };
 
     fetchData();
-  }, [slug]);
+  }, [slug, productData]);
+
+  // Update upsell products when product data changes
+  useEffect(() => {
+    if (upsellData?.products) {
+      const currentProductId = productData?.product?.id;
+      setUpsellProducts((upsellData.products || []).filter((item) => item.id !== currentProductId).slice(0, 3));
+    }
+  }, [upsellData, productData]);
 
   useEffect(() => {
-    const loadPricing = async () => {
-      if (!product?.id) return;
+    if (!product?.id) return;
 
+    const loadPricing = async () => {
       const { data } = await supabase.auth.getSession();
       const token = data?.session?.access_token;
 
@@ -179,6 +205,13 @@ export default function ProductPage({ profile }) {
 
     loadPricing();
   }, [product?.id, quantity]);
+
+  // Function to manually revalidate product data
+  const revalidateProduct = () => {
+    if (slug) {
+      mutate();
+    }
+  };
 
   useEffect(() => {
     if (!product?.id) return;
@@ -678,9 +711,14 @@ const totalPrice = pricePerUnit * quantity;
           )}
 
           {/* 🌟 REVIEWS SECTION */}
+          <div className="border-t pt-12">
+            <GoogleReviews productId={product.id} />
+          </div>
+
+          {/* Cj REVIEWS SECTION (if available) */}
           {product.cj_product_id && (
             <div className="border-t pt-12">
-              <h2 className="text-3xl font-bold mb-8 text-gray-900">Customer Reviews</h2>
+              <h2 className="text-3xl font-bold mb-8 text-gray-900">Additional Reviews</h2>
               
               {loadingReviews ? (
                 <div className="text-center py-8 text-gray-500">
@@ -733,7 +771,7 @@ const totalPrice = pricePerUnit * quantity;
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
-                  No reviews yet for this product.
+                  No additional reviews yet for this product.
                 </div>
               )}
             </div>
