@@ -434,6 +434,9 @@ export default function Layout({ children }) {
           <p className="mt-4">
             © 2026 KV Garage LLC. All rights reserved.
           </p>
+          <p className="text-xs text-gray-400">
+            123 Main Street, Suite 456 • Anytown, CA 90210 • United States
+          </p>
         </div>
 
       </footer>
