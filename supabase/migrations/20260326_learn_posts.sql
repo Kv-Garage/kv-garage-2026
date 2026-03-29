@@ -6,9 +6,15 @@ create table if not exists learn_posts (
   excerpt text,
   content_html text,
   cover_image text,
+  images text[], -- Array of image URLs for content images
   featured boolean default false,
   is_published boolean default true,
   related_product_slug text,
+  meta_title text, -- SEO meta title
+  meta_description text, -- SEO meta description
+  keywords text[], -- Array of keywords
+  reading_time text, -- Reading time estimate
+  author text default 'KV Garage Team', -- Author field
   published_at timestamptz default now(),
   created_at timestamptz default now(),
   updated_at timestamptz default now()

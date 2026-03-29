@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "generate:blog": "node scripts/generateBlog.js",
+    "generate:blog:multi": "node scripts/generateBlog.js 5",
+    "setup:blog:automation": "node scripts/setup-cron.js",
+    "update:sitemap": "node scripts/update-sitemap.js",
+    "test:blog": "node scripts/test-blog-system.js",
+    "blog:full-setup": "npm run setup:blog:automation && npm run update:sitemap && npm run test:blog"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.8.0",

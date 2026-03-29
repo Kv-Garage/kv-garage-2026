@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getBlogPosts, getBlogCategories, getBlogTags, getRecentPosts } from '../lib/blog';
 
 export default function BlogPage({ initialPosts, initialCategories, initialTags, initialRecentPosts, totalPosts }) {
@@ -158,12 +159,16 @@ export default function BlogPage({ initialPosts, initialCategories, initialTags,
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {posts.map(post => (
                   <article key={post.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                    {post.featured_image && (
-                      <div className="aspect-video bg-gray-200">
-                        <img
-                          src={post.featured_image}
+                    {post.cover_image && (
+                      <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
+                        <Image
+                          src={post.cover_image}
                           alt={post.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          quality={75}
+                          loading="lazy"
                         />
                       </div>
                     )}
@@ -178,21 +183,23 @@ export default function BlogPage({ initialPosts, initialCategories, initialTags,
                         )}
                         <span className="text-xs text-gray-500">{new Date(post.published_at).toLocaleDateString()}</span>
                       </div>
-                      <Link href={`/blog/${post.slug}`}>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-3 hover:text-orange-600 transition-colors line-clamp-2">
+                      <Link href={`/blog/${post.slug}`} className="group">
+                        <h2 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
                           {post.title}
                         </h2>
                       </Link>
                       <p className="text-gray-600 mb-4 line-clamp-3">
-                        {post.excerpt || post.content?.substring(0, 150) + '...'}
+                        {post.excerpt || post.content_html?.replace(/<[^>]*>/g, '').substring(0, 150) + '...'}
                       </p>
                       <div className="flex items-center justify-between">
-                        <Link href={`/blog/${post.slug}`} className="text-orange-500 hover:text-orange-600 font-medium">
+                        <Link href={`/blog/${post.slug}`} className="text-orange-500 hover:text-orange-600 font-medium group-hover:underline">
                           Read More →
                         </Link>
-                        <span className="text-xs text-gray-500">
-                          {post.reading_time || '5 min read'}
-                        </span>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>{new Date(post.published_at).toLocaleDateString()}</span>
+                          <span>•</span>
+                          <span>{post.reading_time || '5 min read'}</span>
+                        </div>
                       </div>
                     </div>
                   </article>
@@ -221,16 +228,22 @@ export default function BlogPage({ initialPosts, initialCategories, initialTags,
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Posts</h3>
                 <div className="space-y-4">
                   {recentPosts.map(post => (
-                    <Link key={post.id} href={`/blog/${post.slug}`} className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
-                      {post.featured_image && (
-                        <img
-                          src={post.featured_image}
-                          alt={post.title}
-                          className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                        />
+                    <Link key={post.id} href={`/blog/${post.slug}`} className="flex gap-4 hover:bg-gray-50 p-3 rounded-lg transition-colors group">
+                      {post.cover_image && (
+                        <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                          <Image
+                            src={post.cover_image}
+                            alt={post.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            sizes="80px"
+                            quality={70}
+                            loading="lazy"
+                          />
+                        </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 text-sm line-clamp-2">{post.title}</h4>
+                        <h4 className="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-orange-600 transition-colors">{post.title}</h4>
                         <p className="text-xs text-gray-500 mt-1">{new Date(post.published_at).toLocaleDateString()}</p>
                       </div>
                     </Link>

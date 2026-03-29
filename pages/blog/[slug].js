@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getBlogPostBySlug, getRelatedPosts, getRecentPosts } from '../../lib/blog';
 
 export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
@@ -55,38 +56,51 @@ export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
   return (
     <>
       <Head>
-        <title>{post.title} | KV Garage Blog</title>
-        <meta name="description" content={post.excerpt || post.content?.substring(0, 160)} />
-        <meta name="keywords" content={post.meta_keywords || 'blog, KV Garage'} />
+        {/* Primary Meta Tags */}
+        <title>{post.meta_title || post.title} | KV Garage Blog</title>
+        <meta name="description" content={post.meta_description || post.excerpt || post.content_html?.replace(/<[^>]*>/g, '').substring(0, 160)} />
+        <meta name="keywords" content={post.keywords?.join(', ') || 'blog, KV Garage, luxury, watches, jewelry'} />
+        <meta name="author" content={post.author || 'KV Garage Team'} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow" />
         
-        {/* Open Graph */}
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt || post.content?.substring(0, 160)} />
-        <meta property="og:image" content={post.featured_image || '/logo/Kv%20garage%20icon.png'} />
-        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post.slug}`} />
+        {/* Open Graph / Facebook */}
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post.slug}`} />
+        <meta property="og:title" content={post.meta_title || post.title} />
+        <meta property="og:description" content={post.meta_description || post.excerpt || post.content_html?.replace(/<[^>]*>/g, '').substring(0, 160)} />
+        <meta property="og:image" content={post.cover_image || '/logo/Kv%20garage%20icon.png'} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="KV Garage" />
         <meta property="article:published_time" content={post.published_at} />
-        {post.blog_categories && <meta property="article:section" content={post.blog_categories.name} />}
+        <meta property="article:modified_time" content={post.updated_at || post.published_at} />
+        <meta property="article:section" content={post.category || 'Blog'} />
+        <meta property="article:author" content={post.author || 'KV Garage Team'} />
         
-        {/* Twitter Card */}
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt || post.content?.substring(0, 160)} />
-        <meta name="twitter:image" content={post.featured_image || '/logo/Kv%20garage%20icon.png'} />
+        <meta name="twitter:creator" content="@KVGarage" />
+        <meta name="twitter:site" content="@KVGarage" />
+        <meta name="twitter:title" content={post.meta_title || post.title} />
+        <meta name="twitter:description" content={post.meta_description || post.excerpt || post.content_html?.replace(/<[^>]*>/g, '').substring(0, 160)} />
+        <meta name="twitter:image" content={post.cover_image || '/logo/Kv%20garage%20icon.png'} />
+        <meta name="twitter:image:alt" content={post.title} />
         
-        {/* Structured Data */}
+        {/* Structured Data / Schema.org */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "BlogPosting",
-              "headline": post.title,
-              "description": post.excerpt || post.content?.substring(0, 160),
-              "image": post.featured_image || '/logo/Kv%20garage%20icon.png',
+              "headline": post.meta_title || post.title,
+              "description": post.meta_description || post.excerpt || post.content_html?.replace(/<[^>]*>/g, '').substring(0, 160),
+              "image": post.cover_image || '/logo/Kv%20garage%20icon.png',
               "author": {
                 "@type": "Organization",
-                "name": "KV Garage"
+                "name": post.author || "KV Garage Team",
+                "url": process.env.NEXT_PUBLIC_BASE_URL
               },
               "publisher": {
                 "@type": "Organization",
@@ -97,13 +111,30 @@ export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
                 }
               },
               "datePublished": post.published_at,
+              "dateModified": post.updated_at || post.published_at,
               "mainEntityOfPage": {
                 "@type": "WebPage",
                 "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post.slug}`
-              }
+              },
+              "wordCount": post.content_html ? post.content_html.replace(/<[^>]*>/g, '').trim().split(/\s+/).length : 0,
+              "readingTime": post.reading_time || generateReadingTime(post.content_html),
+              "keywords": post.keywords || [],
+              "articleSection": post.category || "Blog",
+              "inLanguage": "en-US"
             })
           }}
         />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post.slug}`} />
+        
+        {/* Alternate URLs for internationalization (if needed) */}
+        <link rel="alternate" hrefLang="en" href={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post.slug}`} />
+        
+        {/* Preload critical images */}
+        {post.cover_image && (
+          <link rel="preload" href={post.cover_image} as="image" />
+        )}
       </Head>
 
       <div className="min-h-screen bg-gray-50">
@@ -131,13 +162,17 @@ export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
         </div>
 
         {/* Featured Image */}
-        {post.featured_image && (
+        {post.cover_image && (
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
-              <img
-                src={post.featured_image}
+              <Image
+                src={post.cover_image}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                quality={85}
               />
             </div>
           </div>
@@ -146,7 +181,7 @@ export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
         {/* Content */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <article className="prose prose-lg max-w-none">
-            <div className="content" dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div className="content" dangerouslySetInnerHTML={{ __html: post.content_html }} />
           </article>
 
           {/* Tags */}
@@ -209,11 +244,14 @@ export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
                   relatedPosts.map(relatedPost => (
                     <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="group">
                       <div className="bg-gray-100 rounded-lg overflow-hidden mb-4 aspect-video">
-                        {relatedPost.featured_image ? (
-                          <img
-                            src={relatedPost.featured_image}
+                        {relatedPost.cover_image ? (
+                          <Image
+                            src={relatedPost.cover_image}
                             alt={relatedPost.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            quality={75}
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600"></div>
@@ -236,11 +274,14 @@ export default function BlogPostPage({ post, relatedPosts, recentPosts }) {
                   recentPosts.slice(0, 3).map(recentPost => (
                     <Link key={recentPost.id} href={`/blog/${recentPost.slug}`} className="group">
                       <div className="bg-gray-100 rounded-lg overflow-hidden mb-4 aspect-video">
-                        {recentPost.featured_image ? (
-                          <img
-                            src={recentPost.featured_image}
+                        {recentPost.cover_image ? (
+                          <Image
+                            src={recentPost.cover_image}
                             alt={recentPost.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            quality={75}
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600"></div>
