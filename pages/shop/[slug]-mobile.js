@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-import { getProductBySlug } from '../../lib/products';
+import { products } from '../../lib/products';
 import { buildCanonicalUrl } from '../../lib/seo';
+
+// Simple function to get product by slug
+const getProductBySlug = (slug) => {
+  return products.find(product => product.slug === slug);
+};
 
 export default function ProductPage() {
   const router = useRouter();
