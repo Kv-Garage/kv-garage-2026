@@ -6,6 +6,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { products } from '../../lib/products';
 import { buildCanonicalUrl } from '../../lib/seo';
+import { calculatePrice } from '../../lib/pricing';
 
 // Simple function to get product by slug
 const getProductBySlug = (slug) => {
@@ -69,12 +70,25 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = () => {
+    // Calculate dynamic price based on user role and quantity
+    const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    const newCartTotal = cartTotal + (product.price * quantity);
+    
+    const dynamicPrice = calculatePrice({
+      cost: product.cost || product.price / 3.2, // Use cost if available, otherwise estimate
+      quantity: quantity,
+      role: user ? 'retail' : 'retail', // Default to retail for now
+      approved: false, // Default to false for now
+      cartTotal: newCartTotal,
+    });
+
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: dynamicPrice,
       image: product.images[0],
       quantity: quantity,
+      basePrice: product.price, // Store original price for reference
     });
   };
 
@@ -194,6 +208,16 @@ export default function ProductPage() {
               </div>
               <div className="text-sm text-gray-400">
                 Total: ${(product.price * quantity).toFixed(2)}
+              </div>
+            </div>
+            
+            {/* Dynamic Pricing Info */}
+            <div className="text-xs text-gray-400 bg-white/5 p-3 rounded-lg">
+              <div className="grid grid-cols-2 gap-2">
+                <span>Base Price: ${product.price}</span>
+                <span>Quantity: {quantity}</span>
+                <span>Role: Retail</span>
+                <span>Cart Total: ${(cart.reduce((total, item) => total + item.price * item.quantity, 0) + product.price * quantity).toFixed(2)}</span>
               </div>
             </div>
           </div>

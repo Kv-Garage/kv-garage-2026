@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ================= SMOOTH SCROLL ================= */
+/* ================= GLOBAL OVERFLOW + SPACING FIX ================= */
 html, body {
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
 /* ================= CONVEYOR BELT FIX ================= */
-
 @keyframes scroll-left {
   0% {
     transform: translateX(0%);
@@ -29,6 +29,133 @@ html, body {
 .animate-scroll:hover {
   animation-play-state: paused;
 }
+
+/* ================= RESPONSIVE CONTAINER CLASSES ================= */
+.container-responsive {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+/* ================= LAYOUT FIXES ================= */
+.section-spacing {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+}
+
+/* ================= GRID RESPONSIVE FIXES ================= */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ================= TYPOGRAPHY FIXES ================= */
+.text-responsive {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .text-responsive {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive {
+    font-size: 20px;
+  }
+}
+
+/* ================= IMAGE RESPONSIVENESS ================= */
+.img-responsive {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* ================= HEADER SPACING FIXES ================= */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* ================= FOOTER SOCIAL LINKS ================= */
+.footer-social {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .footer-social {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.footer-social a:hover {
+  border-color: #D4AF37;
+  background: rgba(212, 175, 55, 0.1);
+}
+
 .input {
   background: #111827;
   border: 1px solid #1C2233;

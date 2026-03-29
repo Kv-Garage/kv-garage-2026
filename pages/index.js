@@ -293,8 +293,8 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-3xl"></div>
 
         {/* ================= HERO ================= */}
-        <section className="py-24 border-t border-white/20">
-          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <section className="section-spacing border-t border-white/20">
+          <div className="container-responsive grid lg:grid-cols-2 gap-12 items-center">
 
             {/* LEFT */}
             <div className="space-y-8">
@@ -421,8 +421,8 @@ export default function Home() {
         </section>
 
         {/* ================= FEATURED INVENTORY ================= */}
-        <section className="py-20 border-t border-white/20">
-          <div className="max-w-7xl mx-auto px-6">
+        <section className="section-spacing border-t border-white/20">
+          <div className="container-responsive">
             <div className="mb-12 text-center">
               <div className="flex items-center justify-center gap-4 mb-6">
                 <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold">FEATURED INVENTORY</span>
@@ -479,8 +479,8 @@ export default function Home() {
         </section>
 
         {/* ================= FRESH INVENTORY ================= */}
-        <section className="py-16 border-t border-white/20">
-          <div className="max-w-7xl mx-auto px-6">
+        <section className="section-spacing border-t border-white/20">
+          <div className="container-responsive">
             <div className="mb-10 flex items-center justify-between">
               <div className="text-center lg:text-left">
                 <p className="text-sm text-[#D4AF37] font-semibold uppercase tracking-[0.2em] mb-4">JUST IN</p>
@@ -783,8 +783,8 @@ export default function Home() {
         </section>
 
         {/* ================= SERVICES ================= */}
-        <section className="py-24 border-t border-white/20">
-          <div className="max-w-7xl mx-auto px-6">
+        <section className="section-spacing border-t border-white/20">
+          <div className="container-responsive">
             <div className="text-center mb-16">
               <p className="text-sm text-[#D4AF37] font-semibold uppercase tracking-[0.2em] mb-4">Complete Solutions</p>
               <h2 className="text-5xl font-bold mb-8">Your Success Ecosystem</h2>
@@ -810,7 +810,7 @@ export default function Home() {
                 title="Build Your System" 
                 description="We build your complete supply chain system from the ground up. Inventory sourcing, supplier relationships, and operational infrastructure." 
                 link="/deals" 
-                img="https://images.unsplash.com/photo-3861969/pexels-photo-3861969.jpeg?auto=format&fit=crop&w=800&q=80"
+                img="https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=800&q=80"
               />
             </div>
           </div>

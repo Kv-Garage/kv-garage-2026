@@ -49,8 +49,13 @@ export function AuthProvider({ children }) {
       return data;
     },
     signOut: async () => {
-      await supabase.auth.signOut();
-      setUser(null);
+      try {
+        await supabase.auth.signOut();
+        setUser(null);
+      } catch (error) {
+        console.error('Logout error:', error);
+        setUser(null);
+      }
     }
   };
 

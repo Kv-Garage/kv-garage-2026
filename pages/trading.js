@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Layout from "../components/Layout";
 
 export default function Trading() {
   const [loading, setLoading] = useState(false);

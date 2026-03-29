@@ -54,6 +54,10 @@ export default function Contact() {
           <p className="text-blue-300">
             All conversations begin with structured alignment.
           </p>
+
+          <p className="text-blue-400 text-sm mt-2">
+            Grand Rapids, Michigan, United States
+          </p>
         </div>
       </section>
 
