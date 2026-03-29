@@ -372,635 +372,573 @@ export default function MentorshipPage() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <main className="relative overflow-hidden bg-[#060606] text-[#F4F2EC]">
-        <div className="pointer-events-none fixed inset-0 z-[999] opacity-[0.025] mix-blend-screen noise-overlay" />
-
-        <section className="relative flex min-h-screen items-center overflow-hidden border-b border-[#1A1A16]">
-          <div className="absolute inset-0 bg-[#060606]" />
-          <Image
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80"
-            alt="KV Garage mentorship"
-            fill
-            priority
-            className="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(6,6,6,0.96)_40%,rgba(6,6,6,0.5)_100%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-48 bg-[linear-gradient(to_top,#060606_0%,transparent_40%)]" />
-
-          <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-12 px-6 py-24 xl:grid-cols-[minmax(0,640px)_1fr]">
-            <div className="animate">
-              <div className="inline-flex items-center border border-[#C9A84C]/25 bg-[rgba(201,168,76,0.15)] px-5 py-2 font-['DM_Mono'] text-[10px] uppercase tracking-[0.25em] text-[#C9A84C]">
-                ◆ KV Garage Mentorship Program
+      <main className="relative overflow-hidden bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white">
+        {/* 🔥 URGENT HEADER BANNER */}
+        <div className="bg-gradient-to-r from-red-600/20 via-red-700/20 to-red-800/20 border border-red-500/30 text-white py-4 px-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full border border-white/20">
+                <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold">LIMITED CAPACITY</span>
               </div>
-              <h1 className="mt-8 max-w-[640px] font-['Cormorant_Garamond'] text-[52px] font-light leading-[0.92] md:text-[78px] xl:text-[96px]">
-                Build the Business
-                <br />
-                Others Only
-                <br />
-                <span className="italic text-[#C9A84C]">Talk About.</span>
-              </h1>
-              <p className="mt-6 max-w-[480px] font-['DM_Sans'] text-[17px] font-light leading-8 text-[#6B6B5E]">
-                Verified supplier access. Proven supply chain systems. The exact framework serious entrepreneurs use to build real, scalable revenue.
-              </p>
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="inline-flex items-center justify-center rounded-[3px] bg-[#C9A84C] px-10 py-4 font-['DM_Sans'] text-base font-medium text-[#060606]">
-                  Start Your Mentorship Setup →
-                </a>
-                <a href="#live-media" className="inline-flex items-center justify-center rounded-[3px] border border-[#C9A84C]/30 px-10 py-4 font-['DM_Sans'] text-base font-medium text-[#C9A84C]">
-                  Watch How It Works ↓
-                </a>
-              </div>
-              <div className="mt-8 flex items-center gap-3 font-['DM_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#8C8C82]">
-                <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-                Limited spots · Applications reviewed weekly
-              </div>
+              <span className="text-sm text-gray-300">Only 15 spots remaining for Q2 mentorship access</span>
             </div>
-
-            <div className="hidden xl:flex xl:items-center xl:justify-end">
-              <div className="grid grid-cols-3 gap-8 border border-[#C9A84C]/20 bg-black/35 px-8 py-6 backdrop-blur-sm">
-                {[
-                  { value: "500+", label: "Students" },
-                  { value: "$2M+", label: "Revenue" },
-                  { value: "6", label: "Streams" },
-                ].map((stat, index) => (
-                  <div key={stat.label} className={`min-w-[96px] ${index < 2 ? "border-r border-[#C9A84C]/20 pr-8" : ""}`}>
-                    <p className="font-['Cormorant_Garamond'] text-[40px] text-[#C9A84C]">{stat.value}</p>
-                    <p className="font-['DM_Mono'] text-[9px] uppercase tracking-[0.2em] text-[#6B6B5E]">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="flex items-center gap-3 text-sm font-mono bg-white/10 px-4 py-2 rounded-full border border-white/20">
+              <span className="text-red-300">TIME LEFT:</span>
+              <span className="text-white font-bold">23:45:12</span>
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="border-y border-[#C9A84C]/20 bg-[#121212] py-4">
-          <div className="overflow-hidden">
-            <div className="flex w-max animate-[mentorshipMarquee_40s_linear_infinite] gap-8 whitespace-nowrap px-6 font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C] hover:[animation-play-state:paused]">
-              {[
-                "Verified Supplier Access",
-                "Wholesale to Retail Systems",
-                "500+ Entrepreneurs Mentored",
-                "Six-Figure Student Results",
-                "Live Weekly Education",
-                "Supply Chain Mastery",
-                "Affiliate Income Architecture",
-                "Real Revenue. Real Results.",
-              ]
-                .concat([
-                  "Verified Supplier Access",
-                  "Wholesale to Retail Systems",
-                  "500+ Entrepreneurs Mentored",
-                  "Six-Figure Student Results",
-                ])
-                .map((item, index) => (
-                  <span key={`${item}-${index}`}>◆ {item}</span>
-                ))}
-            </div>
-          </div>
-        </section>
+        {/* 🔥 HERO SECTION */}
+        <section className="relative py-24 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 via-transparent to-transparent pointer-events-none"></div>
+          <div className="absolute top-20 right-20 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
 
-        <section id="live-media" className="mx-auto max-w-7xl px-6 py-24">
-          <div className="animate grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-            <div>
-              <button
-                type="button"
-                onClick={() => setVideoOpen(true)}
-                className="group relative block aspect-video w-full overflow-hidden rounded-[4px] border border-[#C9A84C]/25 bg-[#0D0D0D] shadow-[0_0_40px_rgba(201,168,76,0.08)]"
-              >
-                {VIDEO_URL ? (
-                  <iframe
-                    src={VIDEO_URL}
-                    allow="autoplay; fullscreen"
-                    frameBorder="0"
-                    className="h-full w-full rounded-[4px]"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.18),transparent_42%),linear-gradient(135deg,rgba(201,168,76,0.08),transparent_60%),#0D0D0D]">
-                    <div className="text-center">
-                      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 text-3xl text-[#C9A84C] transition group-hover:scale-105">
-                        ▶
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <div className="flex items-center gap-6 mb-8">
+                  <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-6 py-3 rounded-full text-sm font-semibold shadow-lg shadow-[#D4AF37]/30">EST. 2022</span>
+                  <span className="text-gray-400 text-sm border border-white/20 px-4 py-2 rounded-full">500+ Students</span>
+                </div>
+                
+                <h1 className="text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                  <span className="bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
+                    Business Mentorship
+                  </span>
+                  <br />
+                  <span className="text-gray-300">Program</span>
+                </h1>
+
+                <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-3xl">
+                  Work directly with KV Garage to develop your wholesale strategy, supply chain, and business systems. 
+                  Structured mentorship for serious entrepreneurs who are ready to build real, scalable revenue.
+                </p>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                  {PROGRAM_STATS.map((stat, index) => (
+                    <div key={index} className="bg-gradient-to-br from-blue-900/20 to-transparent border border-blue-500/30 p-6 rounded-xl">
+                      <div className={`text-3xl font-bold ${index === 1 ? 'text-[#D4AF37]' : 'text-white'}`}>
+                        {stat.prefix || ''}{stat.value}{stat.suffix || ''}
                       </div>
-                      <p className="mt-6 font-['Cormorant_Garamond'] text-4xl text-white">The KV Garage Story</p>
-                      <p className="mt-2 font-['DM_Sans'] text-sm text-[#8C8C82]">Watch Before You Apply</p>
+                      <div className="text-sm text-gray-300 mt-3">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-6">
+                  <Link href={`#${MENTORSHIP_SIGNUP_ID}`}>
+                    <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-10 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#D4AF37]/30 hover:shadow-xl hover:shadow-[#D4AF37]/50 transition-all duration-300 transform hover:scale-105">
+                      Start Mentorship Setup
+                    </button>
+                  </Link>
+                  
+                  <Link href="#live-media">
+                    <button className="border border-white/30 text-white px-10 py-4 rounded-xl font-semibold hover:bg-white hover:text-black transition-all duration-300">
+                      Watch How It Works
+                    </button>
+                  </Link>
+                </div>
+
+                <div className="mt-8 text-sm text-gray-400">
+                  <div className="flex flex-wrap gap-6">
+                    <span>🔒 Limited Spots Available</span>
+                    <span>⚡ Applications Reviewed Weekly</span>
+                    <span>📈 Proven Results</span>
+                    <span>🌐 Global Network</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-8">
+                    <div className="bg-gradient-to-br from-blue-900/20 to-transparent border border-blue-500/30 p-8 rounded-xl">
+                      <div className="text-4xl font-bold text-[#D4AF37] mb-3">500+</div>
+                      <div className="text-sm text-gray-300">Students Mentored</div>
+                    </div>
+                    <div className="bg-gradient-to-br from-green-900/20 to-transparent border border-green-500/30 p-8 rounded-xl">
+                      <div className="text-4xl font-bold text-[#D4AF37] mb-3">$2M+</div>
+                      <div className="text-sm text-gray-300">Student Revenue</div>
                     </div>
                   </div>
-                )}
-              </button>
+                  <div className="space-y-8">
+                    <div className="bg-gradient-to-br from-purple-900/20 to-transparent border border-purple-500/30 p-8 rounded-xl">
+                      <div className="text-4xl font-bold text-[#D4AF37] mb-3">6</div>
+                      <div className="text-sm text-gray-300">Business Systems</div>
+                    </div>
+                    <div className="bg-gradient-to-br from-red-900/20 to-transparent border border-red-500/30 p-8 rounded-xl">
+                      <div className="text-4xl font-bold text-[#D4AF37] mb-3">100%</div>
+                      <div className="text-sm text-gray-300">Verified Suppliers</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="absolute -top-8 -right-8 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 🔥 LIVE ACTIVITY SECTION */}
+        <section className="py-16 bg-gradient-to-br from-white/5 to-transparent border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl font-bold mb-6">What's Happening Now</h2>
+              <p className="text-xl text-gray-300">Live updates from our growing community</p>
             </div>
 
-            <div className="rounded-[4px] border border-[#1A1A16] bg-[#0D0D0D]">
-              <div className="flex border-b border-[#C9A84C]/25">
-                {[
-                  ["activity", "📍 What's Happening Now"],
-                  ["stats", "📊 Program Stats"],
-                  ["wins", "💬 Student Wins"],
-                ].map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => setActiveTab(key)}
-                    className={`relative flex-1 px-4 py-4 text-left font-['DM_Sans'] text-sm ${activeTab === key ? "text-white" : "text-[#6B6B5E]"}`}
-                  >
-                    {label}
-                    {activeTab === key ? <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#C9A84C]" /> : null}
-                  </button>
-                ))}
-              </div>
-
-              <div className="min-h-[420px] p-6">
-                {activeTab === "activity" ? (
-                  <div className="space-y-4">
-                    {(visibleActivityItems || []).map((item) => {
-                      const [message, time] = item.split(" — ");
-                      return (
-                        <div key={item} className="flex items-start gap-3 border-b border-white/5 pb-4">
-                          <span className="mt-1 inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" />
-                          <div>
-                            <p className="font-['DM_Sans'] text-[13px] text-white">{message}</p>
-                            <p className="mt-1 font-['DM_Mono'] text-[11px] text-[#6B6B5E]">{time || "Live now"}</p>
-                          </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-4 h-4 bg-emerald-400 rounded-full animate-pulse"></div>
+                  <span className="text-emerald-400 font-semibold">LIVE ACTIVITY</span>
+                </div>
+                <div className="space-y-4">
+                  {(visibleActivityItems || []).slice(0, 3).map((item, index) => {
+                    const [message, time] = item.split(" — ");
+                    return (
+                      <div key={item} className="flex items-start gap-3 border-b border-white/10 pb-3">
+                        <span className="mt-1 inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400"></span>
+                        <div>
+                          <p className="text-white text-sm">{message}</p>
+                          <p className="text-gray-400 text-xs mt-1">{time || "Live now"}</p>
                         </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
-                {activeTab === "stats" ? (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {PROGRAM_STATS.map((stat) => (
-                      <div key={stat.label} className="border border-[#1A1A16] bg-[#121212] p-6">
-                        <p className="font-['Cormorant_Garamond'] text-5xl text-[#C9A84C]">
-                          <Counter target={stat.value} prefix={stat.prefix} suffix={stat.suffix} active={activeTab === "stats"} />
-                        </p>
-                        <p className="mt-2 font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#6B6B5E]">{stat.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-4 h-4 bg-[#D4AF37] rounded-full animate-pulse"></div>
+                  <span className="text-[#D4AF37] font-semibold">STUDENT WINS</span>
+                </div>
+                <div className="space-y-4">
+                  {STUDENT_WINS.slice(0, 2).map((testimonial, index) => (
+                    <div key={index} className="border-b border-white/10 pb-3">
+                      <p className="text-gray-300 text-sm italic mb-3">"{testimonial.quote}"</p>
+                      <div className="text-white text-sm font-semibold">{testimonial.author}</div>
+                      <div className="text-gray-400 text-xs">{testimonial.title}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-                {activeTab === "wins" ? (
-                  <div className="relative flex min-h-[320px] flex-col justify-between border border-[#1A1A16] bg-[#121212] p-8">
-                    <div className="pointer-events-none absolute left-6 top-0 font-['Cormorant_Garamond'] text-[120px] leading-none text-[#C9A84C]/10">
-                      “
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-4 h-4 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-blue-400 font-semibold">PROGRAM STATS</span>
+                </div>
+                <div className="grid gap-4">
+                  {PROGRAM_STATS.map((stat, index) => (
+                    <div key={index} className="bg-white/10 p-4 rounded-lg border border-white/20">
+                      <div className="text-2xl font-bold text-[#D4AF37]">{stat.prefix || ''}{stat.value}{stat.suffix || ''}</div>
+                      <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
                     </div>
-                    <div className="relative">
-                      <p className="font-['Cormorant_Garamond'] text-[18px] italic leading-8 text-white">
-                        {STUDENT_WINS[activeWin].quote}
-                      </p>
-                      <p className="mt-6 font-['DM_Sans'] text-[13px] text-[#C9A84C]">{STUDENT_WINS[activeWin].author}</p>
-                      <p className="mt-1 font-['DM_Sans'] text-[13px] text-[#8C8C82]">{STUDENT_WINS[activeWin].title}</p>
-                    </div>
-                    <div className="relative mt-8 flex items-center justify-between">
-                      <div className="flex gap-2">
-                        {STUDENT_WINS.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setActiveWin(index)}
-                            className={`h-2.5 w-2.5 rounded-full ${index === activeWin ? "bg-[#C9A84C]" : "bg-[#6B6B5E]/40"}`}
-                          />
-                        ))}
-                      </div>
-                      <div className="flex gap-2 text-[#C9A84C]">
-                        <button onClick={() => setActiveWin((prev) => (prev - 1 + STUDENT_WINS.length) % STUDENT_WINS.length)}>‹</button>
-                        <button onClick={() => setActiveWin((prev) => (prev + 1) % STUDENT_WINS.length)}>›</button>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div className="animate mt-8 border border-[#C9A84C]/20 bg-[#121212] px-6 py-5 text-center">
-            <p className="font-['DM_Sans'] text-base text-white">Ready to be the next success story? Apply in 2 minutes.</p>
-            <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="mt-4 inline-flex rounded-[3px] bg-[#C9A84C] px-8 py-3 font-['DM_Sans'] font-medium text-[#060606]">
-              Start Now →
-            </a>
+        {/* 🔥 THE REALITY SECTION */}
+        <section className="py-24">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-3xl p-16">
+              <p className="text-[#D4AF37] font-semibold text-lg mb-6">The Reality</p>
+              <h2 className="text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+                Most resellers stay stuck because they're buying retail and selling retail.
+              </h2>
+              
+              <div className="grid md:grid-cols-3 gap-6 mb-10">
+                {[
+                  "No verified supplier access — paying full price, losing margin",
+                  "No system — guessing on every sourcing decision",
+                  "Margins too thin to reinvest, too slow to scale",
+                ].map((item) => (
+                  <div key={item} className="bg-gradient-to-br from-red-900/20 to-transparent border border-red-500/30 p-6 rounded-xl">
+                    <p className="text-white text-sm leading-relaxed">{item}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-3xl text-[#D4AF37] font-semibold">
+                KV Garage Mentorship exists to solve exactly this.
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-[900px] px-6 py-20 text-center">
-          <div className="animate">
-            <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">The Reality</p>
-            <h2 className="mt-6 font-['Cormorant_Garamond'] text-[38px] italic leading-tight text-white md:text-[64px]">
-              Most resellers stay stuck because they&apos;re buying retail and selling retail.
-            </h2>
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {[
-                "No verified supplier access — paying full price, losing margin",
-                "No system — guessing on every sourcing decision",
-                "Margins too thin to reinvest, too slow to scale",
-              ].map((item) => (
-                <div key={item} className="border-l-[3px] border-[rgba(200,60,60,0.6)] bg-[#0D0D0D] px-6 py-7 text-left">
-                  <p className="font-['DM_Sans'] text-sm leading-7 text-[#F4F2EC]">{item}</p>
+        {/* 🔥 CURRICULUM SECTION */}
+        <section className="py-24 bg-gradient-to-br from-white/5 to-transparent border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <p className="text-[#D4AF37] font-semibold text-lg mb-6">The Curriculum</p>
+              <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+                Six Systems. <span className="text-[#D4AF37]">One</span> Business.
+              </h2>
+            </div>
+            
+            <div className="grid lg:grid-cols-2 gap-8">
+              {(CURRICULUM || []).map((item) => (
+                <div key={item.number} className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-3 py-1 rounded-full text-sm font-semibold">{item.number}</span>
+                    <span className="text-[#D4AF37] font-semibold">SYSTEM</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                  <p className="text-gray-300 text-lg leading-relaxed">{item.body}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-10 font-['Cormorant_Garamond'] text-[28px] italic text-[#C9A84C]">
-              KV Garage Mentorship exists to solve exactly this.
-            </p>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-20">
-          <div className="animate">
-            <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">The Curriculum</p>
-            <h2 className="mt-5 font-['Cormorant_Garamond'] text-[44px] leading-none text-white md:text-[64px]">
-              Six Systems. <span className="italic text-[#C9A84C]">One</span> Business.
-            </h2>
-          </div>
-          <div className="mt-10 grid gap-5 lg:grid-cols-2">
-            {(CURRICULUM || []).map((item) => (
-              <div key={item.number} className="animate border border-[#1A1A16] border-t-2 border-t-[#C9A84C] bg-[#0D0D0D] px-9 py-10">
-                <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">{item.number}</p>
-                <h3 className="mt-4 font-['DM_Sans'] text-xl font-semibold text-white">{item.title}</h3>
-                <p className="mt-4 font-['DM_Sans'] text-sm leading-8 text-[#6B6B5E]">{item.body}</p>
+        {/* 🔥 LIVE DASHBOARD SECTION */}
+        <section className="py-24">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <LiveStoreDashboard />
               </div>
-            ))}
-          </div>
-        </section>
+              <div>
+                <p className="text-[#D4AF37] font-semibold text-lg mb-6">Who We Build With</p>
+                <h2 className="text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+                  Not a Course.
+                  <br />
+                  <span className="text-[#D4AF37]">A Mentorship.</span>
+                </h2>
+                <p className="text-gray-300 text-lg mb-6 leading-relaxed">
+                  The difference between students who scale and those who stay stuck is not information — it is execution with the right system and the right people behind them.
+                </p>
+                <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+                  This mentorship is for the entrepreneur who is done consuming and ready to build. We provide verified supplier access, proven systems, and direct accountability.
+                </p>
+                
+                <div className="space-y-4 mb-8">
+                  {[
+                    "Building your first product-based business",
+                    "Scaling a resale operation into wholesale",
+                    "Adding a supply chain revenue stream",
+                    "Ready to invest in a proven system",
+                    "Done watching — committed to executing",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-4">
+                      <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
+                      <span className="text-white text-lg">{item}</span>
+                    </div>
+                  ))}
+                </div>
 
-        <section className="mx-auto max-w-7xl px-6 py-20">
-          <div className="grid gap-0 lg:grid-cols-2">
-            <div className="animate flex items-center justify-center border-l-4 border-l-[#C9A84C] bg-[#090909] px-6 py-10">
-              <LiveStoreDashboard />
-            </div>
-            <div className="animate bg-[#0D0D0D] px-10 py-16 md:px-16">
-              <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">Who We Build With</p>
-              <h2 className="mt-5 font-['Cormorant_Garamond'] text-[42px] leading-tight text-white md:text-[58px]">
-                Not a Course.
-                <br />
-                <span className="italic text-[#C9A84C]">A Mentorship.</span>
-              </h2>
-              <p className="mt-6 font-['DM_Sans'] text-sm leading-8 text-[#8C8C82]">
-                The difference between students who scale and those who stay stuck is not information — it is execution with the right system and the right people behind them.
-              </p>
-              <p className="mt-5 font-['DM_Sans'] text-sm leading-8 text-[#8C8C82]">
-                This mentorship is for the entrepreneur who is done consuming and ready to build. We provide verified supplier access, proven systems, and direct accountability.
-              </p>
-              <div className="mt-8 space-y-3">
-                {[
-                  "Building your first product-based business",
-                  "Scaling a resale operation into wholesale",
-                  "Adding a supply chain revenue stream",
-                  "Ready to invest in a proven system",
-                  "Done watching — committed to executing",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3 font-['DM_Sans'] text-sm text-white">
-                    <span className="text-[#C9A84C]">✓</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
+                <Link href={`#${MENTORSHIP_SIGNUP_ID}`}>
+                  <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
+                    Start Your Setup
+                  </button>
+                </Link>
               </div>
-              <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="mt-8 inline-flex rounded-[3px] bg-[#C9A84C] px-8 py-3 font-['DM_Sans'] font-medium text-[#060606]">
-                Start Your Setup →
-              </a>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-20 text-center">
-          <div className="animate">
-            <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">How It Works</p>
-            <h2 className="mt-5 font-['Cormorant_Garamond'] text-[44px] text-white md:text-[64px]">
+        {/* 🔥 HOW IT WORKS SECTION */}
+        <section className="py-24 bg-gradient-to-br from-white/5 to-transparent border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6 text-center">
+            <p className="text-[#D4AF37] font-semibold text-lg mb-6">How It Works</p>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-12">
               From Application to Revenue
             </h2>
-          </div>
-          <div className="relative mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {(PROCESS || []).map((step) => (
-              <div key={step.number} className="animate relative border border-[#1A1A16] bg-[#0D0D0D] px-6 py-8 text-left">
-                <div className="pointer-events-none absolute right-4 top-0 font-['Cormorant_Garamond'] text-[120px] leading-none text-[#C9A84C]/10">
-                  {step.number}
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {(PROCESS || []).map((step) => (
+                <div key={step.number} className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500">
+                  <div className="text-6xl font-bold text-[#D4AF37] mb-4">{step.number}</div>
+                  <h3 className="text-2xl font-bold text-white mb-4">{step.title}</h3>
+                  <p className="text-gray-300 text-lg leading-relaxed">{step.body}</p>
                 </div>
-                <div className="relative">
-                  <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A84C]/40 text-[#C9A84C]">
-                    ◌
-                  </div>
-                  <h3 className="font-['DM_Sans'] text-lg font-bold text-white">{step.title}</h3>
-                  <p className="mt-4 font-['DM_Sans'] text-sm leading-8 text-[#8C8C82]">{step.body}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-20">
-          <div className="animate text-center">
-            <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">The Investment</p>
-            <h2 className="mt-5 font-['Cormorant_Garamond'] text-[44px] text-white md:text-[64px]">
-              Choose Your Level of Access
-            </h2>
-            <p className="mt-4 font-['DM_Sans'] text-sm italic text-[#8C8C82]">
-              Every tier includes direct mentorship, supplier access, and a proven system. The level determines the depth.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {pricingTiers.map((tier) => {
-              const featured = tier.key === "growth";
-              return (
-                <div
-                  key={tier.key}
-                  className={`animate relative border bg-[#0D0D0D] px-8 py-10 ${featured ? "scale-[1.01] border-[#C9A84C]/30 border-t-[3px] border-t-[#C9A84C] shadow-[0_0_80px_rgba(201,168,76,0.07)]" : tier.key === "starter" ? "border-[#1A1A16] border-t-[3px] border-t-[#6B6B5E]" : "border-[#1A1A16] border-t-[3px] border-t-[#9A9A9A]"}`}
-                >
-                  {featured ? (
-                    <div className="absolute -top-3 left-8 rounded-full border border-[#C9A84C]/30 bg-[#121212] px-3 py-1 font-['DM_Mono'] text-[10px] uppercase tracking-[0.24em] text-[#C9A84C]">
-                      ◆ Most Popular
-                    </div>
-                  ) : null}
-                  <p className={`font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] ${featured ? "text-[#C9A84C]" : "text-[#8C8C82]"}`}>
-                    {tier.label}
-                  </p>
-                  <p className={`mt-6 font-['Cormorant_Garamond'] text-[72px] leading-none ${featured ? "text-[#C9A84C]" : "text-white"}`}>
-                    ${tier.amount}
-                  </p>
-                  <div className="mt-8 space-y-3">
-                    {(tier.features || []).map((feature) => (
-                      <div key={feature} className="flex items-start gap-3 font-['DM_Sans'] text-sm text-[#F4F2EC]">
-                        <span className="text-[#C9A84C]">✓</span>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {tier.key === "elite" ? (
-                    <p className="mt-6 border-t border-[#C9A84C]/20 pt-4 font-['DM_Sans'] text-sm text-[#C9A84C]">
-                      Everything in Growth, plus:
-                    </p>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => handleTierCheckout(tier)}
-                    disabled={checkoutTierKey === tier.key}
-                    className={`mt-8 inline-flex w-full justify-center rounded-[3px] px-6 py-4 font-['DM_Sans'] text-sm font-semibold transition ${featured ? "bg-[#C9A84C] text-[#060606]" : "border border-[#C9A84C]/30 text-[#C9A84C]"} ${checkoutTierKey === tier.key ? "cursor-not-allowed opacity-70" : ""}`}
-                  >
-                    {checkoutTierKey === tier.key ? "Opening Stripe..." : `Choose ${tier.label} →`}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          <p className="mt-8 text-center font-['DM_Sans'] text-sm italic text-[#8C8C82]">
-            Fill out the form below once, then any pricing button takes you straight into Stripe checkout for that tier.
-          </p>
-        </section>
-
-        <section id={MENTORSHIP_SIGNUP_ID} className="mx-auto max-w-7xl px-6 py-20">
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_420px]">
-            <div className="animate border border-[#C9A84C]/20 bg-[#0D0D0D] p-8 md:p-10">
-              <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">Mentorship Signup</p>
-              <h2 className="mt-5 font-['Cormorant_Garamond'] text-[42px] leading-none text-white md:text-[58px]">
-                One form.
-                <br />
-                <span className="italic text-[#C9A84C]">Direct path</span> to checkout and scheduling.
+        {/* 🔥 INVESTMENT SECTION */}
+        <section className="py-24">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <p className="text-[#D4AF37] font-semibold text-lg mb-6">The Investment</p>
+              <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+                Choose Your Level of Access
               </h2>
-              <p className="mt-6 max-w-2xl font-['DM_Sans'] text-sm leading-8 text-[#8C8C82]">
-                Share your details, tell us your current stage, and ask anything you need answered. Once this is filled out, your mentorship tier buttons above route straight into Stripe and then into a Calendly popup after payment.
+              <p className="text-gray-300 text-lg italic">
+                Every tier includes direct mentorship, supplier access, and a proven system. The level determines the depth.
               </p>
-
-              <div className="mt-10 grid gap-4 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Full Name</span>
-                  <input
-                    name="name"
-                    value={signupForm.name}
-                    onChange={updateSignupForm}
-                    placeholder="Your name"
-                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Email</span>
-                  <input
-                    name="email"
-                    type="email"
-                    value={signupForm.email}
-                    onChange={updateSignupForm}
-                    placeholder="you@example.com"
-                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Phone</span>
-                  <input
-                    name="phone"
-                    value={signupForm.phone}
-                    onChange={updateSignupForm}
-                    placeholder="Optional"
-                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Current Stage</span>
-                  <select
-                    name="stage"
-                    value={signupForm.stage}
-                    onChange={updateSignupForm}
-                    className="w-full border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
-                  >
-                    <option value="">Select where you are</option>
-                    <option value="Just getting started">Just getting started</option>
-                    <option value="Already selling online">Already selling online</option>
-                    <option value="Moving from retail to wholesale">Moving from retail to wholesale</option>
-                    <option value="Scaling an existing store">Scaling an existing store</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="mt-4 grid gap-4">
-                <label className="block">
-                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Main Goal</span>
-                  <textarea
-                    name="goal"
-                    value={signupForm.goal}
-                    onChange={updateSignupForm}
-                    rows={4}
-                    placeholder="What are you trying to build over the next 90 days?"
-                    className="w-full resize-none border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#8C8C82]">Questions</span>
-                  <textarea
-                    name="question"
-                    value={signupForm.question}
-                    onChange={updateSignupForm}
-                    rows={4}
-                    placeholder="Ask anything you want covered before you join."
-                    className="w-full resize-none border border-[#1F1F1A] bg-[#121212] px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]/50"
-                  />
-                </label>
-              </div>
-
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={handleApplicationOnly}
-                  disabled={signupState === "saving" && !checkoutTierKey}
-                  className="inline-flex items-center justify-center rounded-[3px] border border-[#C9A84C]/35 px-8 py-4 font-['DM_Sans'] text-sm font-semibold text-[#C9A84C] transition hover:border-[#C9A84C]"
-                >
-                  {signupState === "saving" && !checkoutTierKey ? "Sending..." : "Submit Questions Only"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleTierCheckout(selectedTier)}
-                  disabled={Boolean(checkoutTierKey)}
-                  className="inline-flex items-center justify-center rounded-[3px] bg-[#C9A84C] px-8 py-4 font-['DM_Sans'] text-sm font-semibold text-[#060606] transition hover:brightness-105"
-                >
-                  {checkoutTierKey === selectedTier.key ? "Opening Stripe..." : `Continue with ${selectedTier.label} →`}
-                </button>
-              </div>
-
-              {signupMessage ? (
-                <p className={`mt-5 font-['DM_Sans'] text-sm ${signupState === "error" ? "text-[#F28B82]" : "text-[#9DD7A8]"}`}>
-                  {signupMessage}
-                </p>
-              ) : null}
             </div>
 
-            <aside className="animate border border-[#C9A84C]/20 bg-[#121212] p-8">
-              <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">Selected Tier</p>
-              <h3 className="mt-5 font-['Cormorant_Garamond'] text-[48px] leading-none text-white">{selectedTier.label}</h3>
-              <p className="mt-4 font-['DM_Sans'] text-5xl text-[#C9A84C]">${selectedTier.amount}</p>
-              <div className="mt-8 space-y-3">
-                {(selectedTier.features || []).map((feature) => (
-                  <div key={feature} className="flex items-start gap-3 font-['DM_Sans'] text-sm text-[#F4F2EC]">
-                    <span className="text-[#C9A84C]">✓</span>
-                    <span>{feature}</span>
+            <div className="grid lg:grid-cols-3 gap-8">
+              {pricingTiers.map((tier) => {
+                const featured = tier.key === "growth";
+                return (
+                  <div
+                    key={tier.key}
+                    className={`bg-gradient-to-br from-white/5 to-transparent border rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500 ${featured ? 'transform hover:scale-105' : ''}`}
+                  >
+                    {featured ? (
+                      <div className="text-center mb-4">
+                        <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold shadow-lg shadow-[#D4AF37]/30">
+                          Most Popular
+                        </span>
+                      </div>
+                    ) : null}
+                    
+                    <div className="text-center mb-8">
+                      <p className={`text-sm font-semibold mb-4 ${featured ? 'text-[#D4AF37]' : 'text-gray-400'}`}>
+                        {tier.label}
+                      </p>
+                      <div className={`text-6xl font-bold ${featured ? 'text-[#D4AF37]' : 'text-white'}`}>
+                        ${tier.amount}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 mb-8">
+                      {(tier.features || []).map((feature) => (
+                        <div key={feature} className="flex items-center gap-4">
+                          <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
+                          <span className="text-white text-lg">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {tier.key === "elite" ? (
+                      <div className="border-t border-white/20 pt-4 mb-8">
+                        <p className="text-[#D4AF37] text-lg font-semibold">Everything in Growth, plus:</p>
+                      </div>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      onClick={() => handleTierCheckout(tier)}
+                      disabled={checkoutTierKey === tier.key}
+                      className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 ${
+                        featured 
+                          ? 'bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black hover:shadow-lg hover:shadow-[#D4AF37]/30' 
+                          : 'border border-white/30 text-white hover:bg-white hover:text-black'
+                      } ${checkoutTierKey === tier.key ? 'opacity-70 cursor-not-allowed' : 'transform hover:scale-105'}`}
+                    >
+                      {checkoutTierKey === tier.key ? "Opening Stripe..." : `Choose ${tier.label}`}
+                    </button>
                   </div>
-                ))}
-              </div>
-              <div className="mt-8 border-t border-[#C9A84C]/15 pt-6">
-                <p className="font-['DM_Sans'] text-sm leading-7 text-[#8C8C82]">
-                  Checkout flow: mentorship form → Stripe payment → Calendly popup scheduling on the success page.
-                </p>
-              </div>
-            </aside>
+                );
+              })}
+            </div>
+
+            <div className="text-center mt-8">
+              <p className="text-gray-400 text-lg italic">
+                Fill out the form below once, then any pricing button takes you straight into Stripe checkout for that tier.
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="border-y border-[#C9A84C]/20 bg-[#121212] py-20">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="animate text-center">
-              <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#C9A84C]">Student Results</p>
-              <h2 className="mt-5 font-['Cormorant_Garamond'] text-[42px] italic text-white md:text-[56px]">
+        {/* 🔥 SIGNUP SECTION */}
+        <section id={MENTORSHIP_SIGNUP_ID} className="py-24 bg-gradient-to-br from-white/5 to-transparent border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-12">
+              <div>
+                <p className="text-[#D4AF37] font-semibold text-lg mb-6">Mentorship Signup</p>
+                <h2 className="text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+                  One form.
+                  <br />
+                  <span className="text-[#D4AF37]">Direct path</span> to checkout and scheduling.
+                </h2>
+                <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+                  Share your details, tell us your current stage, and ask anything you need answered. Once this is filled out, your mentorship tier buttons above route straight into Stripe and then into a Calendly popup after payment.
+                </p>
+
+                <form className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                      <input
+                        name="name"
+                        value={signupForm.name}
+                        onChange={updateSignupForm}
+                        placeholder="Your name"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-all duration-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                      <input
+                        name="email"
+                        type="email"
+                        value={signupForm.email}
+                        onChange={updateSignupForm}
+                        placeholder="you@example.com"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Phone (Optional)</label>
+                      <input
+                        name="phone"
+                        value={signupForm.phone}
+                        onChange={updateSignupForm}
+                        placeholder="Optional"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-all duration-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Current Stage</label>
+                      <select
+                        name="stage"
+                        value={signupForm.stage}
+                        onChange={updateSignupForm}
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-all duration-300"
+                      >
+                        <option value="">Select where you are</option>
+                        <option value="Just getting started">Just getting started</option>
+                        <option value="Already selling online">Already selling online</option>
+                        <option value="Moving from retail to wholesale">Moving from retail to wholesale</option>
+                        <option value="Scaling an existing store">Scaling an existing store</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Main Goal</label>
+                    <textarea
+                      name="goal"
+                      value={signupForm.goal}
+                      onChange={updateSignupForm}
+                      rows={4}
+                      placeholder="What are you trying to build over the next 90 days?"
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-all duration-300 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Questions</label>
+                    <textarea
+                      name="question"
+                      value={signupForm.question}
+                      onChange={updateSignupForm}
+                      rows={4}
+                      placeholder="Ask anything you want covered before you join."
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-all duration-300 resize-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      type="button"
+                      onClick={handleApplicationOnly}
+                      disabled={signupState === "saving" && !checkoutTierKey}
+                      className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300"
+                    >
+                      {signupState === "saving" && !checkoutTierKey ? "Sending..." : "Submit Questions Only"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTierCheckout(selectedTier)}
+                      disabled={Boolean(checkoutTierKey)}
+                      className="flex-1 bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-6 py-4 rounded-lg font-bold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105"
+                    >
+                      {checkoutTierKey === selectedTier.key ? "Opening Stripe..." : `Continue with ${selectedTier.label}`}
+                    </button>
+                  </div>
+
+                  {signupMessage ? (
+                    <p className={`text-sm ${signupState === "error" ? "text-red-400" : "text-green-400"}`}>
+                      {signupMessage}
+                    </p>
+                  ) : null}
+                </form>
+              </div>
+
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8">
+                <p className="text-[#D4AF37] font-semibold text-lg mb-6">Selected Tier</p>
+                <h3 className="text-4xl font-bold text-white mb-4">{selectedTier.label}</h3>
+                <p className="text-5xl font-bold text-[#D4AF37] mb-8">${selectedTier.amount}</p>
+                
+                <div className="space-y-4 mb-8">
+                  {(selectedTier.features || []).map((feature) => (
+                    <div key={feature} className="flex items-center gap-4">
+                      <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
+                      <span className="text-white text-lg">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-white/20 pt-6">
+                  <p className="text-gray-300 text-lg leading-relaxed">
+                    Checkout flow: mentorship form → Stripe payment → Calendly popup scheduling on the success page.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 🔥 TESTIMONIALS SECTION */}
+        <section className="py-24">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <p className="text-[#D4AF37] font-semibold text-lg mb-6">Student Results</p>
+              <h2 className="text-5xl lg:text-6xl font-bold mb-8">
                 What Happens When You Execute
               </h2>
             </div>
-            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            
+            <div className="grid lg:grid-cols-3 gap-8">
               {(TESTIMONIALS || []).map((testimonial) => (
-                <div key={testimonial.author} className="animate relative border border-[#1A1A16] bg-[#0D0D0D] px-10 py-12">
-                  <div className="pointer-events-none absolute left-6 top-0 font-['Cormorant_Garamond'] text-[160px] leading-none text-[#C9A84C]/10">
-                    “
+                <div key={testimonial.author} className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500">
+                  <div className="text-8xl font-bold text-[#D4AF37]/20 mb-6">"</div>
+                  <p className="text-white text-lg italic leading-relaxed mb-8">{testimonial.quote}</p>
+                  <div className="border-t border-white/20 pt-6">
+                    <p className="text-[#D4AF37] font-semibold text-lg mb-2">{testimonial.author}</p>
+                    <p className="text-gray-400 text-sm">{testimonial.title}</p>
                   </div>
-                  <p className="relative font-['Cormorant_Garamond'] text-[20px] italic leading-[1.65] text-white">
-                    {testimonial.quote}
-                  </p>
-                  <div className="mt-8 h-px w-8 bg-[#C9A84C]" />
-                  <p className="mt-5 font-['DM_Sans'] text-sm font-semibold text-[#C9A84C]">{testimonial.author}</p>
-                  <p className="mt-1 font-['DM_Sans'] text-xs text-[#8C8C82]">{testimonial.title}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="relative overflow-hidden px-6 py-24 text-center">
-          <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#C9A84C]/10 blur-[120px]" />
-          <div className="animate relative mx-auto max-w-4xl">
-            <div className="mx-auto mb-10 h-px w-[120px] bg-[#C9A84C]/30" />
-            <h2 className="font-['Cormorant_Garamond'] text-[48px] font-light leading-none text-white md:text-[88px]">
-              The System Is Proven.
-              <br />
-              <span className="italic text-[#C9A84C]">The Opportunity Is Now.</span>
-            </h2>
-            <p className="mx-auto mt-8 max-w-[440px] font-['DM_Sans'] text-[18px] leading-8 text-[#8C8C82]">
-              Every week without the right supplier relationships and systems is revenue left on the table. Apply today. Build tomorrow.
-            </p>
-            <a href={`#${MENTORSHIP_SIGNUP_ID}`} className="mt-10 inline-flex animate-[pulseCta_3s_infinite] rounded-[3px] bg-[#C9A84C] px-16 py-5 font-['DM_Sans'] text-base font-semibold text-[#060606]">
-              Start Mentorship Checkout →
-            </a>
-            <p className="mt-6 font-['DM_Mono'] text-[11px] uppercase tracking-[0.18em] text-[#8C8C82]">
-              ● Limited spots · Reviewed weekly · No obligation
-            </p>
-            <p className="mt-4 font-['DM_Sans'] text-xs text-[rgba(107,107,94,0.4)]">
-              KV Garage Mentorship is a private program. Application does not guarantee acceptance.
-            </p>
-          </div>
-        </section>
-
-        {videoOpen ? (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/80 px-6" onClick={() => setVideoOpen(false)}>
-            <div className="w-full max-w-4xl" onClick={(event) => event.stopPropagation()}>
-              <button onClick={() => setVideoOpen(false)} className="mb-3 ml-auto block text-sm text-[#C9A84C]">
-                Close
-              </button>
-              <div className="aspect-video overflow-hidden rounded-[4px] border border-[#C9A84C]/20 bg-[#0D0D0D]">
-                {VIDEO_URL ? (
-                  <iframe
-                    src={VIDEO_URL}
-                    allow="autoplay; fullscreen"
-                    frameBorder="0"
-                    className="h-full w-full"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.18),transparent_42%),#0D0D0D] text-center">
-                    <div>
-                      <p className="font-['Cormorant_Garamond'] text-4xl italic text-[#C9A84C]">Mentorship Reel Coming Online</p>
-                      <p className="mt-3 font-['DM_Sans'] text-sm text-[#8C8C82]">
-                        This space is ready for your hosted video embed the moment it is uploaded.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
+        {/* 🔥 FINAL CTA */}
+        <section className="py-24 bg-gradient-to-br from-white/5 to-transparent border-t border-white/10">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-3xl p-16">
+              <div className="w-px h-16 bg-[#D4AF37] mx-auto mb-8"></div>
+              <h2 className="text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                The System Is Proven.
+                <br />
+                <span className="text-[#D4AF37]">The Opportunity Is Now.</span>
+              </h2>
+              <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-3xl mx-auto">
+                Every week without the right supplier relationships and systems is revenue left on the table. Apply today. Build tomorrow.
+              </p>
+              <Link href={`#${MENTORSHIP_SIGNUP_ID}`}>
+                <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-12 py-5 rounded-xl font-bold text-2xl shadow-lg shadow-[#D4AF37]/30 hover:shadow-xl hover:shadow-[#D4AF37]/50 transition-all duration-300 transform hover:scale-105">
+                  Start Mentorship Checkout
+                </button>
+              </Link>
+              <p className="mt-8 text-gray-400 text-lg">
+                Limited spots · Reviewed weekly · No obligation
+              </p>
+              <p className="mt-4 text-gray-500 text-sm">
+                KV Garage Mentorship is a private program. Application does not guarantee acceptance.
+              </p>
             </div>
           </div>
-        ) : null}
-
-        <style jsx global>{`
-          @keyframes mentorshipMarquee {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-50%);
-            }
-          }
-
-          @keyframes pulseCta {
-            0%, 100% {
-              transform: scale(1);
-            }
-            50% {
-              transform: scale(1.02);
-            }
-          }
-
-          .noise-overlay {
-            background-image:
-              radial-gradient(rgba(255,255,255,0.4) 0.7px, transparent 0.7px),
-              radial-gradient(rgba(255,255,255,0.2) 0.5px, transparent 0.5px);
-            background-position: 0 0, 12px 12px;
-            background-size: 24px 24px;
-          }
-
-          .animate {
-            opacity: 0;
-            transform: translateY(32px);
-            transition:
-              opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-          }
-
-          .animate.visible {
-            opacity: 1;
-            transform: translateY(0);
-          }
-
-          .animate.visible h2::after {
-            width: 48px;
-          }
-        `}</style>
+        </section>
       </main>
     </>
   );
@@ -1047,55 +985,66 @@ function LiveStoreDashboard() {
   }, []);
 
   return (
-    <div className="w-full max-w-[560px] rounded-xl border border-[#C9A84C]/30 bg-[#0D0D0D] p-6 shadow-[0_0_60px_rgba(201,168,76,0.1)]">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-[#22C55E]" />
-          <span className="font-['DM_Mono'] text-[10px] uppercase tracking-[0.24em] text-[#F4F2EC]">Live</span>
-        </div>
-        <div className="text-right">
-          <p className="font-['DM_Mono'] text-[10px] uppercase tracking-[0.22em] text-[#6B6B5E]">Today&apos;s Revenue</p>
-          <p className="font-['DM_Sans'] text-2xl font-semibold text-[#C9A84C]">
-            ${displayRevenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        {DASHBOARD_PRODUCTS.map((product, index) => (
-          <div key={product.name} className="rounded-xl border border-[#1A1A16] bg-[#151515] p-3">
-            <div className="relative overflow-hidden rounded-lg">
-              <Image src={product.image} alt={product.name} width={220} height={140} className="h-28 w-full object-cover" />
-              <span className={`absolute right-2 top-2 rounded-full bg-[#22C55E]/15 px-2 py-1 text-[10px] font-semibold uppercase text-[#22C55E] transition-opacity duration-500 ${soldIndex === index ? "opacity-100" : "opacity-30"}`}>
-                Sold
-              </span>
-            </div>
-            <p className="mt-3 truncate font-['DM_Sans'] text-xs text-white">{product.name}</p>
-            <p className="mt-1 font-['DM_Sans'] text-sm font-bold text-[#C9A84C]">{product.price}</p>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+            <span className="text-emerald-400 font-semibold text-lg">Live Store Dashboard</span>
           </div>
-        ))}
-      </div>
+          <div className="text-right">
+            <p className="text-gray-400 text-sm mb-2">Today's Revenue</p>
+            <p className="text-3xl font-bold text-[#D4AF37]">
+              ${displayRevenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
 
-      <div className="mt-5 rounded-xl border border-[#1A1A16] bg-[#151515] p-4">
-        <p className="font-['DM_Mono'] text-[10px] uppercase tracking-[0.2em] text-[#6B6B5E]">Order Feed</p>
-        <div className="mt-3 space-y-3">
-          {(orders || []).map((order) => (
-            <div key={order.id} className="flex items-center justify-between border-b border-white/5 pb-3 text-sm last:border-b-0 last:pb-0">
-              <p className="font-['DM_Sans'] text-white">✓ Order #{order.id}</p>
-              <p className="font-['DM_Sans'] text-[#C9A84C]">${order.amount.toFixed(2)}</p>
-              <p className="font-['DM_Mono'] text-[11px] text-[#6B6B5E]">{order.time}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {DASHBOARD_PRODUCTS.map((product, index) => (
+            <div key={product.name} className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6 hover:border-[#D4AF37]/50 transition-all duration-500">
+              <div className="relative mb-4">
+                <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-lg" />
+                <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                  soldIndex === index 
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/50' 
+                    : 'bg-white/10 text-gray-400'
+                }`}>
+                  Sold
+                </span>
+              </div>
+              <h3 className="text-white font-semibold mb-2">{product.name}</h3>
+              <p className="text-[#D4AF37] font-bold text-lg">{product.price}</p>
             </div>
           ))}
         </div>
-      </div>
 
-      <div className="mt-5">
-        <div className="mb-2 flex items-center justify-between font-['DM_Mono'] text-[11px] text-[#F4F2EC]">
-          <span>Monthly Goal: $48,470 / $120,000</span>
-          <span className="text-[#6B6B5E]">40%</span>
+        <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6">
+          <p className="text-gray-400 text-sm mb-4 font-semibold">Order Feed</p>
+          <div className="space-y-4">
+            {(orders || []).map((order) => (
+              <div key={order.id} className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-3 h-3 bg-emerald-400 rounded-full"></div>
+                  <span className="text-white font-medium">Order #{order.id}</span>
+                </div>
+                <div className="text-right">
+                  <p className="text-[#D4AF37] font-bold">{order.amount.toFixed(2)}</p>
+                  <p className="text-gray-400 text-sm">{order.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="h-2.5 overflow-hidden rounded-full bg-white/5">
-          <div className="h-full w-[40%] rounded-full bg-[#C9A84C] transition-all duration-1000" />
+
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white font-semibold">Monthly Goal: $48,470 / $120,000</span>
+            <span className="text-gray-400">40%</span>
+          </div>
+          <div className="w-full bg-white/10 rounded-full h-4">
+            <div className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 h-4 rounded-full w-40 transition-all duration-1000"></div>
+          </div>
         </div>
       </div>
     </div>

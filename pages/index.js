@@ -285,144 +285,191 @@ export default function Home() {
         />
       </Head>
 
-      <div className="min-h-screen text-white relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white relative overflow-hidden">
 
-        {/* 🔥 GLOW */}
-        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-[#D4AF37]/25 blur-[140px] rounded-full"></div>
+        {/* 🔥 GLOW EFFECTS */}
+        <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-[#D4AF37]/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-3xl"></div>
 
         {/* ================= HERO ================= */}
-        <section className="py-20 border-b border-[#1C2233]">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+        <section className="py-24 border-t border-white/20">
+          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
 
             {/* LEFT */}
-            <div>
-              <h1 className="text-5xl font-semibold mb-6 leading-tight">
-                Source Inventory → Sell → Scale
+            <div className="space-y-8">
+              <div className="flex items-center gap-4">
+                <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold">EST. 2022</span>
+                <span className="text-gray-400 text-sm">Trusted by 15,000+ operators</span>
+              </div>
+              
+              <h1 className="text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                <span className="bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
+                  Source Inventory
+                </span>
+                <br />
+                <span className="text-gray-300">→ Sell → Scale</span>
               </h1>
 
-              <p className="text-gray-400 mb-8">
-                Wholesale supply and scalable systems.
+              <p className="text-xl text-gray-300 leading-relaxed max-w-2xl">
+                Wholesale supply and scalable systems designed for serious operators. 
+                Build your supply chain with verified products and institutional-grade support.
               </p>
 
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/wholesale">
-                  <button className="bg-[#D4AF37] text-black px-8 py-4 rounded-xl">
+                  <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
                     Enter Wholesale
                   </button>
                 </Link>
 
                 <Link href="/shop">
-                  <button className="border border-[#D4AF37] px-8 py-4 rounded-xl">
+                  <button className="border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-black transition-all duration-300">
                     Shop Retail
                   </button>
                 </Link>
               </div>
+
+              {/* 🔥 TRUST INDICATORS */}
+              <div className="grid grid-cols-3 gap-6 pt-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">15K+</div>
+                  <div className="text-sm text-gray-400">Active Members</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">45+</div>
+                  <div className="text-sm text-gray-400">Countries</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">2022</div>
+                  <div className="text-sm text-gray-400">Est. Year</div>
+                </div>
+              </div>
             </div>
 
             {/* RIGHT */}
-            <div className="flex flex-col gap-4">
-
+            <div className="space-y-6">
               {/* 🔥 TOP PICKS */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 {(topPicks.slice(0, 2).length > 0 ? topPicks.slice(0, 2) : products.slice(0, 2)).map((p, i) => (
                   <Link key={i} href={`/shop/${p.slug}`}>
-                    <div className="bg-[#111827] p-4 rounded-xl border border-[#1C2233] hover:border-[#D4AF37] transition">
-
-                      <img src={getPrimaryProductImage(p)} className="h-24 w-full object-cover rounded mb-2" loading="lazy" alt={p.name} />
-
-                      <p className="text-xs text-[#D4AF37]">Top Pick</p>
-                      <p className="font-semibold">{p.name}</p>
-
-                      <p className="text-xs text-gray-400">
-                        Min Order: {getMOQ(p)} Units
-                      </p>
-
-                      <p className="text-xs text-gray-500">
-                        ${Number(getPrice(p)).toFixed(2)}
-                      </p>
-
+                    <div className="group bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
+                      <div className="aspect-square w-full mb-4 rounded-xl overflow-hidden bg-white/10">
+                        <img src={getPrimaryProductImage(p)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" alt={p.name} />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <span className="inline-flex items-center gap-2 bg-[#D4AF37] text-black px-3 py-1 rounded-full text-sm font-semibold">
+                          <span className="w-2 h-2 bg-black rounded-full"></span>
+                          Top Pick
+                        </span>
+                        <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-[#D4AF37] transition-colors duration-300">{p.name}</h3>
+                        <p className="text-sm text-gray-400">Min Order: {getMOQ(p)} Units</p>
+                        <p className="text-2xl font-bold text-[#D4AF37]">${Number(getPrice(p)).toFixed(2)}</p>
+                      </div>
                     </div>
                   </Link>
                 ))}
               </div>
 
               {/* 🔥 WHOLESALE BLOCK */}
-              <div className="bg-[#111827] p-5 rounded-xl border border-[#1C2233]">
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
+                  <h3 className="text-2xl font-bold text-[#D4AF37]">Wholesale Supply Model</h3>
+                </div>
 
-                <h3 className="text-sm text-[#D4AF37] mb-2">
-                  Wholesale Supply Model
-                </h3>
-
-                <p className="text-xs text-gray-400 mb-4">
+                <p className="text-gray-300 mb-6 leading-relaxed">
                   Built for resellers, store owners, and volume buyers. Products require minimum quantities and offer better pricing at scale.
                 </p>
 
-                <div className="flex flex-col gap-2 text-xs text-gray-300 mb-4">
-                  <span>• MOQ Based Pricing</span>
-                  <span>• Bundle Inventory Available</span>
-                  <span>• Weekly Supply Updates</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                  <div className="bg-white/5 border border-white/20 rounded-lg p-4">
+                    <div className="text-2xl mb-2">📦</div>
+                    <div className="font-semibold mb-1">MOQ Based Pricing</div>
+                    <div className="text-sm text-gray-400">Better margins at volume</div>
+                  </div>
+                  <div className="bg-white/5 border border-white/20 rounded-lg p-4">
+                    <div className="text-2xl mb-2">🔄</div>
+                    <div className="font-semibold mb-1">Bundle Inventory</div>
+                    <div className="text-sm text-gray-400">Pre-packaged deals</div>
+                  </div>
+                  <div className="bg-white/5 border border-white/20 rounded-lg p-4">
+                    <div className="text-2xl mb-2">📈</div>
+                    <div className="font-semibold mb-1">Weekly Updates</div>
+                    <div className="text-sm text-gray-400">Fresh inventory drops</div>
+                  </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/apply">
-                    <button className="flex-1 bg-[#D4AF37] text-black py-2 rounded text-xs font-semibold">
+                    <button className="flex-1 bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
                       Apply for Wholesale
                     </button>
                   </Link>
 
                   <Link href="/shop">
-                    <button className="flex-1 border border-gray-500 py-2 rounded text-xs">
+                    <button className="flex-1 border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
                       Shop Retail
                     </button>
                   </Link>
                 </div>
-
               </div>
-
             </div>
 
           </div>
         </section>
 
-        <section className="py-16 border-b border-[#1C2233]">
+        {/* ================= FEATURED INVENTORY ================= */}
+        <section className="py-20 border-t border-white/20">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-gray-500">Featured Inventory</p>
-                <h2 className="mt-2 text-3xl font-semibold">Top Picks</h2>
+            <div className="mb-12 text-center">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold">FEATURED INVENTORY</span>
+                <span className="text-gray-400 text-sm">EST. 2022</span>
               </div>
-              <Link href="/shop" className="text-sm text-[#D4AF37]">
-                Shop All
-              </Link>
+              
+              <h2 className="text-5xl font-bold mb-6">Top Picks</h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Curated high-performing inventory with proven sell-through rates and exceptional margins
+              </p>
             </div>
 
             {topPicks.length === 0 ? (
-              <div className="rounded-3xl border border-[#D4AF37]/40 bg-[#111827] px-6 py-10 text-center text-[#F4D67A]">
-                Top picks coming soon
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-12 text-center">
+                <div className="text-6xl mb-4">📦</div>
+                <h3 className="text-2xl font-bold mb-4">Top picks coming soon</h3>
+                <p className="text-gray-400">Check back for our curated selection of high-performing products</p>
               </div>
             ) : (
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
                 {topPicks.map((product) => (
                   <Link
                     key={product.id}
                     href={`/shop/${product.slug || product.id}`}
-                    className="group rounded-[28px] border border-[#1C2233] bg-[#111827] p-4 transition hover:-translate-y-1 hover:border-[#D4AF37]/60"
+                    className="group bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105"
                   >
-                    <div className="relative overflow-hidden rounded-[22px]">
+                    <div className="aspect-square w-full mb-6 rounded-xl overflow-hidden bg-white/10">
                       <img
                         src={getPrimaryProductImage(product)}
                         alt={product.name}
-                        className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
                       />
-                      <span className="absolute left-3 top-3 rounded-full bg-[#D4AF37] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-black">
-                        Top Pick
-                      </span>
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-[#D4AF37] text-black px-3 py-1 rounded-full text-sm font-semibold">TOP PICK</span>
+                      </div>
                     </div>
-                    <div className="mt-4">
-                      <p className="text-xs uppercase tracking-[0.18em] text-[#94A3B8]">{product.category || "General"}</p>
-                      <p className="mt-2 line-clamp-2 text-lg font-semibold">{product.name}</p>
-                      <p className="mt-3 text-lg font-semibold text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
+                    
+                    <div className="space-y-4">
+                      <div className="text-sm text-gray-400 uppercase tracking-wider">{product.category || "General"}</div>
+                      <h3 className="text-2xl font-bold line-clamp-2 group-hover:text-[#D4AF37] transition-colors duration-300">{product.name}</h3>
+                      <div className="flex items-center justify-between">
+                        <p className="text-3xl font-bold text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
+                        {product.top_pick && (
+                          <span className="bg-[#D4AF37] text-black px-3 py-1 rounded-full text-sm font-semibold">TOP PICK</span>
+                        )}
+                      </div>
                     </div>
                   </Link>
                 ))}
@@ -431,97 +478,114 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="border-b border-[#1C2233] py-12">
+        {/* ================= FRESH INVENTORY ================= */}
+        <section className="py-16 border-t border-white/20">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <p className="font-['DM_Mono'] text-[11px] uppercase tracking-[0.24em] text-[#D4AF37]">Just In</p>
-                <h2 className="mt-2 text-2xl font-semibold">Fresh Inventory</h2>
+            <div className="mb-10 flex items-center justify-between">
+              <div className="text-center lg:text-left">
+                <p className="text-sm text-[#D4AF37] font-semibold uppercase tracking-[0.2em] mb-4">JUST IN</p>
+                <h2 className="text-4xl font-bold mb-4">Fresh Inventory</h2>
+                <p className="text-gray-300 text-lg">New products added daily with verified supplier relationships</p>
               </div>
-              <Link href="/shop" className="text-sm text-[#D4AF37]">
+              <Link href="/shop" className="hidden lg:block text-lg text-[#D4AF37] font-semibold hover:text-white transition-colors duration-300">
                 See All Inventory →
               </Link>
             </div>
 
             {newArrivals.length > 0 ? (
-              <div className="flex gap-4 overflow-x-auto pb-3">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {newArrivals.map((product) => {
                   const isNew = Date.now() - new Date(product.created_at || Date.now()).getTime() <= 7 * 24 * 60 * 60 * 1000;
                   return (
                     <Link
                       key={`${product.id}-strip`}
                       href={`/shop/${product.slug || product.id}`}
-                      className="flex min-w-[280px] items-center gap-4 rounded-2xl border border-[#1C2233] bg-[#111827] p-4"
+                      className="group bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105"
                     >
-                      <img
-                        src={getPrimaryProductImage(product)}
-                        alt={product.name}
-                        className="h-20 w-20 rounded-2xl object-cover"
-                        loading="lazy"
-                      />
-                      <div className="min-w-0">
-                        <p className="line-clamp-2 text-sm font-semibold text-white">{product.name}</p>
-                        <p className="mt-2 text-sm text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
+                      <div className="aspect-square w-full mb-4 rounded-xl overflow-hidden bg-white/10">
+                        <img
+                          src={getPrimaryProductImage(product)}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
                       </div>
-                      {isNew ? (
-                        <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase text-emerald-300">
-                          New
-                        </span>
-                      ) : null}
+                      
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-bold line-clamp-2 group-hover:text-[#D4AF37] transition-colors duration-300">{product.name}</h3>
+                        <div className="flex items-center justify-between">
+                          <p className="text-2xl font-bold text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
+                          {isNew && (
+                            <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-semibold border border-emerald-500/30">
+                              NEW
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </Link>
                   );
                 })}
               </div>
-            ) : null}
+            ) : (
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 text-center">
+                <p className="text-gray-400">New inventory dropping soon</p>
+              </div>
+            )}
           </div>
         </section>
 
         {/* ================= LIVE INVENTORY ================= */}
-        <section className="py-16 border-t border-[#1C2233] overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6 mb-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D4AF37]">Live Inventory</p>
+        <section className="py-24 border-t border-white/20 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
+            <p className="text-sm text-[#D4AF37] font-semibold uppercase tracking-[0.2em] mb-4">LIVE INVENTORY</p>
+            <h2 className="text-4xl font-bold">Real-Time Product Flow</h2>
+            <p className="text-gray-300 text-lg mt-4 max-w-2xl mx-auto">
+              Watch our inventory rotate in real-time. Products update every 60 seconds with fresh drops and availability changes.
+            </p>
           </div>
 
           {liveInventory.length === 0 ? (
             <div className="max-w-7xl mx-auto px-6">
-              <div className="rounded-2xl border border-[#1C2233] bg-[#111827] px-6 py-4 text-sm text-gray-300">
-                New inventory dropping soon
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 text-center">
+                <p className="text-gray-300 text-lg">New inventory dropping soon</p>
               </div>
             </div>
           ) : (
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#05070D] to-transparent" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#05070D] to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0B0F19] to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0B0F19] to-transparent" />
+              
               <div className="group overflow-hidden">
-                <div className="flex w-max animate-[inventoryMarquee_60s_linear_infinite] gap-4 group-hover:[animation-play-state:paused]">
+                <div className="flex w-max animate-[inventoryMarquee_60s_linear_infinite] gap-6 group-hover:[animation-play-state:paused]">
                   {[...liveInventory, ...liveInventory].map((item, index) => {
-                  const isNew = Date.now() - new Date(item.created_at || Date.now()).getTime() <= 7 * 24 * 60 * 60 * 1000;
-                  return (
-                    <Link
-                      key={`${item.id}-${index}`}
-                      href={`/shop/${item.slug || item.id}`}
-                      className="flex min-h-[120px] min-w-[210px] max-w-[220px] items-center gap-4 rounded-[22px] border border-[#1C2233] bg-[#111827] px-4 py-4"
-                    >
-                      <img
-                        src={getPrimaryProductImage(item)}
-                        className="h-20 w-20 rounded-2xl object-cover"
-                        loading="lazy"
-                        alt={item.name}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="line-clamp-2 text-[14px] font-semibold leading-5 text-white">
-                          {String(item.name || "Inventory").slice(0, 48)}
-                        </p>
-                        <p className="mt-2 text-base font-bold text-[#D4AF37]">${Number(getPrice(item)).toFixed(2)}</p>
-                      </div>
-                      {isNew ? (
-                        <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase text-emerald-300">
-                          New
-                        </span>
-                      ) : null}
-                    </Link>
-                  );
-                })}
+                    const isNew = Date.now() - new Date(item.created_at || Date.now()).getTime() <= 7 * 24 * 60 * 60 * 1000;
+                    return (
+                      <Link
+                        key={`${item.id}-${index}`}
+                        href={`/shop/${item.slug || item.id}`}
+                        className="group flex min-h-[140px] min-w-[240px] max-w-[260px] items-center gap-6 rounded-2xl border border-white/20 bg-gradient-to-br from-white/5 to-transparent p-6 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105"
+                      >
+                        <div className="aspect-square w-24 rounded-xl overflow-hidden bg-white/10">
+                          <img
+                            src={getPrimaryProductImage(item)}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
+                            alt={item.name}
+                          />
+                        </div>
+                        
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-lg font-bold line-clamp-2 group-hover:text-[#D4AF37] transition-colors duration-300 mb-2">{String(item.name || "Inventory").slice(0, 48)}</h3>
+                          <p className="text-2xl font-bold text-[#D4AF37] mb-2">${Number(getPrice(item)).toFixed(2)}</p>
+                          {isNew && (
+                            <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-semibold border border-emerald-500/30">
+                              NEW
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -539,73 +603,75 @@ export default function Home() {
           `}</style>
         </section>
 
-        {/* ================= PROFIT TOOL ================= */}
-        <section className="py-20 border-t border-[#1C2233] text-center relative">
+        {/* ================= PROFIT CALCULATOR ================= */}
+        <section className="py-24 border-t border-white/20">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-3xl p-8 shadow-2xl">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span className="text-4xl">📊</span>
+                <h3 className="text-3xl font-bold text-[#D4AF37]">Profit Calculator</h3>
+              </div>
 
-          <div className="absolute inset-0 opacity-10">
-            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71" className="w-full h-full object-cover"/>
-          </div>
+              <p className="text-gray-300 text-lg mb-8 leading-relaxed max-w-3xl mx-auto">
+                Model live inventory opportunities using KV Garage retail pricing. Profit math is calculated server-side so supplier cost never appears in the browser.
+              </p>
 
-          <div className="relative z-10">
-            <div className="mx-auto max-w-[560px] rounded-[28px] border border-[#1C2233] bg-[#111827] p-4 text-left shadow-2xl shadow-black/20">
-              <button
-                type="button"
-                onClick={() => setCalculatorOpen((prev) => !prev)}
-                className="flex w-full items-center justify-between rounded-2xl bg-[#D4AF37] px-5 py-4 text-base font-semibold text-black"
-              >
-                <span>📊 Profit Calculator</span>
-                <span className={`transition-transform duration-300 ${calculatorOpen ? "rotate-180" : ""}`}>▾</span>
-              </button>
-
-              <div className={`overflow-hidden transition-all duration-500 ${calculatorOpen ? "max-h-[600px] pt-5" : "max-h-0"}`}>
-                <p className="mb-5 text-sm text-gray-300">
-                  Model live inventory opportunities using KV Garage retail pricing. Profit math is calculated server-side so supplier cost never appears in the browser.
-                </p>
-
-                <div ref={productSelectRef} className="relative w-full max-w-[560px]">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
-                    Product
-                  </label>
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6">
+                <div ref={productSelectRef} className="relative w-full mb-6">
+                  <label className="block text-sm font-semibold text-gray-300 mb-3">Select Product</label>
                   <button
                     type="button"
                     onClick={() => setProductDropdownOpen((prev) => !prev)}
-                    className={`flex w-full items-center gap-3 rounded-md border border-[#1A1A16] bg-white/5 px-4 py-[14px] text-left transition ${productDropdownOpen ? "border-[#C9A84C]/40" : "hover:border-[#C9A84C]/40"}`}
+                    className={`w-full flex items-center gap-4 px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-left transition-all duration-300 ${
+                      productDropdownOpen ? "border-[#D4AF37]/50" : "hover:border-white/40"
+                    }`}
                   >
                     {selectedProfitProduct ? (
                       <img
                         src={getPrimaryProductImage(selectedProfitProduct)}
                         alt={selectedProfitProduct.name}
-                        className="h-9 w-9 rounded-md object-cover"
+                        className="w-12 h-12 rounded-xl object-cover"
                         loading="lazy"
                       />
                     ) : (
-                      <div className="h-9 w-9 rounded-md bg-white/5" />
+                      <div className="w-12 h-12 rounded-xl bg-white/10" />
                     )}
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-lg font-semibold text-white truncate">
                         {selectedProfitProduct?.name || "Select a product..."}
                       </p>
+                      <p className="text-sm text-gray-400">{selectedProfitProduct?.category || "General"}</p>
                     </div>
-                    <span className="text-sm font-bold text-[#C9A84C]">
-                      {selectedProfitProduct ? `$${Number(getPrice(selectedProfitProduct)).toFixed(2)}` : ""}
-                    </span>
-                    <span className={`transition-transform duration-200 ${productDropdownOpen ? "rotate-180" : ""}`}>▾</span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-bold text-[#D4AF37]">
+                        {selectedProfitProduct ? `$${Number(getPrice(selectedProfitProduct)).toFixed(2)}` : ""}
+                      </span>
+                      <span className={`transition-transform duration-300 ${productDropdownOpen ? "rotate-180" : ""}`}>
+                        ▼
+                      </span>
+                    </div>
                   </button>
 
                   <div
-                    className={`absolute left-0 right-0 top-[calc(100%+4px)] z-50 overflow-hidden rounded-md border border-[#C9A84C]/25 bg-[#0D0D0D] shadow-[0_16px_40px_rgba(0,0,0,0.6)] transition-all duration-200 ${productDropdownOpen ? "max-h-[320px]" : "max-h-0 border-transparent"}`}
+                    className={`absolute left-0 right-0 top-[calc(100%+12px)] z-50 overflow-hidden rounded-xl border border-white/30 bg-gradient-to-br from-white/5 to-transparent transition-all duration-300 ${
+                      productDropdownOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+                    }`}
                   >
-                    <input
-                      ref={productSearchInputRef}
-                      type="text"
-                      value={profitSearch}
-                      onChange={(event) => setProfitSearch(event.target.value)}
-                      placeholder="Search products..."
-                      className="w-full border-b border-[#1A1A16] bg-white/5 px-4 py-3 text-[13px] text-[#F4F2EC] outline-none"
-                    />
-                    <div className="max-h-[260px] overflow-y-auto">
+                    <div className="p-4 border-b border-white/20">
+                      <input
+                        ref={productSearchInputRef}
+                        type="text"
+                        value={profitSearch}
+                        onChange={(event) => setProfitSearch(event.target.value)}
+                        placeholder="Search products..."
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300"
+                      />
+                    </div>
+                    <div className="max-h-[320px] overflow-y-auto">
                       {(filteredCalculatorProducts || []).length === 0 ? (
-                        <div className="px-4 py-6 text-sm text-[#6B6B5E]">No products found</div>
+                        <div className="px-6 py-8 text-center text-gray-400">
+                          No products found
+                        </div>
                       ) : (
                         (filteredCalculatorProducts || []).map((product) => (
                           <button
@@ -615,14 +681,23 @@ export default function Home() {
                               setSelectedProfitProductId(product.id);
                               setProductDropdownOpen(false);
                             }}
-                            className={`flex h-14 w-full items-center gap-3 border-b border-white/5 px-4 text-left transition last:border-b-0 ${selectedProfitProductId === product.id ? "border-l-2 border-l-[#C9A84C] bg-[#C9A84C]/10" : "hover:bg-[#C9A84C]/[0.06]"}`}
+                            className={`w-full flex items-center gap-4 px-6 py-4 border-b border-white/20 text-left transition-all duration-300 last:border-b-0 ${
+                              selectedProfitProductId === product.id 
+                                ? "bg-[#D4AF37]/20 border-l-4 border-l-[#D4AF37]" 
+                                : "hover:bg-white/10"
+                            }`}
                           >
-                            <img src={getPrimaryProductImage(product)} alt={product.name} className="h-9 w-9 rounded-md object-cover" loading="lazy" />
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-medium text-white">{product.name}</p>
-                              <p className="truncate text-[11px] text-[#6B6B5E]">{product.category || "General"}</p>
+                            <img 
+                              src={getPrimaryProductImage(product)} 
+                              alt={product.name} 
+                              className="w-12 h-12 rounded-xl object-cover" 
+                              loading="lazy" 
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-lg font-semibold text-white truncate">{product.name}</p>
+                              <p className="text-sm text-gray-400">{product.category || "General"}</p>
                             </div>
-                            <p className="text-sm font-bold text-[#C9A84C]">${Number(getPrice(product)).toFixed(2)}</p>
+                            <p className="text-lg font-bold text-[#D4AF37]">${Number(getPrice(product)).toFixed(2)}</p>
                           </button>
                         ))
                       )}
@@ -630,37 +705,64 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
-                    How many units?
-                  </label>
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-300 mb-3">Quantity</label>
                   <input
                     type="number"
                     min="1"
                     value={profitQuantity}
                     onChange={(event) => setProfitQuantity(Math.max(1, Number(event.target.value) || 1))}
-                    className="w-full rounded-xl border border-white/10 bg-[#0B1020] px-4 py-3 text-sm text-white"
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white text-lg placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300"
                   />
                 </div>
 
                 {profitResult?.product ? (
-                  <>
-                    <div className="mt-5 flex items-center gap-4 rounded-2xl border border-white/10 bg-[#0B1020] p-4">
-                      <img src={getPrimaryProductImage(profitResult.product)} alt={profitResult.product.name} className="h-16 w-16 rounded-2xl object-cover" loading="lazy" />
-                      <div className="min-w-0">
-                        <p className="truncate text-lg font-semibold text-white">{profitResult.product.name}</p>
-                        <p className="mt-1 text-sm text-[#D4AF37]">Based on KV Garage retail pricing: ${Number(profitResult.sell_price || 0).toFixed(2)}</p>
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6">
+                      <div className="flex items-center gap-6">
+                        <img 
+                          src={getPrimaryProductImage(profitResult.product)} 
+                          alt={profitResult.product.name} 
+                          className="w-20 h-20 rounded-xl object-cover" 
+                          loading="lazy" 
+                        />
+                        <div className="flex-1">
+                          <h4 className="text-2xl font-bold text-white mb-2">{profitResult.product.name}</h4>
+                          <p className="text-lg text-[#D4AF37]">
+                            Based on KV Garage retail pricing: ${Number(profitResult.sell_price || 0).toFixed(2)}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                      <Stat label="Sell Price / Unit" value={`$${Number(profitResult.sell_price || 0).toFixed(2)}`} />
-                      <Stat label="Total Revenue" value={`$${Number(profitResult.total_revenue || 0).toFixed(2)}`} />
-                      <Stat label="Estimated Profit" value={`$${Number(profitResult.estimated_total_profit || 0).toFixed(2)}`} />
-                      <Stat label="Profit Margin %" value={`${Number(profitResult.margin_percent || 0).toFixed(1)}%`} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6 text-center">
+                        <div className="text-2xl font-bold text-[#D4AF37] mb-2">${Number(profitResult.sell_price || 0).toFixed(2)}</div>
+                        <div className="text-sm text-gray-400">Sell Price / Unit</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6 text-center">
+                        <div className="text-2xl font-bold text-[#D4AF37] mb-2">${Number(profitResult.total_revenue || 0).toFixed(2)}</div>
+                        <div className="text-sm text-gray-400">Total Revenue</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6 text-center">
+                        <div className="text-2xl font-bold text-[#D4AF37] mb-2">${Number(profitResult.estimated_total_profit || 0).toFixed(2)}</div>
+                        <div className="text-sm text-gray-400">Estimated Profit</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6 text-center">
+                        <div className="text-2xl font-bold text-[#D4AF37] mb-2">{Number(profitResult.margin_percent || 0).toFixed(1)}%</div>
+                        <div className="text-sm text-gray-400">Profit Margin</div>
+                      </div>
                     </div>
 
-                    <div className="mt-5 rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/10 p-4 text-sm text-[#F8E8A6]">
+                    <div className={`rounded-xl p-6 text-center ${
+                      Number(profitResult.margin_percent || 0) > 60
+                        ? "bg-green-500/20 border border-green-500/40 text-green-300"
+                        : Number(profitResult.margin_percent || 0) >= 40
+                          ? "bg-blue-500/20 border border-blue-500/40 text-blue-300"
+                          : Number(profitResult.margin_percent || 0) >= 20
+                            ? "bg-yellow-500/20 border border-yellow-500/40 text-yellow-300"
+                            : "bg-red-500/20 border border-red-500/40 text-red-300"
+                    }`}>
                       {Number(profitResult.margin_percent || 0) > 60
                         ? "🔥 Exceptional margin — high profit potential"
                         : Number(profitResult.margin_percent || 0) >= 40
@@ -669,10 +771,10 @@ export default function Home() {
                             ? "Healthy margin — consistent at volume"
                             : "Thin margin — best at high volume"}
                     </div>
-                  </>
+                  </div>
                 ) : null}
 
-                <p className="mt-5 text-sm leading-relaxed text-[#94A3B8]">
+                <p className="text-gray-400 text-sm mt-6 leading-relaxed">
                   Based on avg KV Garage retail pricing. Many resellers achieve margins well above these estimates.
                 </p>
               </div>
@@ -681,36 +783,63 @@ export default function Home() {
         </section>
 
         {/* ================= SERVICES ================= */}
-        <section className="py-20 border-t border-[#1C2233]">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10">
+        <section className="py-24 border-t border-white/20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <p className="text-sm text-[#D4AF37] font-semibold uppercase tracking-[0.2em] mb-4">Complete Solutions</p>
+              <h2 className="text-5xl font-bold mb-8">Your Success Ecosystem</h2>
+              <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+                From mentorship to trading systems, we provide the complete infrastructure for building a profitable resale business
+              </p>
+            </div>
 
-            <ServiceCard title="Mentorship" link="/mentorship" img="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg"/>
-            <ServiceCard title="Trading" link="/trading" img="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3"/>
-            <ServiceCard title="We Build Your System" link="/deals" img="https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg"/>
-
+            <div className="grid md:grid-cols-3 gap-8">
+              <ServiceCard 
+                title="Business Mentorship" 
+                description="Work directly with KV Garage to develop your wholesale strategy, supply chain, and business systems. Structured mentorship for serious entrepreneurs." 
+                link="/mentorship" 
+                img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
+              />
+              <ServiceCard 
+                title="Trading Education" 
+                description="Learn how to trade inventory, maximize margins, and build a repeatable trading system. Practical education for resellers and entrepreneurs." 
+                link="/trading" 
+                img="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80"
+              />
+              <ServiceCard 
+                title="Build Your System" 
+                description="We build your complete supply chain system from the ground up. Inventory sourcing, supplier relationships, and operational infrastructure." 
+                link="/deals" 
+                img="https://images.unsplash.com/photo-3861969/pexels-photo-3861969.jpeg?auto=format&fit=crop&w=800&q=80"
+              />
+            </div>
           </div>
         </section>
 
         {/* ================= EMAIL POPUP ================= */}
         {emailPopupOpen && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white text-black rounded-2xl max-w-md w-full p-6 relative">
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+            <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl max-w-md w-full p-8 relative shadow-2xl">
               <button
                 onClick={() => setEmailPopupOpen(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-300 text-2xl"
               >
-                ✕
+                ×
               </button>
               
               <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#D4AF37] to-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <span className="text-2xl">📧</span>
+                </div>
                 <h3 className="text-2xl font-bold mb-2">Join Our Community</h3>
-                <p className="text-gray-600">Get exclusive updates, product drops, and wholesale opportunities.</p>
+                <p className="text-gray-300">Get exclusive updates, product drops, and wholesale opportunities.</p>
               </div>
 
               {emailSubmitted ? (
-                <div className="text-center py-4">
-                  <div className="text-green-600 mb-2">✓</div>
-                  <p className="text-sm text-gray-600">Thanks for subscribing!</p>
+                <div className="text-center py-6">
+                  <div className="text-6xl mb-4">✓</div>
+                  <h4 className="text-xl font-bold text-[#D4AF37] mb-2">You're In!</h4>
+                  <p className="text-gray-300">Thanks for subscribing! Check your inbox for our welcome email.</p>
                 </div>
               ) : (
                 <form onSubmit={handleEmailSubmit} className="space-y-4">
@@ -719,16 +848,16 @@ export default function Home() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Your email address"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#D4AF37]"
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300 text-lg"
                     required
                   />
                   <button
                     type="submit"
-                    className="w-full bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:opacity-90 transition"
+                    className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105"
                   >
-                    Subscribe
+                    Subscribe Now
                   </button>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-400 text-center">
                     We respect your privacy. Unsubscribe anytime.
                   </p>
                 </form>
@@ -744,20 +873,36 @@ export default function Home() {
 
 function Stat({label,value}) {
   return (
-    <div className="bg-[#111827] p-6 rounded-xl border border-[#1C2233]">
-      <p className="text-gray-400">{label}</p>
-      <h3>{value}</h3>
+    <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-6">
+      <p className="text-gray-400 mb-2">{label}</p>
+      <h3 className="text-2xl font-bold text-[#D4AF37]">{value}</h3>
     </div>
   );
 }
 
-function ServiceCard({title,link,img}) {
+function ServiceCard({title, description, link, img}) {
   return (
-    <Link href={link}>
-      <div className="relative group overflow-hidden rounded-2xl border border-[#1C2233] cursor-pointer">
-        <img src={img} className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition"/>
-        <div className="relative p-10">
-          <h3 className="text-xl">{title}</h3>
+    <Link href={link} className="group block">
+      <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl overflow-hidden hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
+        <div className="relative aspect-video overflow-hidden">
+          <img 
+            src={img} 
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+            alt={title}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        </div>
+        <div className="p-8">
+          <h3 className="text-2xl font-bold mb-4 group-hover:text-[#D4AF37] transition-colors duration-300">{title}</h3>
+          <p className="text-gray-300 leading-relaxed mb-6">{description}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-[#D4AF37] font-semibold">Learn More →</span>
+            <div className="w-8 h-8 bg-gradient-to-r from-[#D4AF37] to-yellow-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </Link>

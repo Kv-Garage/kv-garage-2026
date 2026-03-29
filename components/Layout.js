@@ -169,7 +169,7 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#05070D] text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white">
       {seo ? (
         <Head>
           <title>{seo.title}</title>
@@ -186,51 +186,64 @@ export default function Layout({ children }) {
       ) : null}
 
       {/* ================= HEADER ================= */}
-      <header className="w-full bg-[#05070D] border-b border-[#1C2233] sticky top-0 z-50">
-
+      <header className="w-full sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-br from-white/5 to-transparent border-b border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+        
         {/* TOP ROW */}
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-5 flex justify-between items-center">
-
+          
           {/* LOGO */}
-          <Link href="/" aria-label="Go to homepage" className="flex items-center gap-2.5 cursor-pointer">
-            <Image src="/logo/Kv%20garage%20icon.png" alt="" width={36} height={36} className="h-8 w-8 md:h-9 md:w-9 object-contain flex-shrink-0" priority={router.pathname === "/"} />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[15px] md:text-base font-semibold tracking-[0.08em] leading-none">
-                KV GARAGE
-              </span>
-              <span className="text-[10px] md:text-[11px] text-gray-500 font-normal tracking-[0.06em] uppercase">
-                Verified Supplies
-              </span>
+          <Link href="/" aria-label="Go to homepage" className="flex items-center gap-4 group cursor-pointer">
+            <div className="relative w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-yellow-500 rounded-2xl p-3 shadow-lg shadow-[#D4AF37]/30 group-hover:shadow-[#D4AF37]/50 transition-all duration-300 transform group-hover:scale-110">
+              <Image 
+                src="/logo/Kv%20garage%20icon.png" 
+                alt="KV Garage Logo" 
+                fill
+                className="object-contain"
+                priority={router.pathname === "/"} 
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-bold bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
+                  KV GARAGE
+                </span>
+                <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-2 py-1 rounded-full text-xs font-semibold">
+                  EST. 2022
+                </span>
+              </div>
+              <p className="text-sm text-gray-400 font-medium tracking-wide">
+                Verified Wholesale Supplier
+              </p>
             </div>
           </Link>
 
           {/* 🔥 RIGHT SIDE (AUTH + CART) */}
-          <div className="flex items-center gap-3">
-
+          <div className="flex items-center gap-4">
+            
             {/* AUTH */}
             {!user ? (
-              <>
+              <div className="flex items-center gap-3">
                 <Link href="/login">
-                  <span className="text-sm border px-3 py-2 rounded cursor-pointer hover:border-[#D4AF37] transition">
+                  <span className="text-sm border border-white/30 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 hover:border-[#D4AF37] transition-all duration-300">
                     Login
                   </span>
                 </Link>
 
                 <Link href="/signup">
-                  <span className="text-sm bg-[#D4AF37] text-black px-3 py-2 rounded cursor-pointer">
+                  <span className="text-sm bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
                     Sign Up
                   </span>
                 </Link>
-              </>
+              </div>
             ) : (
-              <>
-                <span className="text-xs text-gray-400 hidden md:block">
+              <div className="flex items-center gap-4">
+                <div className="text-xs text-gray-400 bg-white/5 border border-white/20 px-3 py-2 rounded-lg">
                   {user?.email}
-                </span>
+                </div>
 
                 {isAdmin && (
                   <Link href="/admin">
-                    <span className="text-xs border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#F3D46A] px-3 py-2 rounded cursor-pointer hover:bg-[#D4AF37]/15 transition">
+                    <span className="text-xs border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#F3D46A] px-3 py-2 rounded-lg hover:bg-[#D4AF37]/20 transition-all duration-300">
                       Admin Dashboard
                     </span>
                   </Link>
@@ -238,21 +251,29 @@ export default function Layout({ children }) {
 
                 <button
                   onClick={handleLogout}
-                  className="text-xs border px-3 py-2 rounded hover:border-red-500 transition"
+                  className="text-sm border border-red-500/30 bg-red-500/10 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-300"
                 >
                   Logout
                 </button>
-              </>
+              </div>
             )}
 
             {/* CART */}
             <Link href="/cart">
-              <div className="cursor-pointer bg-[#111827] hover:bg-[#1A2235] px-4 py-2 rounded-md text-sm flex items-center gap-2 transition">
-                <span>🛒</span>
-                <span>{itemCount}</span>
-                <span className="text-[#D4AF37]">
-                  ${totalPrice.toFixed(2)}
-                </span>
+              <div className="cursor-pointer bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-xl p-3 hover:border-[#D4AF37]/50 transition-all duration-300 group">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-8 h-8 bg-gradient-to-br from-[#D4AF37] to-yellow-500 rounded-xl p-2 group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                    </svg>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-gray-300">Cart</div>
+                    <div className="text-lg font-bold text-[#D4AF37]">
+                      {itemCount} • ${totalPrice.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
               </div>
             </Link>
 
@@ -261,20 +282,33 @@ export default function Layout({ children }) {
         </div>
 
         {/* NAV */}
-        <div className="w-full border-t border-[#1C2233]">
-          <div className="max-w-7xl mx-auto px-6 py-2.5 md:py-3 flex items-center justify-center overflow-x-auto">
-            <nav className="flex gap-6 md:gap-8 text-[13px] md:text-sm font-medium text-gray-400 whitespace-nowrap">
-              <NavLink href="/">Home</NavLink>
-              <NavLink href="/wholesale">Wholesale</NavLink>
-              <NavLink href="/shop">Retail</NavLink>
-              <NavLink href="/private-preview">Private Preview</NavLink>
-              <NavLink href="/mentorship">Mentorship</NavLink>
-              <NavLink href="/affiliate">Affiliate</NavLink>
-              <NavLink href="/trading">Trading</NavLink>
-              <NavLink href="/learn">Learn</NavLink>
-              <NavLink href="/deals">Deals</NavLink>
-              <NavLink href="/contact">Contact</NavLink>
-
+        <div className="w-full border-t border-white/20">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <nav className="flex flex-wrap gap-6 md:gap-8 justify-center text-sm font-medium">
+              {[
+                { name: "Home", href: "/" },
+                { name: "Wholesale", href: "/wholesale" },
+                { name: "Retail", href: "/shop" },
+                { name: "Private Preview", href: "/private-preview" },
+                { name: "Mentorship", href: "/mentorship" },
+                { name: "Affiliate", href: "/affiliate" },
+                { name: "Trading", href: "/trading" },
+                { name: "Learn", href: "/learn" },
+                { name: "Deals", href: "/deals" },
+                { name: "Contact", href: "/contact" },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                    router.pathname === item.href
+                      ? "bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black font-semibold shadow-lg shadow-[#D4AF37]/30"
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
             </nav>
           </div>
         </div>
@@ -287,180 +321,207 @@ export default function Layout({ children }) {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-[#05070D] border-t border-[#1C2233] pt-16 pb-10 mt-20">
-        <div className="border-t border-[#C9A84C]/30 bg-[#0D0D0D]">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[minmax(0,1fr)_440px]">
-            <div>
-              <p className="font-['DM_Mono'] text-[10px] uppercase tracking-[0.2em] text-[#C9A84C]">
-                Insider Access
-              </p>
-              <h3 className="mt-4 max-w-xl font-['Cormorant_Garamond'] text-4xl font-light leading-[1.05] text-[#F4F2EC] md:text-5xl">
-                Get Wholesale Drops,
-                <br />
-                Supplier Alerts &
-                <br />
-                <span className="italic text-[#C9A84C]">Exclusive Deals First.</span>
-              </h3>
-              <p className="mt-5 max-w-md font-['DM_Sans'] text-sm leading-7 text-[#8C8C82]">
-                Join thousands of entrepreneurs getting early access to verified inventory, wholesale pricing updates,
-                mentorship spots, and profit opportunities before anyone else.
-              </p>
-              <div className="mt-6 space-y-3 font-['DM_Sans'] text-sm text-[#F4F2EC]">
-                {[
-                  "Early access to new wholesale drops",
-                  "Exclusive mentorship enrollment windows",
-                  "Supplier alerts + margin tips",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <span className="text-[#C9A84C]">◆</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[4px] border border-[#C9A84C]/30 bg-[#121212] p-8 shadow-[0_0_40px_rgba(201,168,76,0.05)]">
-              {captureSuccess ? (
-                <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
-                  <p className="font-['Cormorant_Garamond'] text-4xl italic text-[#C9A84C]">✓ You&apos;re In.</p>
-                  <p className="mt-4 max-w-sm font-['DM_Sans'] text-sm leading-7 text-[#8C8C82]">
-                    Check your inbox. Your first insider drop is on its way.
-                  </p>
+      <footer className="border-t border-white/20 bg-gradient-to-br from-white/5 to-transparent">
+        
+        {/* Email Capture Section */}
+        <div className="bg-gradient-to-br from-[#D4AF37]/10 to-transparent border-t border-white/20">
+          <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold">INSIDER ACCESS</span>
+                  <span className="text-gray-400 text-sm">EST. 2022</span>
                 </div>
-              ) : (
-                <form onSubmit={submitEmailCapture}>
-                  <h4 className="font-['DM_Sans'] text-lg font-semibold text-white">
-                    You&apos;re One Step From the Inside Track.
-                  </h4>
-                  <p className="mt-2 font-['DM_Sans'] text-sm leading-6 text-[#8C8C82]">
-                    No spam. No noise. Just verified opportunities and real business intelligence.
-                  </p>
+                
+                <h3 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                  <span className="bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
+                    Get Wholesale Drops,
+                  </span>
+                  <br />
+                  <span className="text-gray-300">Supplier Alerts &</span>
+                  <br />
+                  <span className="text-[#D4AF37]">Exclusive Deals First</span>
+                </h3>
 
-                  <div className="mt-6 space-y-4">
-                    <input
-                      value={captureForm.firstName}
-                      onChange={(event) => setCaptureForm((prev) => ({ ...prev, firstName: event.target.value }))}
-                      placeholder="First Name"
-                      className="w-full rounded-[3px] border border-[#1A1A16] bg-white/5 px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]"
-                    />
-                    <input
-                      type="email"
-                      value={captureForm.email}
-                      onChange={(event) => setCaptureForm((prev) => ({ ...prev, email: event.target.value }))}
-                      placeholder="Email Address"
-                      className="w-full rounded-[3px] border border-[#1A1A16] bg-white/5 px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]"
-                    />
+                <p className="text-gray-300 text-lg mb-8 leading-relaxed max-w-2xl">
+                  Join thousands of entrepreneurs getting early access to verified inventory, wholesale pricing updates,
+                  mentorship spots, and profit opportunities before anyone else.
+                </p>
+
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-white/5 border border-white/20 rounded-xl p-6">
+                    <div className="text-3xl mb-4">📦</div>
+                    <h4 className="font-semibold mb-2">Early Access</h4>
+                    <p className="text-sm text-gray-400">New wholesale drops before they go public</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/20 rounded-xl p-6">
+                    <div className="text-3xl mb-4">📈</div>
+                    <h4 className="font-semibold mb-2">Exclusive Deals</h4>
+                    <p className="text-sm text-gray-400">Special pricing and volume discounts</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/20 rounded-xl p-6">
+                    <div className="text-3xl mb-4">🎯</div>
+                    <h4 className="font-semibold mb-2">Supplier Alerts</h4>
+                    <p className="text-sm text-gray-400">Margin tips and sourcing opportunities</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 shadow-xl">
+                {captureSuccess ? (
+                  <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
+                    <div className="text-8xl mb-6">✓</div>
+                    <h4 className="text-3xl font-bold text-[#D4AF37] mb-4">You're In!</h4>
+                    <p className="text-gray-300 text-lg max-w-md">
+                      Check your inbox. Your first insider drop is on its way.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={submitEmailCapture} className="space-y-6">
+                    <div>
+                      <h4 className="text-2xl font-bold mb-2">Join the Inside Track</h4>
+                      <p className="text-gray-400">No spam. No noise. Just verified opportunities and real business intelligence.</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input
+                        value={captureForm.firstName}
+                        onChange={(event) => setCaptureForm((prev) => ({ ...prev, firstName: event.target.value }))}
+                        placeholder="First Name"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300"
+                      />
+                      <input
+                        type="email"
+                        value={captureForm.email}
+                        onChange={(event) => setCaptureForm((prev) => ({ ...prev, email: event.target.value }))}
+                        placeholder="Email Address"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300"
+                      />
+                    </div>
+
                     <select
                       value={captureForm.interest}
                       onChange={(event) => setCaptureForm((prev) => ({ ...prev, interest: event.target.value }))}
-                      className="w-full rounded-[3px] border border-[#1A1A16] bg-white/5 px-4 py-3 font-['DM_Sans'] text-sm text-white outline-none transition focus:border-[#C9A84C]"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300"
                     >
                       {["Wholesale", "Retail Deals", "Mentorship", "All of the Above"].map((option) => (
-                        <option key={option} value={option} className="bg-[#121212]">
+                        <option key={option} value={option} className="bg-gradient-to-br from-white/5 to-transparent">
                           {option}
                         </option>
                       ))}
                     </select>
-                  </div>
 
-                  {captureError ? (
-                    <p className="mt-4 font-['DM_Sans'] text-sm text-rose-300">{captureError}</p>
-                  ) : null}
+                    {captureError && (
+                      <p className="text-red-400 text-sm">{captureError}</p>
+                    )}
 
-                  <button
-                    type="submit"
-                    disabled={captureLoading}
-                    className="mt-5 w-full rounded-[3px] bg-[#C9A84C] px-4 py-4 font-['DM_Sans'] text-sm font-semibold text-[#060606] transition hover:-translate-y-0.5 hover:bg-[#E8C96A] disabled:opacity-70"
-                  >
-                    {captureLoading ? "Submitting..." : "Get Insider Access →"}
-                  </button>
-                  <p className="mt-4 text-center font-['DM_Sans'] text-[11px] text-[#8C8C82]">
-                    Zero spam. Unsubscribe anytime. Your information is never sold or shared.
-                  </p>
-                </form>
-              )}
+                    <button
+                      type="submit"
+                      disabled={captureLoading}
+                      className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-8 py-4 rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {captureLoading ? "Submitting..." : "Get Insider Access →"}
+                    </button>
+                    
+                    <p className="text-xs text-gray-400 text-center">
+                      Zero spam. Unsubscribe anytime. Your information is never sold or shared.
+                    </p>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-10">
+        {/* Footer Content */}
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
 
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <Image src="/logo/Kv%20garage%20icon.png" alt="" width={32} height={32} className="h-8 w-8 object-contain opacity-80" loading="lazy" />
-              <h4 className="text-lg font-semibold text-[#D4AF37]">
-                KV GARAGE
-              </h4>
-            </Link>
+            <div className="lg:col-span-2">
+              <Link href="/" className="flex items-center gap-4 mb-6 group">
+                <div className="relative w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-yellow-500 rounded-2xl p-3 shadow-lg shadow-[#D4AF37]/30 group-hover:shadow-[#D4AF37]/50 transition-all duration-300 transform group-hover:scale-110">
+                  <Image src="/logo/Kv%20garage%20icon.png" alt="KV Garage Logo" fill className="object-contain" />
+                </div>
+                <div>
+                  <h4 className="text-2xl font-bold text-[#D4AF37] mb-1">KV GARAGE</h4>
+                  <p className="text-gray-400">Verified Wholesale Supplier</p>
+                </div>
+              </Link>
 
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Verified wholesale supplier access, retail inventory, dropshipping pathways, trade education, and business mentorship for operators building a stronger resale business.
-            </p>
+              <p className="text-gray-300 text-lg leading-relaxed max-w-md">
+                Verified wholesale supplier access, retail inventory, dropshipping pathways, trade education, and business mentorship for operators building a stronger resale business.
+              </p>
+
+              <div className="mt-8 flex gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#D4AF37]">15K+</div>
+                  <div className="text-sm text-gray-400">Active Members</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#D4AF37]">45+</div>
+                  <div className="text-sm text-gray-400">Countries</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#D4AF37]">2022</div>
+                  <div className="text-sm text-gray-400">Est. Year</div>
+                </div>
+              </div>
+            </div>
+
+            <FooterCol title="Core" links={[
+              { name: "Wholesale", href: "/wholesale" },
+              { name: "Retail", href: "/shop" },
+              { name: "Build System", href: "/deals" },
+            ]} />
+
+            <FooterCol title="Systems" links={[
+              { name: "Mentorship", href: "/mentorship" },
+              { name: "Trading", href: "/trading" },
+              { name: "Learn", href: "/learn" },
+            ]} />
+
+            <FooterCol title="Network" links={[
+              { name: "Affiliate", href: "/affiliate" },
+              { name: "Private Preview", href: "/private-preview" },
+            ]} />
+
           </div>
 
-          <FooterCol title="Core" links={[
-            { name: "Wholesale", href: "/wholesale" },
-            { name: "Retail", href: "/shop" },
-            { name: "Build System", href: "/deals" },
-          ]} />
-
-          <FooterCol title="Systems" links={[
-            { name: "Mentorship", href: "/mentorship" },
-            { name: "Trading", href: "/trading" },
-            { name: "Learn", href: "/learn" },
-          ]} />
-
-          <FooterCol title="Network" links={[
-            { name: "Affiliate", href: "/affiliate" },
-            { name: "Private Preview", href: "/private-preview" },
-          ]} />
-
-          <FooterCol title="Company" links={[
-            { name: "About", href: "/about" },
-            { name: "Contact", href: "/contact" },
-            { name: "Track Your Order", href: "/track-order" },
-            { name: "Privacy Policy", href: "/privacy-policy" },
-            { name: "Terms & Conditions", href: "/terms-and-conditions" },
-            { name: "Refund Policy", href: "/refund-policy" },
-            { name: "Shipping Policy", href: "/shipping-policy" },
-          ]} />
-
-        </div>
-
-        <div className="text-center text-gray-500 text-xs mt-12 space-y-2">
-          <p className="mx-auto max-w-3xl px-6 text-sm text-gray-400">
-            KV Garage helps buyers, resellers, and students source verified products, unlock wholesale supplier relationships, improve profit margins, and build repeatable systems around retail inventory and supply chain growth.
-          </p>
-          <p>kvgarage@kvgarage.com</p>
-          <p className="mt-4">
-            © 2026 KV Garage LLC. All rights reserved.
-          </p>
-          <p className="text-xs text-gray-400">
-            Grand Rapids, Michigan • United States
-          </p>
-          
-          {/* Small Map */}
-          <div className="mt-6 flex justify-center">
-            <div className="w-full max-w-md">
-              <div className="bg-gray-800 rounded-lg p-4">
-                <h4 className="text-sm font-semibold text-gray-300 mb-2">Our Location</h4>
-                <div className="w-full h-40 bg-gradient-to-br from-blue-900 to-green-800 rounded relative overflow-hidden">
-                  {/* Simple map representation */}
-                  <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full shadow-lg"></div>
-                  <div className="absolute top-8 left-12 w-2 h-2 bg-white rounded-full"></div>
-                  <div className="absolute top-16 left-8 w-2 h-2 bg-white rounded-full"></div>
-                  <div className="absolute bottom-8 right-8 w-2 h-2 bg-white rounded-full"></div>
-                  <div className="absolute bottom-4 left-16 w-2 h-2 bg-white rounded-full"></div>
-                  
-                  {/* State outline */}
-                  <div className="absolute inset-0 border-2 border-gray-600 rounded opacity-20"></div>
-                  
-                  {/* Label */}
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-xs text-white bg-black bg-opacity-50 px-2 py-1 rounded">
-                    Grand Rapids, MI
+          <div className="border-t border-white/20 mt-12 pt-10">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <p className="text-gray-300 text-lg max-w-3xl">
+                  KV Garage helps buyers, resellers, and students source verified products, unlock wholesale supplier relationships, improve profit margins, and build repeatable systems around retail inventory and supply chain growth.
+                </p>
+                <div className="mt-6 text-gray-400">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[#D4AF37]">✉️</span>
+                    <span>kvgarage@kvgarage.com</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#D4AF37]">📍</span>
+                    <span>Grand Rapids, Michigan • United States</span>
                   </div>
                 </div>
               </div>
+
+              <div className="space-y-4">
+                <h5 className="font-semibold text-lg">Quick Links</h5>
+                <div className="grid grid-cols-2 gap-2 text-gray-400">
+                  <Link href="/about" className="hover:text-white transition-colors duration-300">About</Link>
+                  <Link href="/contact" className="hover:text-white transition-colors duration-300">Contact</Link>
+                  <Link href="/track-order" className="hover:text-white transition-colors duration-300">Track Order</Link>
+                  <Link href="/privacy-policy" className="hover:text-white transition-colors duration-300">Privacy Policy</Link>
+                  <Link href="/terms-and-conditions" className="hover:text-white transition-colors duration-300">Terms</Link>
+                  <Link href="/refund-policy" className="hover:text-white transition-colors duration-300">Refund Policy</Link>
+                  <Link href="/shipping-policy" className="hover:text-white transition-colors duration-300">Shipping</Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-white/20 mt-10 pt-8 text-center text-gray-400">
+              <p className="text-lg font-semibold text-[#D4AF37] mb-2">Trusted by 15,000+ Operators Worldwide</p>
+              <p className="text-sm">© 2026 KV Garage LLC. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -482,11 +543,13 @@ function NavLink({ href, children }) {
 function FooterCol({ title, links }) {
   return (
     <div>
-      <h5 className="font-semibold mb-4">{title}</h5>
-      <ul className="space-y-2 text-sm text-gray-400">
+      <h5 className="font-semibold text-lg mb-6">{title}</h5>
+      <ul className="space-y-3 text-gray-400">
         {links.map((link, i) => (
           <li key={i}>
-            <Link href={link.href}>{link.name}</Link>
+            <Link href={link.href} className="hover:text-white transition-colors duration-300">
+              {link.name}
+            </Link>
           </li>
         ))}
       </ul>
