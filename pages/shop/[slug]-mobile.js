@@ -22,6 +22,19 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    const handleScroll = (e) => {
+      if (document.body.style.overflow === 'hidden') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    
+    document.addEventListener('touchmove', handleScroll, { passive: false });
+    return () => document.removeEventListener('touchmove', handleScroll);
+  }, []);
+
   useEffect(() => {
     if (slug) {
       const fetchProduct = async () => {
@@ -230,7 +243,7 @@ export default function ProductPage() {
       </div>
 
       {/* Sticky Bottom CTA */}
-      <div className="fixed bottom-20 left-4 right-4">
+      <div className="fixed bottom-20 left-4 right-4 z-50">
         <button
           onClick={handleAddToCart}
           disabled={isInCart}
