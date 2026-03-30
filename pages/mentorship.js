@@ -417,6 +417,18 @@ export default function MentorshipPage() {
                   Structured mentorship for serious entrepreneurs who are ready to build real, scalable revenue.
                 </p>
 
+                <div className="my-8 text-center">
+                  <a 
+                    href="https://midnight-architect.emergent.host/join?ref=146DA53E&dept=sales_rep" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    aria-label="Apply to Become a Mentor and Earn"
+                    className="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-colors duration-300"
+                  >
+                    Apply to Make Money
+                  </a>
+                </div>
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
                   {PROGRAM_STATS.map((stat, index) => (
                     <div key={index} className="bg-gradient-to-br from-blue-900/20 to-transparent border border-blue-500/30 p-6 rounded-xl">

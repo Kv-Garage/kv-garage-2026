@@ -1,510 +1,378 @@
-import { useEffect, useMemo, useState } from "react";
-import { notFound } from "next/navigation";
-import AdminGuard from "../../components/AdminGuard";
-import AdminLayout from "../layout";
-import { supabase } from "../../lib/supabase";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-  AdminEmptyState,
-  AdminErrorState,
-  AdminLoadingState,
-  AdminMetricCard,
-  AdminPageShell,
-  AdminTableCard,
-} from "../../components/admin/AdminPageShell";
-import { AdminSectionHeader, AdminStatGrid } from "../../components/admin/AdminPrimitives";
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Button } from '../../components/ui/button';
+import { 
+  Users, 
+  ShoppingCart, 
+  Eye, 
+  TrendingUp, 
+  Activity, 
+  RefreshCw,
+  Mail,
+  DollarSign,
+  Clock
+} from 'lucide-react';
 
-function groupRecordsBy(records, key, mode = "day") {
-  const grouped = {};
-
-  records.forEach((record) => {
-    const value = record?.[key];
-    if (!value) return;
-
-    const date = new Date(value);
-    const label =
-      mode === "week"
-        ? `${date.getFullYear()}-W${Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7)}`
-        : date.toISOString().slice(0, 10);
-
-    grouped[label] = (grouped[label] || 0) + Number(record.total || 1);
+export default function AnalyticsPage() {
+  const [analytics, setAnalytics] = useState({
+    totalVisitors: 0,
+    activeVisitors: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    emailSubscriptions: 0,
+    viewedProducts: 0,
+    addedToCart: 0
   });
+  const [recentEvents, setRecentEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [liveMode, setLiveMode] = useState(true);
 
-  return Object.entries(grouped).map(([label, value]) => ({ label, value }));
-}
+  // Fetch analytics data
+  const fetchAnalytics = async () => {
+    try {
+      const { data: events, error } = await supabase
+        .from('traffic_events')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(1000);
 
-function SimpleLineChart({ data }) {
-  if (!data.length) return <p className="text-sm text-[#94A3B8]">No chart data available.</p>;
+      if (error) throw error;
 
-  const maxValue = Math.max(...data.map((point) => point.value), 1);
-  const points = data
-    .map((point, index) => {
-      const x = data.length === 1 ? 0 : (index / (data.length - 1)) * 100;
-      const y = 100 - (point.value / maxValue) * 100;
-      return `${x},${y}`;
-    })
-    .join(" ");
+      // Calculate metrics
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+      
+      const activeVisitors = events.filter(e => 
+        e.event_type === 'Active on Site' && 
+        new Date(e.timestamp) > oneHourAgo
+      ).length;
 
-  return (
-    <svg viewBox="0 0 100 100" className="h-52 w-full overflow-visible">
-      <polyline
-        fill="none"
-        stroke="#D4AF37"
-        strokeWidth="2.5"
-        points={points}
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
-}
+      const totalVisitors = new Set(events.map(e => e.profile_data?.email || e.profile_data?.id)).size;
+      const totalOrders = events.filter(e => e.event_type === 'Placed Order').length;
+      const emailSubscriptions = events.filter(e => e.event_type === 'Subscribed to Email').length;
+      const viewedProducts = events.filter(e => e.event_type === 'Viewed Product').length;
+      const addedToCart = events.filter(e => e.event_type === 'Added to Cart').length;
 
-function SimpleBarChart({ data }) {
-  if (!data.length) return <p className="text-sm text-[#94A3B8]">No chart data available.</p>;
+      const totalRevenue = events
+        .filter(e => e.event_type === 'Placed Order')
+        .reduce((sum, e) => sum + (e.properties?.value || 0), 0);
 
-  const maxValue = Math.max(...data.map((point) => point.value), 1);
-  const barWidth = 100 / Math.max(data.length, 1);
+      setAnalytics({
+        totalVisitors,
+        activeVisitors,
+        totalOrders,
+        totalRevenue,
+        emailSubscriptions,
+        viewedProducts,
+        addedToCart
+      });
 
-  return (
-    <svg viewBox="0 0 100 100" className="h-52 w-full overflow-visible">
-      {data.map((point, index) => {
-        const height = (point.value / maxValue) * 100;
-        const x = index * barWidth + 2;
-        const width = Math.max(barWidth - 4, 2);
+      // Get recent events
+      setRecentEvents(events.slice(0, 20));
+    } catch (error) {
+      console.error('Analytics fetch error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        return (
-          <rect
-            key={point.label}
-            x={x}
-            y={100 - height}
-            width={width}
-            height={height}
-            rx="2"
-            fill="#D4AF37"
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
-export const dynamic = 'force-dynamic';
-
-export default function AdminAnalyticsPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [grouping, setGrouping] = useState("day");
-  const [metrics, setMetrics] = useState(null);
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [studentSpend, setStudentSpend] = useState([]);
-  const [studentCategory, setStudentCategory] = useState("all");
-  const [studentDateFrom, setStudentDateFrom] = useState("");
-  const [studentDateTo, setStudentDateTo] = useState("");
-  const [totalOrdersCount, setTotalOrdersCount] = useState(0);
-  const page = Math.max(1, Number(searchParams?.get('page')) || 1);
-  const pageSize = 20;
-
+  // Real-time updates
   useEffect(() => {
-    const loadAnalytics = async () => {
-      try {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize - 1;
+    fetchAnalytics();
 
-        const [
-          { data: orders, error: ordersError },
-          { data: customers, error: customersError },
-          { data: trafficEvents, error: trafficError },
-          { data: pagedOrders, error: pagedOrdersError, count },
-          { data: studentSpendRows, error: studentSpendError },
-          { data: profiles, error: profilesError },
-        ] = await Promise.all([
-          supabase.from("orders").select("id,order_number,customer_email,total,status,created_at,user_id"),
-          supabase.from("orders").select("user_id"),
-          supabase
-            .from("traffic_events")
-            .select("page,event_type,timestamp")
-            .gte("timestamp", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-          supabase
-            .from("orders")
-            .select("order_number,customer_email,total,status,created_at", { count: "exact" })
-            .order("created_at", { ascending: false })
-            .range(from, to),
-          supabase.from("student_spend").select("user_id,amount,category,created_at,order_id"),
-          supabase.from("profiles").select("id,email,full_name"),
-        ]);
+    if (liveMode) {
+      const interval = setInterval(fetchAnalytics, 5000); // Update every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [liveMode]);
 
-        if (ordersError || customersError || trafficError || pagedOrdersError || studentSpendError || profilesError) {
-          throw ordersError || customersError || trafficError || pagedOrdersError || studentSpendError || profilesError;
+  // Subscribe to real-time changes
+  useEffect(() => {
+    if (!liveMode) return;
+
+    const channel = supabase
+      .channel('traffic_events')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'traffic_events'
+        },
+        (payload) => {
+          console.log('New event:', payload);
+          fetchAnalytics(); // Refresh data when new events come in
         }
+      )
+      .subscribe();
 
-        const uniqueCustomers = new Set(
-          (customers || []).map((order) => order.user_id).filter(Boolean)
-        ).size;
-
-        const pageViews = (trafficEvents || []).filter((event) => event.event_type === "page_view");
-        const productViews = (trafficEvents || []).filter((event) => event.event_type === "product_view");
-        const conversions = (trafficEvents || []).filter((event) => event.event_type === "conversion");
-
-        const topPages = Object.entries(
-          pageViews.reduce((accumulator, event) => {
-            accumulator[event.page] = (accumulator[event.page] || 0) + 1;
-            return accumulator;
-          }, {})
-        )
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5);
-
-        const topProducts = Object.entries(
-          productViews.reduce((accumulator, event) => {
-            accumulator[event.page] = (accumulator[event.page] || 0) + 1;
-            return accumulator;
-          }, {})
-        )
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5);
-
-        setMetrics({
-          totalRevenue: (orders || []).reduce((sum, order) => sum + Number(order.total || 0), 0),
-          totalOrders: orders?.length || 0,
-          totalCustomers: uniqueCustomers,
-          revenuePoints: groupRecordsBy(orders || [], "created_at", grouping),
-          orderPoints: groupRecordsBy(
-            (orders || []).map((order) => ({ ...order, total: 1 })),
-            "created_at",
-            grouping
-          ),
-          totalPageViews30d: pageViews.length,
-          totalConversions30d: conversions.length,
-          topPages,
-          topProducts,
-        });
-
-        setRecentOrders(pagedOrders || []);
-        setTotalOrdersCount(count || 0);
-
-        const profileMap = new Map((profiles || []).map((profile) => [profile.id, profile]));
-        const groupedStudentSpend = Object.values(
-          (studentSpendRows || []).reduce((accumulator, row) => {
-            const key = row.user_id || row.order_id || `unknown-${Math.random()}`;
-            const existing =
-              accumulator[key] ||
-              {
-                user_id: row.user_id,
-                total_spent: 0,
-                orders: 0,
-                categorySet: new Set(),
-                latest_created_at: row.created_at,
-                profile: profileMap.get(row.user_id) || null,
-              };
-
-            existing.total_spent += Number(row.amount || 0);
-            existing.orders += 1;
-            if (row.category) existing.categorySet.add(row.category);
-            if (!existing.latest_created_at || new Date(row.created_at) > new Date(existing.latest_created_at)) {
-              existing.latest_created_at = row.created_at;
-            }
-
-            accumulator[key] = existing;
-            return accumulator;
-          }, {})
-        ).map((row) => ({
-          ...row,
-          categories: Array.from(row.categorySet || []),
-          currentTier:
-            row.orders >= 10
-              ? "Platinum"
-              : row.orders >= 5
-                ? "Gold"
-                : row.orders >= 3
-                  ? "Silver"
-                  : row.total_spent >= 500
-                    ? "Gold"
-                    : "Bronze",
-          effectiveDiscount:
-            row.orders >= 10
-              ? 15
-              : row.orders >= 5
-                ? 10
-                : row.total_spent >= 500
-                  ? 12
-                  : row.orders >= 3
-                    ? 5
-                    : 0,
-        }));
-
-        setStudentSpend(groupedStudentSpend);
-      } catch (loadError) {
-        console.error(loadError);
-        setError("Could not load analytics.");
-      } finally {
-        setLoading(false);
-      }
+    return () => {
+      supabase.removeChannel(channel);
     };
+  }, [liveMode]);
 
-    loadAnalytics();
-  }, [grouping, page]);
-
-  const totalPages = Math.max(1, Math.ceil(totalOrdersCount / pageSize));
-
-  const goToPage = (nextPage) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', nextPage.toString());
-    router.push(`${router.pathname}?${params.toString()}`);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
   };
 
-  const topPages = useMemo(() => metrics?.topPages || [], [metrics]);
-  const topProducts = useMemo(() => metrics?.topProducts || [], [metrics]);
-  const spendCategories = useMemo(
-    () =>
-      Array.from(
-        new Set(studentSpend.flatMap((row) => row.categories || []).filter(Boolean))
-      ).sort(),
-    [studentSpend]
-  );
-  const filteredStudentSpend = useMemo(
-    () =>
-      studentSpend.filter((row) => {
-        const matchesCategory =
-          studentCategory === "all" || (row.categories || []).includes(studentCategory);
-        const matchesStart =
-          !studentDateFrom || new Date(row.latest_created_at) >= new Date(studentDateFrom);
-        const matchesEnd =
-          !studentDateTo || new Date(row.latest_created_at) <= new Date(`${studentDateTo}T23:59:59`);
-        return matchesCategory && matchesStart && matchesEnd;
-      }),
-    [studentSpend, studentCategory, studentDateFrom, studentDateTo]
-  );
-
-  const exportStudentSpend = () => {
-    const rows = filteredStudentSpend.map((row) => ({
-      name: row.profile?.full_name || "",
-      email: row.profile?.email || "",
-      total_spent: Number(row.total_spent || 0).toFixed(2),
-      orders: row.orders,
-      categories: (row.categories || []).join(", "),
-      latest_created_at: row.latest_created_at || "",
-    }));
-
-    const header = Object.keys(rows[0] || {
-      name: "",
-      email: "",
-      total_spent: "",
-      orders: "",
-      categories: "",
-      latest_created_at: "",
-    });
-    const csv = [
-      header.join(","),
-      ...rows.map((row) =>
-        header
-          .map((key) => `"${String(row[key] ?? "").replace(/"/g, '""')}"`)
-          .join(",")
-      ),
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "student-spend.csv";
-    link.click();
-    URL.revokeObjectURL(url);
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleString();
   };
 
-  return (
-    <AdminGuard>
-      <AdminLayout title="Analytics" description="Commerce, traffic, and order performance from Supabase.">
-        <AdminPageShell
-          eyebrow="Insights"
-          title="Analytics"
-          description="Revenue, orders, customers, traffic, and recent order activity grouped directly from production data."
-          actions={
-            <div className="flex gap-2">
-              {["day", "week"].map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setGrouping(mode)}
-                  className={`rounded-lg px-3 py-2 text-sm ${
-                    grouping === mode ? "bg-[#D4AF37] text-black" : "bg-white/5 text-white"
-                  }`}
-                >
-                  {mode === "day" ? "By Day" : "By Week"}
-                </button>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white">
+        <div className="container mx-auto px-6 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-white/20 rounded mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-32 bg-white/20 rounded-xl"></div>
               ))}
             </div>
-          }
-        >
-          {error ? <AdminErrorState message={error} /> : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-          {loading ? (
-            <AdminLoadingState label="Loading analytics..." />
-          ) : !metrics ? (
-            <AdminEmptyState title="No analytics available" description="Analytics will appear once orders and traffic events exist." />
-          ) : (
-            <>
-              <AdminStatGrid columns="xl:grid-cols-5">
-                <AdminMetricCard label="Total Revenue" value={`$${metrics.totalRevenue.toFixed(2)}`} hint="Sum of orders.total" />
-                <AdminMetricCard label="Total Orders" value={metrics.totalOrders} hint="All order records" />
-                <AdminMetricCard label="Total Customers" value={metrics.totalCustomers} hint="Distinct order user_ids" />
-                <AdminMetricCard label="Page Views (30d)" value={metrics.totalPageViews30d} hint="Traffic events in last 30 days" />
-                <AdminMetricCard label="Conversions (30d)" value={metrics.totalConversions30d} hint="Tracked checkout success events" />
-              </AdminStatGrid>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white">
+      {/* Header */}
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
+              Live Analytics Dashboard
+            </h1>
+            <p className="text-gray-400 mt-2">Real-time tracking of website events and conversions</p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => setLiveMode(!liveMode)}
+              className={`flex items-center gap-2 ${
+                liveMode 
+                  ? 'bg-green-500/20 border border-green-500/40 text-green-300 hover:bg-green-500/30' 
+                  : 'bg-gray-500/20 border border-gray-500/40 text-gray-300 hover:bg-gray-500/30'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+              {liveMode ? 'Live Mode' : 'Paused'}
+            </Button>
+            
+            <Button
+              onClick={fetchAnalytics}
+              className="bg-[#D4AF37] text-black hover:bg-[#D4AF37]/90"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
+        </div>
 
-              <div className="grid gap-6 xl:grid-cols-2">
-                <AdminTableCard>
-                  <AdminSectionHeader title="Revenue over time" />
-                  <div className="p-6">
-                    <SimpleLineChart data={metrics.revenuePoints} />
-                  </div>
-                </AdminTableCard>
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Visitors */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Total Visitors</CardTitle>
+              <Users className="h-4 w-4 text-[#D4AF37]" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.totalVisitors.toLocaleString()}</div>
+              <p className="text-xs text-gray-400">All time unique visitors</p>
+            </CardContent>
+          </Card>
 
-                <AdminTableCard>
-                  <AdminSectionHeader title="Orders over time" />
-                  <div className="p-6">
-                    <SimpleBarChart data={metrics.orderPoints} />
-                  </div>
-                </AdminTableCard>
+          {/* Active Visitors */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Active Now</CardTitle>
+              <Activity className="h-4 w-4 text-green-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-400">{analytics.activeVisitors}</div>
+              <p className="text-xs text-gray-400">Last 60 minutes</p>
+            </CardContent>
+          </Card>
+
+          {/* Total Orders */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Total Orders</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-blue-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-400">{analytics.totalOrders}</div>
+              <p className="text-xs text-gray-400">All time orders</p>
+            </CardContent>
+          </Card>
+
+          {/* Total Revenue */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-green-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-400">{formatCurrency(analytics.totalRevenue)}</div>
+              <p className="text-xs text-gray-400">All time revenue</p>
+            </CardContent>
+          </Card>
+
+          {/* Email Subscriptions */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Email Subs</CardTitle>
+              <Mail className="h-4 w-4 text-purple-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-400">{analytics.emailSubscriptions}</div>
+              <p className="text-xs text-gray-400">Newsletter subscribers</p>
+            </CardContent>
+          </Card>
+
+          {/* Product Views */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Product Views</CardTitle>
+              <Eye className="h-4 w-4 text-yellow-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-400">{analytics.viewedProducts}</div>
+              <p className="text-xs text-gray-400">Total product views</p>
+            </CardContent>
+          </Card>
+
+          {/* Add to Cart */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Add to Cart</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-orange-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-400">{analytics.addedToCart}</div>
+              <p className="text-xs text-gray-400">Items added to cart</p>
+            </CardContent>
+          </Card>
+
+          {/* Conversion Rate */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-400">Conversion Rate</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-400">
+                {analytics.totalVisitors > 0 
+                  ? ((analytics.totalOrders / analytics.totalVisitors) * 100).toFixed(2) 
+                  : '0.00'}%
               </div>
+              <p className="text-xs text-gray-400">Orders / Visitors</p>
+            </CardContent>
+          </Card>
+        </div>
 
-              <div className="grid gap-6 xl:grid-cols-2">
-                <AdminTableCard>
-                  <AdminSectionHeader title="Top Pages (30d)" />
-                  <div className="space-y-3 p-6">
-                    {topPages.map(([pageName, count]) => (
-                      <div key={pageName} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                        <span>{pageName}</span>
-                        <span className="font-semibold text-white">{count}</span>
+        {/* Recent Events */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-[#D4AF37]" />
+                Recent Events
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentEvents.slice(0, 15).map((event, index) => (
+                  <div key={event.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/20">
+                    <div className="flex items-center gap-3">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs px-2 py-1 ${
+                          event.event_type === 'Active on Site' ? 'bg-blue-500/20 text-blue-300' :
+                          event.event_type === 'Viewed Product' ? 'bg-yellow-500/20 text-yellow-300' :
+                          event.event_type === 'Added to Cart' ? 'bg-orange-500/20 text-orange-300' :
+                          event.event_type === 'Placed Order' ? 'bg-green-500/20 text-green-300' :
+                          event.event_type === 'Subscribed to Email' ? 'bg-purple-500/20 text-purple-300' :
+                          'bg-gray-500/20 text-gray-300'
+                        }`}
+                      >
+                        {event.event_type}
+                      </Badge>
+                      <div>
+                        <p className="font-medium text-white">{event.properties?.ProductName || event.properties?.email || 'N/A'}</p>
+                        <p className="text-xs text-gray-400">{formatTime(event.timestamp)}</p>
                       </div>
-                    ))}
-                  </div>
-                </AdminTableCard>
-
-                <AdminTableCard>
-                  <AdminSectionHeader title="Top Products (30d)" />
-                  <div className="space-y-3 p-6">
-                    {topProducts.map(([pageName, count]) => (
-                      <div key={pageName} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                        <span>{pageName}</span>
-                        <span className="font-semibold text-white">{count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </AdminTableCard>
-              </div>
-
-              <AdminTableCard>
-                <AdminSectionHeader
-                  title="Student Spend"
-                  description="Admin-only reporting for student account purchase volume by user, category, and date range."
-                />
-                <div className="flex flex-wrap gap-3 border-b border-white/10 px-6 py-4">
-                  <select
-                    value={studentCategory}
-                    onChange={(event) => setStudentCategory(event.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  >
-                    <option value="all">All Categories</option>
-                    {spendCategories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="date"
-                    value={studentDateFrom}
-                    onChange={(event) => setStudentDateFrom(event.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  />
-                  <input
-                    type="date"
-                    value={studentDateTo}
-                    onChange={(event) => setStudentDateTo(event.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
-                  />
-                  <button
-                    onClick={exportStudentSpend}
-                    className="rounded-lg bg-[#D4AF37] px-3 py-2 text-sm font-semibold text-black"
-                  >
-                    Export CSV
-                  </button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-white/[0.02] text-left text-[#94A3B8]">
-                      <tr>
-                        <th className="px-6 py-4 font-medium">Student</th>
-                        <th className="px-6 py-4 font-medium">Total Spent</th>
-                        <th className="px-6 py-4 font-medium">Orders</th>
-                        <th className="px-6 py-4 font-medium">Categories</th>
-                        <th className="px-6 py-4 font-medium">Tier</th>
-                        <th className="px-6 py-4 font-medium">Last Order</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredStudentSpend.map((row) => (
-                        <tr key={row.user_id || row.latest_created_at} className="border-t border-white/5">
-                          <td className="px-6 py-4">
-                            <div className="font-medium text-white">{row.profile?.full_name || "Student Account"}</div>
-                            <div className="mt-1 text-xs text-[#64748B]">{row.profile?.email || "No email"}</div>
-                          </td>
-                          <td className="px-6 py-4 text-white">${Number(row.total_spent || 0).toFixed(2)}</td>
-                          <td className="px-6 py-4">{row.orders}</td>
-                          <td className="px-6 py-4">{(row.categories || []).join(", ") || "general"}</td>
-                          <td className="px-6 py-4">{row.currentTier} ({row.effectiveDiscount}% off)</td>
-                          <td className="px-6 py-4">{row.latest_created_at ? new Date(row.latest_created_at).toLocaleDateString() : "N/A"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </AdminTableCard>
-
-              <AdminTableCard>
-                <AdminSectionHeader title="Recent orders" description="Latest paid orders, paginated at 20 rows per page." />
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm text-[#CBD5E1]">
-                    <thead className="bg-white/5 text-xs uppercase tracking-[0.2em] text-[#94A3B8]">
-                      <tr>
-                        {["Order Number", "Customer Email", "Total", "Status", "Created"].map((column) => (
-                          <th key={column} className="px-6 py-4 font-medium">{column}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentOrders.map((order) => (
-                        <tr key={`${order.order_number}-${order.created_at}`} className="border-t border-white/5">
-                          <td className="px-6 py-4 text-white">{order.order_number || "-"}</td>
-                          <td className="px-6 py-4">{order.customer_email || "-"}</td>
-                          <td className="px-6 py-4">${Number(order.total || 0).toFixed(2)}</td>
-                          <td className="px-6 py-4 capitalize">{order.status || "pending"}</td>
-                          <td className="px-6 py-4 text-[#94A3B8]">
-                            {order.created_at ? new Date(order.created_at).toLocaleString() : "-"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {totalPages > 1 ? (
-                  <div className="flex items-center justify-between border-t border-white/10 px-6 py-4 text-sm text-[#94A3B8]">
-                    <span>Page {page} of {totalPages}</span>
-                    <div className="flex gap-2">
-                      <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1} className="rounded-lg border border-white/10 px-3 py-1.5 disabled:opacity-40">
-                        Previous
-                      </button>
-                      <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="rounded-lg border border-white/10 px-3 py-1.5 disabled:opacity-40">
-                        Next
-                      </button>
                     </div>
+                    {event.properties?.value && (
+                      <span className="text-green-400 font-bold">
+                        {formatCurrency(event.properties.value)}
+                      </span>
+                    )}
                   </div>
-                ) : null}
-              </AdminTableCard>
-            </>
-          )}
-        </AdminPageShell>
-      </AdminLayout>
-    </AdminGuard>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Event Summary */}
+          <Card className="bg-gradient-to-br from-white/5 to-transparent border border-white/20">
+            <CardHeader>
+              <CardTitle>Event Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Active on Site</span>
+                  <span className="font-bold text-blue-400">
+                    {recentEvents.filter(e => e.event_type === 'Active on Site').length}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Viewed Product</span>
+                  <span className="font-bold text-yellow-400">
+                    {recentEvents.filter(e => e.event_type === 'Viewed Product').length}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Added to Cart</span>
+                  <span className="font-bold text-orange-400">
+                    {recentEvents.filter(e => e.event_type === 'Added to Cart').length}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Placed Order</span>
+                  <span className="font-bold text-green-400">
+                    {recentEvents.filter(e => e.event_type === 'Placed Order').length}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Subscribed to Email</span>
+                  <span className="font-bold text-purple-400">
+                    {recentEvents.filter(e => e.event_type === 'Subscribed to Email').length}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t border-white/20">
+                <p className="text-sm text-gray-400">
+                  Last updated: {formatTime(new Date())}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Events tracked: {recentEvents.length}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }

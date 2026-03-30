@@ -52,7 +52,10 @@ export default function AdminLayout({
   }, []);
 
   useEffect(() => {
-    setMobileMenuOpen(false);
+    // Only close mobile menu on larger screens, keep it open on mobile for better UX
+    if (window.innerWidth >= 1024) {
+      setMobileMenuOpen(false);
+    }
   }, [router.pathname]);
 
   const renderPrimaryLinks = () =>

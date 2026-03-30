@@ -243,6 +243,12 @@ export default function Home() {
       setEmailSubmitted(true);
       setEmail('');
       
+      // Track email subscription event
+      trackKlaviyoEvent('Subscribed to Email', {
+        email: email,
+        source: 'homepage_popup'
+      });
+
       // Close popup after 3 seconds
       setTimeout(() => {
         setEmailPopupOpen(false);
@@ -254,6 +260,65 @@ export default function Home() {
       alert('Failed to subscribe. Please try again.');
     }
   };
+
+  // Klaviyo tracking functions
+  const trackKlaviyoEvent = (eventName, properties = {}) => {
+    if (typeof window !== 'undefined' && window.klaviyo) {
+      try {
+        window.klaviyo.track(eventName, properties);
+        console.log(`Klaviyo event tracked: ${eventName}`, properties);
+      } catch (error) {
+        console.error('Klaviyo tracking error:', error);
+      }
+    }
+  };
+
+  const trackViewedProduct = (product) => {
+    if (product) {
+      const productData = {
+        ProductName: product.name,
+        ProductID: product.id,
+        SKU: product.sku || product.id,
+        Categories: [product.category || 'General'],
+        ImageURL: getPrimaryProductImage(product),
+        URL: `/shop/${product.slug || product.id}`,
+        Brand: product.brand || 'KV Garage',
+        Price: getPrice(product),
+        CompareAtPrice: product.compare_at_price || null
+      };
+
+      trackKlaviyoEvent('Viewed Product', productData);
+      
+      // Track recently viewed items
+      if (typeof window !== 'undefined' && window.klaviyo) {
+        window.klaviyo.trackViewedItem({
+          Title: product.name,
+          ItemId: product.id,
+          Categories: [product.category || 'General'],
+          ImageUrl: getPrimaryProductImage(product),
+          Url: `/shop/${product.slug || product.id}`,
+          Metadata: {
+            Brand: product.brand || 'KV Garage',
+            Price: getPrice(product),
+            CompareAtPrice: product.compare_at_price || null
+          }
+        });
+      }
+    }
+  };
+
+  const trackActiveOnSite = () => {
+    trackKlaviyoEvent('Active on Site', {
+      page_url: window.location.href,
+      page_title: document.title,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  // Track page view when component mounts
+  useEffect(() => {
+    trackActiveOnSite();
+  }, []);
 
   return (
     <>
@@ -332,41 +397,8 @@ export default function Home() {
                 Build your supply chain with verified products and institutional-grade support.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/wholesale">
-                  <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
-                    Enter Wholesale
-                  </button>
-                </Link>
-
-                <Link href="/shop">
-                  <button className="border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                    Shop Retail
-                  </button>
-                </Link>
-              </div>
-
-              {/* 🔥 TRUST INDICATORS */}
-              <div className="grid grid-cols-3 gap-6 pt-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">7,800+</div>
-                  <div className="text-sm text-gray-400">Verified Customers</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">30+</div>
-                  <div className="text-sm text-gray-400">Global Markets</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">2022</div>
-                  <div className="text-sm text-gray-400">Est. Year</div>
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT */}
-            <div className="space-y-6">
-              {/* 🔥 TOP PICKS */}
-              <div className="grid grid-cols-2 gap-6">
+              {/* 🔥 TOP PICKS - MOVED TO TOP */}
+              <div className="grid grid-cols-2 gap-6 mb-8">
                 {(topPicks.slice(0, 2).length > 0 ? topPicks.slice(0, 2) : products.slice(0, 2)).map((p, i) => (
                   <Link key={i} href={`/shop/${p.slug}`}>
                     <div className="group bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
@@ -388,8 +420,8 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* 🔥 WHOLESALE BLOCK */}
-              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8">
+              {/* 🔥 WHOLESALE MODEL - MOVED TO TOP */}
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 mb-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
                   <h3 className="text-2xl font-bold text-[#D4AF37]">Wholesale Supply Model</h3>
@@ -431,8 +463,109 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/wholesale">
+                  <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
+                    Enter Wholesale
+                  </button>
+                </Link>
+
+                <Link href="/shop">
+                  <button className="border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-black transition-all duration-300">
+                    Shop Retail
+                  </button>
+                </Link>
+              </div>
             </div>
 
+            {/* RIGHT */}
+            <div className="space-y-6">
+              {/* 🔥 PARTNER & INVEST - FULL WIDTH HORIZONTAL SECTION */}
+              <section className="col-span-full bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="p-8">
+                  <h2 className="text-3xl lg:text-5xl font-bold mb-8 text-center text-[#D4AF37] border-b border-white/20 pb-6">
+                    Partner & Invest – Dominate Your Financial Future
+                  </h2>
+                  <div className="grid lg:grid-cols-2 gap-8">
+                    {/* LEFT: VALUE PROPOSITION */}
+                    <div className="space-y-6">
+                      <p className="text-lg text-gray-300 leading-relaxed">
+                        Join KV Garage and IP Value Managements for elite investment opportunities and mentorship partnerships. Grow wealth, sell strategies, and become a top-performing partner.
+                      </p>
+                      
+                      <div className="space-y-4">
+                        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
+                          <div className="text-4xl mb-4">✅</div>
+                          <h3 className="text-xl font-bold mb-3">Trusted Investment Platform</h3>
+                          <p className="text-gray-300 leading-relaxed">Profit-sharing opportunities with proven returns and institutional-grade security</p>
+                        </div>
+                        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
+                          <div className="text-4xl mb-4">✅</div>
+                          <h3 className="text-xl font-bold mb-3">Mentor & Earn</h3>
+                          <p className="text-gray-300 leading-relaxed">Sell strategies to earn while helping others grow their wealth and financial knowledge</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* RIGHT: DUAL CTAs */}
+                    <div className="space-y-6">
+                      <a
+                        href="https://academy.ipvaluemanagements.com/invest?rep=146DA53E"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group block w-full bg-blue-600 text-white font-bold text-lg lg:text-xl px-8 py-6 rounded-xl hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                        aria-label="Invest with IP Value Managements via KV Garage Partnership"
+                      >
+                        <div className="flex items-center justify-center gap-4">
+                          <span className="text-2xl">💼</span>
+                          <span>Start Investing</span>
+                          <span className="text-sm opacity-75 group-hover:opacity-100 transition-opacity">→</span>
+                        </div>
+                      </a>
+                      <a
+                        href="https://midnight-architect.emergent.host/join?ref=146DA53E&dept=sales_rep"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group block w-full bg-green-600 text-white font-bold text-lg lg:text-xl px-8 py-6 rounded-xl hover:bg-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                        aria-label="Apply to Sell Investment Strategies as KV Garage Partner"
+                      >
+                        <div className="flex items-center justify-center gap-4">
+                          <span className="text-2xl">🚀</span>
+                          <span>Apply to Make Money</span>
+                          <span className="text-sm opacity-75 group-hover:opacity-100 transition-opacity">→</span>
+                        </div>
+                      </a>
+                      
+                      <div className="bg-white/10 border border-white/20 rounded-xl p-4">
+                        <div className="text-4xl mb-4">📈</div>
+                        <h3 className="text-xl font-bold mb-3">Exponential Growth</h3>
+                        <p className="text-gray-300 leading-relaxed">Growth opportunities for committed partners</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* SOCIAL PROOF & URGENCY */}
+                  <div className="grid md:grid-cols-3 gap-6 mt-8">
+                    <div className="bg-white/10 border border-white/20 rounded-xl p-6 text-center">
+                      <div className="text-4xl mb-4">🚀</div>
+                      <div className="text-3xl font-bold text-[#D4AF37] mb-2">10,000+</div>
+                      <p className="text-gray-300">Investors growing their wealth daily</p>
+                    </div>
+                    <div className="bg-white/10 border border-white/20 rounded-xl p-6 text-center">
+                      <div className="text-4xl mb-4">💰</div>
+                      <div className="text-3xl font-bold text-[#D4AF37] mb-2">Millions</div>
+                      <p className="text-gray-300">Dollars invested and growing every month</p>
+                    </div>
+                    <div className="bg-white/10 border border-white/20 rounded-xl p-6 text-center">
+                      <div className="text-4xl mb-4">⏰</div>
+                      <div className="text-2xl font-bold text-red-300 mb-2">Limited Spots</div>
+                      <p className="text-gray-300">Secure your partnership today before opportunities fill up!</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
           </div>
         </section>
 

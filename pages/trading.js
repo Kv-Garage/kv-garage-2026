@@ -66,6 +66,18 @@ export default function Trading() {
               {loading ? "Redirecting..." : "Book $50 Strategy Call"}
             </button>
           </div>
+
+          <div className="my-8 text-center">
+            <a 
+              href="https://academy.ipvaluemanagements.com/invest?rep=146DA53E" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              aria-label="Invest in KV Garage Trading Opportunities"
+              className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors duration-300"
+            >
+              Invest Now
+            </a>
+          </div>
         </div>
       </section>
 

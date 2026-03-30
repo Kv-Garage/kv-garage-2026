@@ -11,12 +11,6 @@ import { buildCanonicalUrl, buildProductDescription, stripHtml } from "../../lib
 import GoogleReviews from "../../components/GoogleReviews";
 import ReplicaDisclaimerModal from "../../components/product/ReplicaDisclaimerModal";
 
-async function getAuthHeaders() {
-  const { data } = await supabase.auth.getSession();
-  const token = data?.session?.access_token;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export default function ProductPage({ profile }) {
   const router = useRouter();
   const { slug } = router.query;
@@ -69,8 +63,12 @@ export default function ProductPage({ profile }) {
 
   // SWR fetcher function
   const fetcher = async (url) => {
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    
     const response = await fetch(url, {
-      headers: await getAuthHeaders(),
+      headers,
     });
     if (!response.ok) {
       throw new Error('Failed to fetch product');

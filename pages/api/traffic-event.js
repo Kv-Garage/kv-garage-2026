@@ -1,54 +1,49 @@
-import { supabase } from "../../lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pwkafubmtyeufycnkmpz.supabase.co";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3a2FmdWJtdHlldWZ5Y25rbXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTA5NzQsImV4cCI6MjA4NjU4Njk3NH0.YqmBtvSchzy6wcN1OJ0G_lM6c51BxezBbg8n5TBPZfA";
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    const { event_type, page, referrer, user_agent, ip_address } = req.body;
-
+    const { event_type, properties = {}, profile = {} } = req.body;
+    
     // Validate required fields
-    if (!event_type || !page) {
-      return res.status(400).json({ error: "Missing required fields: event_type and page" });
+    if (!event_type) {
+      return res.status(400).json({ error: 'Event type is required' });
     }
 
-    // Get client IP
-    const clientIP = req.headers['x-forwarded-for'] || 
-                    req.headers['x-real-ip'] || 
-                    req.connection.remoteAddress ||
-                    req.socket.remoteAddress ||
-                    (req.connection.socket ? req.connection.socket.remoteAddress : null);
-
-    // Create traffic event record
+    // Insert event into traffic_events table
     const { data, error } = await supabase
-      .from("traffic_events")
+      .from('traffic_events')
       .insert({
-        event_type: event_type,
-        page: page,
-        referrer: referrer || null,
-        user_agent: user_agent || null,
-        ip_address: clientIP || null,
-        metadata: {
-          timestamp: new Date().toISOString(),
-          headers: req.headers
-        }
+        event_type,
+        properties,
+        profile_data: profile,
+        timestamp: new Date().toISOString()
       })
       .select()
       .single();
 
     if (error) {
-      console.error("Traffic event insertion error:", error);
-      return res.status(500).json({ error: `Database error: ${error.message}` });
+      console.error('Traffic event insert error:', error);
+      return res.status(500).json({ error: 'Failed to record event' });
     }
 
-    return res.status(200).json({ 
-      message: "Traffic event recorded successfully",
-      event_id: data?.id 
+    // Return success
+    res.status(200).json({ 
+      success: true, 
+      message: 'Event tracked successfully',
+      event_id: data.id 
     });
 
   } catch (error) {
-    console.error("Traffic event error:", error);
-    return res.status(500).json({ error: error.message || "Internal server error" });
+    console.error('Traffic event handler error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
