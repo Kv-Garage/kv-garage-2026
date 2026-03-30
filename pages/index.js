@@ -293,14 +293,14 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-3xl"></div>
 
         {/* ================= HERO ================= */}
-        <section className="section-spacing border-t border-white/20">
+        <section className="section-spacing border-t border-white/20 pt-16">
           <div className="container-responsive grid lg:grid-cols-2 gap-12 items-center">
 
             {/* LEFT */}
             <div className="space-y-8">
               <div className="flex items-center gap-4">
                 <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold">EST. 2022</span>
-                <span className="text-gray-400 text-sm">Trusted by 15,000+ operators</span>
+                <span className="text-gray-400 text-sm">Trusted by 1,200+ operators</span>
               </div>
               
               <h1 className="text-6xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -333,12 +333,12 @@ export default function Home() {
               {/* 🔥 TRUST INDICATORS */}
               <div className="grid grid-cols-3 gap-6 pt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">15K+</div>
-                  <div className="text-sm text-gray-400">Active Members</div>
+                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">7,800+</div>
+                  <div className="text-sm text-gray-400">Verified Customers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">45+</div>
-                  <div className="text-sm text-gray-400">Countries</div>
+                  <div className="text-3xl font-bold text-[#D4AF37] mb-2">30+</div>
+                  <div className="text-sm text-gray-400">Global Markets</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-[#D4AF37] mb-2">2022</div>

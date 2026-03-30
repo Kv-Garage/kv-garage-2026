@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import UrgencyBar from '../../components/UrgencyBar';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { buildCanonicalUrl } from '../../lib/seo';
@@ -36,6 +36,9 @@ export default function MobileLayout({ children, title, description, image, hide
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white">
+        {/* Urgency Bar */}
+        <UrgencyBar />
+        
         {/* Mobile Navigation Bar */}
         <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled 
@@ -47,10 +50,12 @@ export default function MobileLayout({ children, title, description, image, hide
               {/* Logo */}
               <Link href="/" className="flex items-center space-x-3 group">
                 <div className="relative w-10 h-10">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37] to-yellow-500 rounded-lg transform rotate-45 group-hover:rotate-12 transition-transform duration-300"></div>
-                  <div className="absolute inset-1 bg-[#0B0F19] rounded-md flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">KV</span>
-                  </div>
+                  <Image
+                    src="/logo/Kv garage icon.png"
+                    alt="KV Garage Logo"
+                    fill
+                    className="object-contain"
+                  />
                 </div>
                 <span className="text-lg font-bold bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
                   KV Garage

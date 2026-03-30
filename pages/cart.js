@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
 import { PUBLIC_PRODUCT_FIELDS, getPrimaryProductImage } from "../lib/productFields";
+import CartDisclaimerBanner from "../components/product/CartDisclaimerBanner";
 
 export default function CartPage() {
   const {
@@ -429,6 +430,41 @@ export default function CartPage() {
               {checkoutError && (
                 <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-md">
                   <p className="text-red-400 text-sm font-medium">⚠️ Error: {checkoutError}</p>
+                </div>
+              )}
+
+              {/* 🔥 REPLICA DISCLAIMER BANNER - ONLY FOR WATCHES */}
+              {cart.length > 0 && cart.every(item => 
+                item.category && item.category.toLowerCase().includes('watch') ||
+                item.name && item.name.toLowerCase().includes('replica') ||
+                item.name && item.name.toLowerCase().includes('fake')
+              ) && (
+                <div className="mb-4 p-4 bg-yellow-900/30 border border-yellow-700 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-yellow-900 font-bold text-sm">⚠️</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-yellow-300 mb-1">Important Notice</h3>
+                      <p className="text-yellow-200 text-sm">
+                        This cart contains replica products. By proceeding with checkout, you acknowledge and accept that these are 1:1 replicas and not authentic branded items.
+                      </p>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => {}}
+                          className="px-4 py-2 bg-yellow-600 text-yellow-900 rounded font-medium hover:bg-yellow-500 transition-colors"
+                        >
+                          I Understand
+                        </button>
+                        <button
+                          onClick={() => window.location.href = '/shop'}
+                          className="px-4 py-2 border border-yellow-600 text-yellow-300 rounded font-medium hover:bg-yellow-900/50 transition-colors"
+                        >
+                          Remove Replicas
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 

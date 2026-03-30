@@ -9,6 +9,7 @@ import AffiliateTracker from "./AffiliateTracker";
 import { useDevice } from "../hooks/useDevice";
 import MobileLayout from "./layout/MobileLayout";
 import DesktopLayout from "./layout/DesktopLayout";
+import UrgencyBar from "./UrgencyBar";
 
 const SEO_BY_PATH = {
   "/": {

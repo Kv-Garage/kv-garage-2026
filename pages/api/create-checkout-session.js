@@ -196,7 +196,7 @@ export default async function handler(req, res) {
 
         // Validate price differences - prevent checkout if prices are too different
         const priceDiff = Math.abs(clientPrice - serverPrice);
-        if (priceDiff > 1.00) {
+        if (priceDiff > 0.50) {
           console.error(`  ❌ Price difference too large: Server $${serverPrice} vs Client $${clientPrice} (diff: $${priceDiff.toFixed(2)})`);
           return res.status(400).json({ 
             error: `Price validation failed: Server price ($${serverPrice.toFixed(2)}) differs from client price ($${clientPrice.toFixed(2)}) by $${priceDiff.toFixed(2)}` 
@@ -213,6 +213,21 @@ export default async function handler(req, res) {
           applied_tier: null,
         });
         console.log(`  ✅ Item validated`);
+      }
+
+      // 🔥 REPLICA PRODUCT VALIDATION
+      const replicaProducts = validatedCart.filter(item => {
+        return item.category && item.category.toLowerCase().includes('watch') ||
+               item.name && item.name.toLowerCase().includes('replica') ||
+               item.name && item.name.toLowerCase().includes('fake');
+      });
+
+      if (replicaProducts.length > 0) {
+        console.log(`⚠️ Replica products detected: ${replicaProducts.length} items`);
+        console.log(`   Products: ${replicaProducts.map(p => p.name).join(', ')}`);
+        
+        // For now, allow checkout but log the replica products
+        // In a production system, you might want to require additional validation here
       }
 
       console.log(`📦 Building order items from ${validatedCart.length} products`);

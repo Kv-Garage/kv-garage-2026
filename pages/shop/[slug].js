@@ -9,6 +9,7 @@ import { supabase } from "../../lib/supabase";
 import { getPrimaryProductImage, getProductImageArray } from "../../lib/productFields";
 import { buildCanonicalUrl, buildProductDescription, stripHtml } from "../../lib/seo";
 import GoogleReviews from "../../components/GoogleReviews";
+import ReplicaDisclaimerModal from "../../components/product/ReplicaDisclaimerModal";
 
 async function getAuthHeaders() {
   const { data } = await supabase.auth.getSession();
@@ -31,6 +32,10 @@ export default function ProductPage({ profile }) {
 
   const [quantity, setQuantity] = useState(1);
   const [addedMessage, setAddedMessage] = useState("");
+  
+  // 🔥 REPLICA DISCLAIMER SYSTEM
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   // 🔥 UPSSELL (ADDED ONLY)
   const [upsellProducts, setUpsellProducts] = useState([]);
@@ -287,55 +292,47 @@ export default function ProductPage({ profile }) {
   // 🔥 CUSTOM PRICING SYSTEM
 let pricePerUnit;
 
-// MANUAL PRODUCTS (WATCHES)
+// MANUAL PRODUCTS (WATCHES) - Use exact hardcoded pricing
 if (product.type === "manual") {
-
-  if (role === "retail") {
-    if (quantity >= 10) pricePerUnit = 125;
-    else if (quantity >= 4) pricePerUnit = 150;
-    else pricePerUnit = 200;
-  }
-
-  if (role === "student") {
-    if (quantity < 4) {
-      pricePerUnit = 150; // still show price, MOQ handled separately
-    } else if (quantity >= 10) {
-      pricePerUnit = 125;
+  // For manual products, always use server pricing to ensure consistency
+  if (pricingPreview?.display_price) {
+    pricePerUnit = pricingPreview.display_price;
+  } else {
+    // EXACT HARDCODED PRICING (NO ROLE-BASED CHANGES)
+    if (quantity >= 10) {
+      pricePerUnit = 125; // 10+ units → $125 each
+    } else if (quantity >= 4) {
+      pricePerUnit = 150; // 4-9 units → $150 each
     } else {
-      pricePerUnit = 150;
+      pricePerUnit = 200; // 1-3 units → $200 each
     }
   }
-
-  if (role === "wholesale") {
-    if (quantity < 10) {
-      pricePerUnit = 125; // show price, MOQ handled separately
-    } else {
-      pricePerUnit = 125;
-    }
-  }
-
 } else {
-  // EXISTING SYSTEM (DO NOT CHANGE)
-  const shouldDiscount =
-    quantity > 1 || cartTotal >= 100 || role !== "retail";
+  // EXISTING SYSTEM - Use server pricing for consistency
+  if (pricingPreview?.display_price) {
+    pricePerUnit = pricingPreview.display_price;
+  } else {
+    // Fallback to client-side calculation
+    const shouldDiscount =
+      quantity > 1 || cartTotal >= 100 || role !== "retail";
 
-  pricePerUnit = shouldDiscount
-    ? calculatePrice({
-        cost: activeCost,
-        quantity,
-        role,
-        approved,
-        cartTotal,
-      })
-    : basePrice;
-}
-
-if (pricingPreview?.display_price) {
-  pricePerUnit = pricingPreview.display_price;
+    pricePerUnit = shouldDiscount
+      ? calculatePrice({
+          cost: activeCost,
+          quantity,
+          role,
+          approved,
+          cartTotal,
+        })
+      : basePrice;
+  }
 }
 
 const totalPrice = pricePerUnit * quantity;
 
+  // 🔥 WATCH DETECTION LOGIC
+  const isWatch = product.type === "manual" || (product.category && product.category.toLowerCase().includes('watch'));
+  
   // 🔥 MOQ ENFORCEMENT FOR MANUAL PRODUCTS
   let minQty = 1;
   if (product.type === "manual") {
@@ -372,6 +369,12 @@ const totalPrice = pricePerUnit * quantity;
   };
 
   const handleAddToCart = () => {
+    // 🔥 CHECK FOR WATCHES - TRIGGER DISCLAIMER
+    if (isWatch) {
+      setShowDisclaimer(true);
+      return;
+    }
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -383,6 +386,38 @@ const totalPrice = pricePerUnit * quantity;
 
     setAddedMessage("Added to cart");
     setTimeout(() => setAddedMessage(""), 2000);
+  };
+
+  const handleAddToCartWithDisclaimer = () => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: pricingPreview?.display_price || pricePerUnit,
+      quantity,
+      image: selectedImage,
+      category: product.category || "general",
+    });
+
+    setAddedMessage("Added to cart");
+    setTimeout(() => setAddedMessage(""), 2000);
+    setDisclaimerAccepted(true);
+    setShowDisclaimer(false);
+  };
+
+  const handleBuyNow = () => {
+    // 🔥 CHECK FOR WATCHES - TRIGGER DISCLAIMER
+    if (isWatch) {
+      setShowDisclaimer(true);
+      return;
+    }
+    
+    router.push('/cart');
+  };
+
+  const handleBuyNowWithDisclaimer = () => {
+    setDisclaimerAccepted(true);
+    setShowDisclaimer(false);
+    router.push('/cart');
   };
 
   // 🔥 BUNDLE ADD (ADDED)
@@ -642,7 +677,7 @@ const totalPrice = pricePerUnit * quantity;
                 </button>
                 
                 <button
-                  onClick={() => router.push('/cart')}
+                  onClick={handleBuyNow}
                   disabled={quantity < minQty}
                   className={`w-full py-4 px-6 font-semibold text-lg rounded-lg shadow-md transition-colors ${
                     quantity < minQty
@@ -778,6 +813,15 @@ const totalPrice = pricePerUnit * quantity;
           )}
 
         </div>
+
+        {/* 🔥 REPLICA DISCLAIMER MODAL */}
+        <ReplicaDisclaimerModal
+          isOpen={showDisclaimer}
+          onClose={() => setShowDisclaimer(false)}
+          onAccept={handleAddToCartWithDisclaimer}
+          productName={product.name}
+        />
+
       </main>
     </>
   );

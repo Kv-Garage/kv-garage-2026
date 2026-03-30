@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { buildCanonicalUrl } from '../../lib/seo';
+import UrgencyBar from '../../components/UrgencyBar';
 
 export default function DesktopLayout({ children, title, description, image, hideFooter = false }) {
   const { user, signOut } = useAuth();
@@ -22,6 +23,9 @@ export default function DesktopLayout({ children, title, description, image, hid
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white">
+        {/* Urgency Bar */}
+        <UrgencyBar />
+        
         {/* Desktop Navigation */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0B0F19] to-[#111827] border-b border-white/20 backdrop-blur-xl">
           <div className="max-w-7xl mx-auto px-6 py-2">
@@ -29,10 +33,12 @@ export default function DesktopLayout({ children, title, description, image, hid
               {/* Logo */}
               <Link href="/" className="flex items-center space-x-4 group">
                 <div className="relative w-12 h-12">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37] to-yellow-500 rounded-xl transform rotate-45 group-hover:rotate-12 transition-transform duration-300"></div>
-                  <div className="absolute inset-1 bg-[#0B0F19] rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">KV</span>
-                  </div>
+                  <Image
+                    src="/logo/Kv garage icon.png"
+                    alt="KV Garage Logo"
+                    fill
+                    className="object-contain"
+                  />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
                   KV Garage
