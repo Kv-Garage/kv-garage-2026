@@ -41,46 +41,16 @@ export default function Home() {
       fetchCalculatorProducts();
     }, 60000);
 
-    return () => clearInterval(interval);
+    // Trigger email popup after 5 seconds
+    const popupTimer = setTimeout(() => {
+      setEmailPopupOpen(true);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(popupTimer);
+    };
   }, []);
-
-  // Email popup logic
-  useEffect(() => {
-    const hasSeenPopup = localStorage.getItem('emailPopupSeen');
-    if (!hasSeenPopup) {
-      const timer = setTimeout(() => {
-        setEmailPopupOpen(true);
-      }, 3000); // Show after 3 seconds
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-
-    try {
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setEmailSubmitted(true);
-        localStorage.setItem('emailPopupSeen', 'true');
-        setTimeout(() => {
-          setEmailPopupOpen(false);
-          setEmailSubmitted(false);
-          setEmail('');
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('Email subscription failed:', error);
-    }
-  };
 
   const fetchProducts = async () => {
     try {
@@ -246,6 +216,45 @@ export default function Home() {
     }
   }, [productDropdownOpen]);
 
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(await getAuthHeaders()),
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to subscribe');
+      }
+
+      setEmailSubmitted(true);
+      setEmail('');
+      
+      // Close popup after 3 seconds
+      setTimeout(() => {
+        setEmailPopupOpen(false);
+        setEmailSubmitted(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error('Subscription error:', error);
+      alert('Failed to subscribe. Please try again.');
+    }
+  };
+
   return (
     <>
       <Head>
@@ -283,6 +292,13 @@ export default function Home() {
             }),
           }}
         />
+        <script async type='text/javascript' src='https://static.klaviyo.com/onsite/js/U7NNPN/klaviyo.js?company_id=U7NNPN'></script>
+        <script type="text/javascript" dangerouslySetInnerHTML={{
+          __html: `
+            //Initialize Klaviyo object on page load
+            !function(){if(!window.klaviyo){window._klOnsite=window._klOnsite||[];try{window.klaviyo=new Proxy({},{get:function(n,i){return"push"===i?function(){var n;(n=window._klOnsite).push.apply(n,arguments)}:function(){for(var n=arguments.length,o=new Array(n),w=0;w<n;w++)o[w]=arguments[w];var t="function"==typeof o[o.length-1]?o.pop():void 0,e=new Promise((function(n){window._klOnsite.push([i].concat(o,[function(i){t&&t(i),n(i)}]))}));return e}}})}catch(n){window.klaviyo=window.klaviyo||[],window.klaviyo.push=function(){var n;(n=window._klOnsite).push.apply(n,arguments)}}}}();
+          `
+        }} />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0B0F19] text-white relative overflow-hidden">
@@ -865,6 +881,7 @@ export default function Home() {
             </div>
           </div>
         )}
+
 
       </div>
     </>
