@@ -10,6 +10,7 @@ import { useDevice } from "../hooks/useDevice";
 import MobileLayout from "./layout/MobileLayout";
 import DesktopLayout from "./layout/DesktopLayout";
 import UrgencyBar from "./UrgencyBar";
+import { initAnalytics, trackEmailSubscription, EVENT_TYPES } from "../lib/analytics";
 
 const SEO_BY_PATH = {
   "/": {
@@ -110,29 +111,15 @@ export default function Layout({ children }) {
     };
   }, [user?.id]);
 
+  // Initialize analytics tracking
   useEffect(() => {
-    const trackPageView = async () => {
-      try {
-        await fetch("/api/traffic-event", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user?.id || null,
-            page: router.asPath,
-            event_type: "page_view",
-          }),
-        });
-      } catch (error) {
-        console.error("Traffic event failed:", error);
-      }
-    };
-
-    if (router.isReady) {
-      trackPageView();
-    }
-  }, [router.isReady, router.asPath, user?.id]);
+    if (!router.isReady) return;
+    
+    // Initialize analytics with heartbeat
+    const cleanup = initAnalytics(router.asPath, user);
+    
+    return cleanup;
+  }, [router.isReady, router.asPath, user]);
 
   const submitEmailCapture = async (event) => {
     event.preventDefault();
@@ -162,6 +149,9 @@ export default function Layout({ children }) {
       if (!response.ok) {
         throw new Error(payload.error || "Something went wrong. Please try again.");
       }
+
+      // Track email subscription in analytics
+      await trackEmailSubscription(captureForm.email, "footer", user);
 
       setCaptureSuccess(true);
     } catch (error) {

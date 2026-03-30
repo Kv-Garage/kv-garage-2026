@@ -5,17 +5,20 @@ import Link from "next/link";
 import useSWR from "swr";
 import { calculatePrice } from "../../lib/pricing";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import { getPrimaryProductImage, getProductImageArray } from "../../lib/productFields";
 import { buildCanonicalUrl, buildProductDescription, stripHtml } from "../../lib/seo";
 import GoogleReviews from "../../components/GoogleReviews";
 import ReplicaDisclaimerModal from "../../components/product/ReplicaDisclaimerModal";
+import { trackProductView, trackAddToCart } from "../../lib/analytics";
 
 export default function ProductPage({ profile }) {
   const router = useRouter();
   const { slug } = router.query;
 
   const { cart, addToCart } = useCart();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -216,31 +219,12 @@ export default function ProductPage({ profile }) {
     }
   };
 
+  // Track product view with analytics
   useEffect(() => {
     if (!product?.id) return;
 
-    const trackProductView = async () => {
-      try {
-        const { data: authData } = await supabase.auth.getUser();
-
-        await fetch("/api/traffic-event", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: authData?.user?.id || null,
-            page: `product:${product.id}`,
-            event_type: "product_view",
-          }),
-        });
-      } catch (error) {
-        console.error("Product view tracking failed:", error);
-      }
-    };
-
-    trackProductView();
-  }, [product?.id]);
+    trackProductView(product, user);
+  }, [product?.id, user]);
 
   if (!product) {
     return (
@@ -373,28 +357,38 @@ const totalPrice = pricePerUnit * quantity;
       return;
     }
 
-    addToCart({
+    const cartItem = {
       id: product.id,
       name: product.name,
       price: pricingPreview?.display_price || pricePerUnit,
       quantity,
       image: selectedImage,
       category: product.category || "general",
-    });
+    };
+
+    addToCart(cartItem);
+
+    // Track add to cart in analytics
+    trackAddToCart(product, quantity, cartItem.price, user);
 
     setAddedMessage("Added to cart");
     setTimeout(() => setAddedMessage(""), 2000);
   };
 
   const handleAddToCartWithDisclaimer = () => {
-    addToCart({
+    const cartItem = {
       id: product.id,
       name: product.name,
       price: pricingPreview?.display_price || pricePerUnit,
       quantity,
       image: selectedImage,
       category: product.category || "general",
-    });
+    };
+
+    addToCart(cartItem);
+
+    // Track add to cart in analytics
+    trackAddToCart(product, quantity, cartItem.price, user);
 
     setAddedMessage("Added to cart");
     setTimeout(() => setAddedMessage(""), 2000);

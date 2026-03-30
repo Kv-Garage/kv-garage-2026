@@ -1,7 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pwkafubmtyeufycnkmpz.supabase.co";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3a2FmdWJtdHlldWZ5Y25rbXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTA5NzQsImV4cCI6MjA4NjU4Njk3NH0.YqmBtvSchzy6wcN1OJ0G_lM6c51BxezBbg8n5TBPZfA";
+// Use service role key to bypass RLS for tracking
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -31,8 +32,13 @@ export default async function handler(req, res) {
       .single();
 
     if (error) {
-      console.error('Traffic event insert error:', error);
-      return res.status(500).json({ error: 'Failed to record event' });
+      console.error('Traffic event insert error:', JSON.stringify(error, null, 2));
+      return res.status(500).json({ 
+        error: 'Failed to record event',
+        details: error.message,
+        code: error.code,
+        hint: error.hint
+      });
     }
 
     // Return success

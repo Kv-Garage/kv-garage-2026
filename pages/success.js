@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { useRouter } from "next/router";
+import { trackPlacedOrder } from "../lib/analytics";
 
 export default function Success() {
   const { clearCart } = useCart();
@@ -33,16 +34,20 @@ export default function Success() {
 
         if (orderData?.order?.order_number) {
           setOrderNumber(orderData.order.order_number);
+          
+          // Track order in analytics
+          const orderValue = data?.amount_total ? data.amount_total / 100 : 0;
+          await trackPlacedOrder(
+            {
+              id: orderData.order.id,
+              order_id: orderData.order.id,
+              order_number: orderData.order.order_number,
+              items: orderData.order.items || [],
+              payment_method: data?.payment_intent ? 'stripe' : 'unknown',
+            },
+            orderValue
+          );
         }
-
-        await fetch("/api/traffic-event", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            page: "/success",
-            event_type: "conversion",
-          }),
-        }).catch(() => {});
 
         // 🔥 ONLY show calendar for these types
         if (
