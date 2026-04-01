@@ -579,20 +579,20 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/apply">
-                    <button className="flex-1 bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
+                  <Link href="/apply" className="flex-1">
+                    <button className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
                       Apply for Wholesale
                     </button>
                   </Link>
 
-                  <Link href="/shop">
-                    <button className="flex-1 border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
+                  <Link href="/shop" className="flex-1">
+                    <button className="w-full border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
                       Shop Retail
                     </button>
                   </Link>
 
-                  <Link href="/about">
-                    <button className="flex-1 border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2">
+                  <Link href="/about" className="flex-1">
+                    <button className="w-full border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
