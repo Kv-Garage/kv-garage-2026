@@ -58,6 +58,15 @@ export default function CartPage() {
 
       for (const item of cart) {
         try {
+          // Skip pricing API call for Shopify products - use item.price directly
+          if (item.shopifyId || (typeof item.id === 'string' && (item.id.startsWith('shopify_') || item.id.includes('gid://shopify')))) {
+            nextPricing[item.id] = {
+              display_price: item.price || 0,
+              price: item.price || 0,
+            };
+            continue;
+          }
+
           const response = await fetch("/api/price-preview", {
             method: "POST",
             headers: {
@@ -125,7 +134,7 @@ export default function CartPage() {
   const estimatedRevenue = totalPrice * 2;
   const estimatedProfit = estimatedRevenue - totalPrice;
 
-  // 🔥 STRIPE CHECKOUT (FIXED)
+  // 🔥 CHECKOUT HANDLER - Routes to Shopify or Stripe based on cart contents
   const handleCheckout = async () => {
     console.log("🔷 Checkout button clicked");
     
@@ -147,6 +156,77 @@ export default function CartPage() {
       console.log("🔍 Pricing map:", pricingMap);
       console.log("🔍 Total price:", totalPrice);
 
+      // Determine which checkout to use based on cart contents
+      // Shopify items have shopifyId OR id starts with 'shopify_' OR id contains 'gid://shopify'
+      const shopifyCartItems = cart.filter(item => {
+        if (item.shopifyId) return true;
+        if (typeof item.id === 'string' && (item.id.startsWith('shopify_') || item.id.includes('gid://shopify'))) {
+          return true;
+        }
+        return false;
+      });
+      const stripeCartItems = cart.filter(item => !shopifyCartItems.includes(item));
+
+      console.log(`📦 Shopify items: ${shopifyCartItems.length}, Stripe items: ${stripeCartItems.length}`);
+      console.log('🔍 Cart items:', cart.map(item => ({ id: item.id, shopifyId: item.shopifyId, isShopify: shopifyCartItems.includes(item) })));
+
+      // If cart has ONLY Shopify items, use Shopify checkout
+      if (shopifyCartItems.length > 0 && stripeCartItems.length === 0) {
+        console.log("🛍️ Using Shopify checkout");
+        
+        const shopifyPayload = {
+          cartItems: shopifyCartItems.map(item => {
+            // CRITICAL: Ensure we have the variant ID, not product ID
+            const variantId = item.shopifyVariantId || item.variantId;
+            
+            console.log('🔍 Preparing Shopify item for checkout:', {
+              name: item.name,
+              id: item.id,
+              shopifyId: item.shopifyId,
+              shopifyVariantId: item.shopifyVariantId,
+              variantId: item.variantId,
+              finalVariantId: variantId,
+              hasVariantId: !!variantId
+            });
+            
+            return {
+              id: item.id,
+              shopifyId: item.shopifyId || (typeof item.id === 'string' ? item.id.replace('shopify_', '') : null),
+              shopifyVariantId: variantId,
+              name: item.name,
+              quantity: item.quantity,
+              image: item.image,
+              price: Number(pricingMap[item.id]?.display_price || item.price || 0),
+            };
+          }),
+        };
+        
+        console.log('📦 Shopify checkout payload:', JSON.stringify(shopifyPayload, null, 2));
+
+        const res = await fetch("/api/create-shopify-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shopifyPayload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || `Shopify checkout error: ${res.status}`);
+        }
+
+        if (!data.url) {
+          throw new Error("No checkout URL received from Shopify");
+        }
+
+        console.log("✅ Redirecting to Shopify checkout:", data.url);
+        window.location.href = data.url;
+        return;
+      }
+
+      // If cart has ONLY Stripe items or mixed items, use Stripe checkout
+      console.log("💳 Using Stripe checkout");
+      
       // Validate that all items have prices
       const itemsWithoutPrices = cart.filter(item => {
         const price = Number(pricingMap[item.id]?.display_price || item.price || 0);
@@ -202,6 +282,8 @@ export default function CartPage() {
 
       console.log("✅ Redirecting to Stripe:", data.url);
       window.location.href = data.url;
+      return;
+
     } catch (err) {
       console.error("❌ Checkout error:", err);
       const errorMessage = err.message || "An unexpected error occurred. Please try again.";

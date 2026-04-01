@@ -49,6 +49,10 @@ export default function DesktopLayout({ children, title, description, image, hid
               <div className="hidden lg:flex items-center space-x-8">
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Home</Link>
                 <Link href="/shop" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Shop</Link>
+                <Link href="/shop/private-preview" className="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium text-lg flex items-center gap-2">
+                  <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                  Sourcing Desk
+                </Link>
                 <Link href="/learn" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Learn</Link>
                 <Link href="/wholesale" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Wholesale</Link>
                 <Link href="/mentorship" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Mentorship</Link>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Image from 'next/image';
 import UrgencyBar from '../../components/UrgencyBar';
 import { useState, useEffect } from 'react';
@@ -104,6 +105,10 @@ export default function MobileLayout({ children, title, description, image, hide
             <div className="px-4 py-4 space-y-3 bg-gradient-to-br from-[#0B0F19]/95 to-[#111827]/95">
               <Link href="/" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Home</Link>
               <Link href="/shop" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Shop</Link>
+              <Link href="/shop/private-preview" className="block text-blue-400 hover:text-blue-300 transition-colors duration-200 py-3 border-b border-white/10 flex items-center gap-2">
+                <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                Sourcing Desk
+              </Link>
               <Link href="/learn" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Learn</Link>
               <Link href="/wholesale" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Wholesale</Link>
               <Link href="/mentorship" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Mentorship</Link>

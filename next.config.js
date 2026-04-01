@@ -18,6 +18,10 @@ export default {
         hostname: 'images.unsplash.com',
         pathname: '/photo-*',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.shopify.com',
+      },
     ],
   },
 };

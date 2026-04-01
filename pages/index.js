@@ -5,6 +5,8 @@ import Link from "next/link";
 import { getPrimaryProductImage } from "../lib/productFields";
 import { buildCanonicalUrl } from "../lib/seo";
 import { getSiteSettingsClient } from "../lib/siteSettings";
+import { getProducts as getShopifyProducts } from "../lib/shopify";
+import { calculatePrice } from "../lib/pricing";
 
 async function getAuthHeaders() {
   const { data } = await supabase.auth.getSession();
@@ -54,16 +56,50 @@ export default function Home() {
 
   const fetchProducts = async () => {
     try {
+      // Fetch database products
       const response = await fetch("/api/products/public?limit=200", {
         headers: await getAuthHeaders(),
       });
       const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error || "Could not load live inventory");
+      let dbProds = [];
+      
+      if (response.ok) {
+        dbProds = payload.products || [];
       }
 
-      setDbProducts(payload.products || []);
+      // Fetch Shopify products
+      let shopifyProds = [];
+      try {
+        const sp = await getShopifyProducts(50);
+        console.log('🏠 Home page: Fetched', sp.length, 'Shopify products');
+        shopifyProds = sp.map(s => ({
+          ...s,
+          id: `shopify_${s.id}`,
+          name: s.title,
+          slug: `shopify_${s.handle}`,
+          display_price: s.price,
+          price: s.price,
+          category: s.productType || 'Health & Beauty',
+          source: 'shopify',
+          top_pick: false,
+          // Ensure image fields are set correctly for getPrimaryProductImage
+          image: s.image || (s.images && s.images.length > 0 ? s.images[0].url : '/placeholder.jpg'),
+          images: s.images || (s.image ? [{ url: s.image }] : []),
+          // Apply pricing logic
+          retail_price: calculatePrice({ cost: s.price || 0, role: 'retail' }),
+          student_price: calculatePrice({ cost: s.price || 0, role: 'student' }),
+          wholesale_price: calculatePrice({ cost: s.price || 0, role: 'wholesale', approved: true }),
+        }));
+        console.log('🏠 Home page: Transformed Shopify products, first:', shopifyProds[0]?.name, shopifyProds[0]?.category);
+      } catch (shopifyError) {
+        console.error('Shopify products fetch error:', shopifyError);
+      }
+
+      // Combine both sources
+      const combined = [...dbProds, ...shopifyProds];
+      console.log('🏠 Home page: Combined products:', combined.length, 'Total (DB:', dbProds.length, '+ Shopify:', shopifyProds.length, ')');
+      console.log('🏠 Home page: First 3 products:', combined.slice(0, 3).map(p => ({ id: p.id, name: p.name, category: p.category, image: p.image?.substring(0, 50) })));
+      setDbProducts(combined);
     } catch (error) {
       console.error("Products fetch error:", error);
       setDbProducts([]);
@@ -72,11 +108,41 @@ export default function Home() {
 
   const fetchCalculatorProducts = async () => {
     try {
-      const response = await fetch("/api/products/public", {
+      // Fetch database products
+      const response = await fetch("/api/products/public?limit=100", {
         headers: await getAuthHeaders(),
       });
       const payload = await response.json();
-      setCalculatorProducts(payload.products || []);
+      let dbProds = [];
+      
+      if (response.ok) {
+        dbProds = payload.products || [];
+      }
+
+      // Fetch Shopify products
+      let shopifyProds = [];
+      try {
+        const sp = await getShopifyProducts(50);
+        shopifyProds = sp.map(s => ({
+          ...s,
+          id: `shopify_${s.id}`,
+          name: s.title,
+          slug: `shopify_${s.handle}`,
+          display_price: s.price,
+          category: s.productType || 'Shopify',
+          source: 'shopify',
+          top_pick: false,
+          // Apply pricing logic
+          retail_price: calculatePrice({ cost: s.price || 0, role: 'retail' }),
+          student_price: calculatePrice({ cost: s.price || 0, role: 'student' }),
+          wholesale_price: calculatePrice({ cost: s.price || 0, role: 'wholesale', approved: true }),
+        }));
+      } catch (shopifyError) {
+        console.error('Shopify products fetch error:', shopifyError);
+      }
+
+      // Combine both sources
+      setCalculatorProducts([...dbProds, ...shopifyProds]);
     } catch (error) {
       console.error("Calculator inventory failed:", error);
       setCalculatorProducts([]);
@@ -103,6 +169,15 @@ export default function Home() {
   };
 
   const products = dbProducts.length > 0 ? dbProducts : [];
+  
+  // Debug: Log products state
+  useEffect(() => {
+    console.log('📦 Home page products state:', products.length, 'products');
+    if (products.length > 0) {
+      console.log('📦 First product:', { id: products[0]?.id, name: products[0]?.name, category: products[0]?.category, hasImage: !!products[0]?.image });
+    }
+  }, [products]);
+  
   const topPicks = products.filter((product) => product.top_pick).slice(0, 4);
   const newArrivals = products.filter((product) => !product.top_pick).slice(0, 8);
   const liveInventory = products.slice(0, 30);

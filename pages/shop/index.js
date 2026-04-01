@@ -7,6 +7,9 @@ import { getPrimaryProductImage } from "../../lib/productFields";
 import { buildCanonicalUrl } from "../../lib/seo";
 import { useCart } from "../../context/CartContext";
 import { sortCategories } from "../../lib/categories";
+import { getProducts as getShopifyProducts, getProductsByType as getShopifyProductsByType } from "../../lib/shopify";
+import { calculatePrice } from "../../lib/pricing";
+import Image from "next/image";
 
 const PAGE_SIZE = 24;
 
@@ -87,16 +90,102 @@ export default function Shop({ profile }) {
         if (searchValue) params.set("search", searchValue);
         if (selectedCategory) params.set("category", selectedCategory);
 
-        const response = await fetch(`/api/public-products?${params.toString()}`, {
-          headers: await getAuthHeaders(),
-        });
+        // Fetch database products and Shopify products from multiple sources
+        const [response, allShopifyProducts, womanProducts, petProducts] = await Promise.all([
+          fetch(`/api/public-products?${params.toString()}`, {
+            headers: await getAuthHeaders(),
+          }),
+          getShopifyProducts(50), // Fetch all Shopify products
+          getShopifyProductsByType('Woman', 50), // Fetch Woman category
+          getShopifyProductsByType('Pets', 50), // Fetch Pets category (plural)
+        ]);
+
         const payload = await response.json();
 
         if (!response.ok) {
-          throw new Error(payload.error || "Could not load products");
+          console.error('API Error:', payload);
+          // Don't throw - just use empty array for database products
+          // This allows Shopify products to still show even if DB API fails
         }
 
-        let nextProducts = payload.products || [];
+        let dbProducts = payload.products || [];
+        
+        // Log fetched products for debugging
+        console.log('📦 Fetched products - DB:', dbProducts.length, 'Shopify:', allShopifyProducts.length, 'Woman:', womanProducts.length, 'Pet:', petProducts.length);
+
+        // Combine all Shopify products (deduplicate by id)
+        const combinedShopifyProducts = [...allShopifyProducts, ...womanProducts, ...petProducts];
+        const uniqueShopifyProducts = combinedShopifyProducts.filter((product, index, self) =>
+          index === self.findIndex((p) => p.id === product.id)
+        );
+        
+        console.log('📦 Unique Shopify products after dedup:', uniqueShopifyProducts.length);
+
+        // Transform Shopify products to match the database product format
+        const transformedShopifyProducts = uniqueShopifyProducts.map((sp) => {
+          // Extract image URLs from Shopify's nested structure
+          const imageUrlArray = sp.images && sp.images.length > 0
+            ? sp.images.map(img => img.url).filter(Boolean)
+            : [];
+          
+          // CRITICAL: Ensure variantId is properly set
+          const variantId = sp.variantId || (sp.variants && sp.variants.length > 0 ? sp.variants[0].id : null);
+          
+          if (!variantId) {
+            console.error('⚠️ Shopify product missing variantId:', sp.id, sp.title);
+          }
+          
+          return {
+            id: `shopify_${sp.id}`,
+            shopifyId: sp.id,
+            name: sp.title,
+            slug: `shopify_${sp.handle}`,
+            description: sp.description || '',
+            price: sp.price || 0,
+            display_price: sp.price || 0,
+            compareAtPrice: sp.compareAtPrice || null,
+            category: sp.productType || 'Shopify',
+            image: sp.image || (imageUrlArray.length > 0 ? imageUrlArray[0] : '/placeholder.jpg'),
+            images: imageUrlArray, // Array of URL strings for getPrimaryProductImage
+            tags: sp.tags || [],
+            top_pick: false,
+            inventory: sp.availableForSale ? 99 : 0, // Shopify doesn't provide quantity
+            availableForSale: sp.availableForSale,
+            vendor: sp.vendor || '',
+            source: 'shopify',
+            handle: sp.handle,
+            variantId: variantId, // CRITICAL for checkout
+            shopifyVariantId: variantId, // Also set this for compatibility
+            variants: sp.variants || [],
+            // Apply pricing logic
+            pricing: {
+              basePrice: sp.price || 0,
+              retailPrice: calculatePrice({ cost: sp.price || 0, role: 'retail' }),
+              studentPrice: calculatePrice({ cost: sp.price || 0, role: 'student' }),
+              wholesalePrice: calculatePrice({ cost: sp.price || 0, role: 'wholesale', approved: true }),
+            }
+          };
+        });
+
+        // Combine database and Shopify products
+        let nextProducts = [...dbProducts, ...transformedShopifyProducts];
+
+        // Apply filters
+        if (searchValue) {
+          const searchLower = searchValue.toLowerCase();
+          nextProducts = nextProducts.filter((product) => 
+            (product.name || '').toLowerCase().includes(searchLower) ||
+            (product.description || '').toLowerCase().includes(searchLower) ||
+            (product.category || '').toLowerCase().includes(searchLower) ||
+            (product.tags || []).some(tag => tag.toLowerCase().includes(searchLower))
+          );
+        }
+
+        if (selectedCategory) {
+          nextProducts = nextProducts.filter((product) => 
+            (product.category || '').toLowerCase() === selectedCategory.toLowerCase()
+          );
+        }
 
         if (minPrice > 0) {
           nextProducts = nextProducts.filter((product) => Number(product.display_price || product.price || 0) >= minPrice);
@@ -107,19 +196,37 @@ export default function Shop({ profile }) {
         }
 
         if (inStockOnly) {
-          nextProducts = nextProducts.filter((product) => Number(product.inventory_count || 0) > 0);
+          nextProducts = nextProducts.filter((product) => 
+            (product.inventory_count || product.inventory || 0) > 0 || product.availableForSale
+          );
         }
 
         if (topPickOnly) {
           nextProducts = nextProducts.filter((product) => product.top_pick);
         }
 
-        if (sort === "popular") {
+        // Apply sorting
+        if (sort === "price_asc") {
+          nextProducts = [...nextProducts].sort((a, b) => 
+            Number(a.display_price || a.price || 0) - Number(b.display_price || b.price || 0)
+          );
+        } else if (sort === "price_desc") {
+          nextProducts = [...nextProducts].sort((a, b) => 
+            Number(b.display_price || b.price || 0) - Number(a.display_price || a.price || 0)
+          );
+        } else if (sort === "popular") {
           nextProducts = [...nextProducts].sort((a, b) => Number(b.top_pick) - Number(a.top_pick));
+        } else if (sort === "newest") {
+          // Sort by source - database products first, then Shopify
+          nextProducts = [...nextProducts].sort((a, b) => {
+            const aOrder = a.source === 'shopify' ? 1 : 0;
+            const bOrder = b.source === 'shopify' ? 1 : 0;
+            return aOrder - bOrder;
+          });
         }
 
         setProducts(nextProducts);
-        setTotalCount(payload.totalCount || nextProducts.length || 0);
+        setTotalCount(nextProducts.length);
       } catch (error) {
         console.error("Products fetch error:", error);
         setProducts([]);
@@ -131,16 +238,44 @@ export default function Shop({ profile }) {
     };
 
     const fetchSupportData = async () => {
-      const [{ data: authData }, productsResponse] = await Promise.all([
+      const [{ data: authData }, productsResponse, shopifyProducts] = await Promise.all([
         supabase.auth.getUser(),
         fetch("/api/public-products?limit=200", { headers: await getAuthHeaders() }),
+        getShopifyProducts(50),
       ]);
 
       const payload = await productsResponse.json();
       const allProducts = payload.products || [];
 
-      setTopPicks(allProducts.filter((product) => product.top_pick).slice(0, 12));
-      setCategories(sortCategories(allProducts.map((product) => product.category)));
+      // Transform Shopify products for top picks
+      const transformedShopifyProducts = shopifyProducts.slice(0, 10).map((sp) => ({
+        id: `shopify_${sp.id}`,
+        name: sp.title,
+        slug: `shopify_${sp.handle}`,
+        price: sp.price,
+        display_price: sp.price,
+        category: sp.productType || 'Shopify',
+        image: sp.image,
+        top_pick: true,
+        source: 'shopify',
+      }));
+
+      setTopPicks([...allProducts.filter((product) => product.top_pick).slice(0, 12), ...transformedShopifyProducts]);
+      
+      // Combine categories from all sources - ensure all categories are included
+      const dbCategories = allProducts.map((product) => product.category).filter(Boolean);
+      const shopifyCategories = shopifyProducts.map(p => p.productType).filter(Boolean);
+      const womanCategories = ['Woman']; // Add Woman category explicitly
+      const petCategories = ['Pets']; // Add Pets category explicitly (plural)
+      
+      // Log categories for debugging
+      console.log('📂 DB Categories:', [...new Set(dbCategories)]);
+      console.log('📂 Shopify Categories:', [...new Set(shopifyCategories)]);
+      console.log('📂 Added Categories:', womanCategories, petCategories);
+      
+      // Combine and deduplicate categories - include all sources
+      const allCategories = [...new Set([...dbCategories, ...shopifyCategories, ...womanCategories, ...petCategories])];
+      setCategories(sortCategories(allCategories));
       setCurrentUser(authData?.user || null);
 
       try {
@@ -634,16 +769,29 @@ export default function Shop({ profile }) {
                           <div className="mt-6 pt-6 border-t border-white/10">
                             <div className="flex gap-4">
                               <button
-                                onClick={() =>
-                                  addToCart({
-                                    id: product.id,
+                                onClick={() => {
+                                  // Debug: Log the product's variantId
+                                  console.log('🔍 Product variantId:', product.variantId);
+                                  console.log('🔍 Product shopifyId:', product.shopifyId);
+                                  console.log('🔍 Product variants:', product.variants?.slice(0, 2));
+                                  
+                                  // CRITICAL: For Shopify products, use variantId as the ID
+                                  const itemToAdd = {
+                                    id: product.variantId || product.id, // Use variantId for Shopify products
                                     name: product.name,
                                     price: product.display_price || product.price,
                                     quantity: 1,
                                     image: displayImage,
                                     category: product.category || "general",
-                                  })
-                                }
+                                    // Include Shopify-specific fields for checkout
+                                    shopifyId: product.shopifyId || null,
+                                    shopifyVariantId: product.variantId || null,
+                                    variantId: product.variantId || null,
+                                    isShopify: !!product.shopifyId,
+                                  };
+                                  console.log('🛒 ADDING TO CART:', itemToAdd);
+                                  addToCart(itemToAdd);
+                                }}
                                 className="flex-1 bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-xl font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105"
                               >
                                 Add to Cart

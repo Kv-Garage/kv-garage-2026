@@ -1,14 +1,84 @@
-[
-  {
-    "name": "Premium Rolling Tray",
-    "price": 29.99,
-    "slug": "premium-rolling-tray",
-    "stripeLink": "#"
-  },
-  {
-    "name": "Luxury Glass Piece",
-    "price": 79.99,
-    "slug": "luxury-glass-piece",
-    "stripeLink": "#"
-  }
-]
+{
+  "products": [
+    {
+      "id": "iced-watch-001",
+      "slug": "iced-out-audemars",
+      "name": "Iced Out Audemars Piguet Royal Oak",
+      "description": "<p>Luxury iced out timepiece featuring premium lab-grown diamonds. Features include:</p><ul><li>41mm case diameter</li><li>Full diamond bezel and dial</li><li>Swiss automatic movement</li><li>Sapphire crystal glass</li><li>Water resistant to 50m</li><li>Comes with luxury presentation box</li></ul>",
+      "price": 2499.99,
+      "images": [
+        "/KV-CAM-SMART-BLK-001-1.webp",
+        "/KV-CAM-SMART-BLK-001-2.webp",
+        "/KV-CAM-SMART-BLK-001-3.webp",
+        "/KV-CAM-SMART-BLK-001-4.webp"
+      ],
+      "category": "Iced Out Watches",
+      "tags": ["iced out", "luxury", "diamond", "audemars"],
+      "inventory": 10
+    },
+    {
+      "id": "iced-watch-002",
+      "slug": "iced-out-rolex",
+      "name": "Iced Out Rolex Submariner",
+      "description": "<p>Stunning iced out Rolex Submariner with full diamond coverage. Features include:</p><ul><li>40mm case diameter</li><li>Full diamond bezel and bracelet</li><li>Swiss automatic movement</li><li>Ceramic bezel insert</li><li>Water resistant to 300m</li><li>Comes with luxury presentation box</li></ul>",
+      "price": 3499.99,
+      "images": [
+        "/KV-CAM-SMART-GEN-001.webp",
+        "/KV-CAM-SMART-GEN-002.webp",
+        "/KV-CAM-SMART-GEN-003.webp",
+        "/KV-CAM-SMART-BLK-001-1.webp"
+      ],
+      "category": "Iced Out Watches",
+      "tags": ["iced out", "luxury", "diamond", "rolex"],
+      "inventory": 8
+    },
+    {
+      "id": "iced-watch-003",
+      "slug": "iced-out-patek",
+      "name": "Iced Out Patek Philippe Nautilus",
+      "description": "<p>Elite iced out Patek Philippe Nautilus with premium diamond setting. Features include:</p><ul><li>40mm case diameter</li><li>Full diamond dial and bezel</li><li>Swiss automatic movement</li><li>Sapphire case back</li><li>Water resistant to 120m</li><li>Comes with luxury presentation box</li></ul>",
+      "price": 4999.99,
+      "images": [
+        "/KV-CAM-SMART-ORG-002-1.webp",
+        "/KV-CAM-SMART-ORG-002-2.webp",
+        "/KV-CAM-SMART-BLK-001-2.webp",
+        "/KV-CAM-SMART-BLK-001-3.webp"
+      ],
+      "category": "Iced Out Watches",
+      "tags": ["iced out", "luxury", "diamond", "patek philippe"],
+      "inventory": 5
+    },
+    {
+      "id": "iced-watch-004",
+      "slug": "iced-out-cartier",
+      "name": "Iced Out Cartier Santos",
+      "description": "<p>Sophisticated iced out Cartier Santos with elegant diamond setting. Features include:</p><ul><li>39mm case diameter</li><li>Diamond bezel and dial</li><li>Swiss quartz movement</li><li>Sapphire crystal glass</li><li>Water resistant to 100m</li><li>Comes with luxury presentation box</li></ul>",
+      "price": 1999.99,
+      "images": [
+        "/KV-CAM-SMART-BLK-001-1.webp",
+        "/KV-CAM-SMART-BLK-001-2.webp",
+        "/KV-CAM-SMART-BLK-001-3.webp",
+        "/KV-CAM-SMART-BLK-001-4.webp"
+      ],
+      "category": "Iced Out Watches",
+      "tags": ["iced out", "luxury", "diamond", "cartier"],
+      "inventory": 12
+    },
+    {
+      "id": "iced-watch-005",
+      "slug": "iced-out-richard-mille",
+      "name": "Iced Out Richard Mille RM 011",
+      "description": "<p>Ultimate luxury iced out Richard Mille with exceptional diamond coverage. Features include:</p><ul><li>44mm case diameter</li><li>Full diamond case and bezel</li><li>Swiss automatic movement</li><li>Skeleton dial</li><li>Water resistant to 50m</li><li>Comes with luxury presentation box</li></ul>",
+      "price": 5999.99,
+      "images": [
+        "/KV-CAM-SMART-BLK-001-1.webp",
+        "/KV-CAM-SMART-BLK-001-2.webp",
+        "/KV-CAM-SMART-BLK-001-3.webp",
+        "/KV-CAM-SMART-BLK-001-4.webp"
+      ],
+      "category": "Iced Out Watches",
+      "tags": ["iced out", "luxury", "diamond", "richard mille"],
+      "inventory": 3
+    }
+  ]
+}

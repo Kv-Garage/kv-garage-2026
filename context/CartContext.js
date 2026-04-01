@@ -59,6 +59,11 @@ export function CartProvider({ children }) {
           quantity: item.quantity || 1,
           image: item.image || null, // 🔥 READY FOR PRODUCT IMAGE
           id: item.id || item.name, // 🔥 FUTURE SAFE
+          // Shopify-specific fields for dropshipping checkout
+          shopifyId: item.shopifyId || null,
+          shopifyVariantId: item.shopifyVariantId || item.variantId || null,
+          variantId: item.variantId || null,
+          category: item.category || null,
         },
       ];
     });

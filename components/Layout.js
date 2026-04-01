@@ -44,9 +44,14 @@ const SEO_BY_PATH = {
       "Join the KV Garage affiliate program and earn commissions by referring wholesale buyers, retail customers, and mentorship students.",
   },
   "/private-preview": {
-    title: "Private Preview | Early Access to Verified Inventory — KV Garage",
+    title: "Private Sourcing Desk | Global Supplier Access — KV Garage",
     description:
-      "Get early access to new wholesale drops and exclusive inventory before they go public. Private preview access for verified KV Garage members.",
+      "Submit product requests to our private sourcing desk. Direct access to verified global suppliers with under 30-minute response times for serious operators.",
+  },
+  "/shop/private-preview": {
+    title: "Sourcing Desk | Product Inquiry — KV Garage",
+    description:
+      "Request products you need. Our private sourcing desk will find verified suppliers and respond within 30 minutes during business hours.",
   },
 };
 

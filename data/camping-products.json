@@ -1,0 +1,667 @@
+{
+  "products": [
+    {
+      "sku": "KV-CAM-SMART-BLK-001",
+      "title": "KVGarage | Smart Security Camera - Crystal Clear Night Vision & Motion Alerts",
+      "category": "Camera",
+      "cost_estimate": 24.99,
+      "price": 49.99,
+      "compare_price": 89.99,
+      "short_description": "Professional-grade home security with AI-powered motion detection and 1080p HD video.",
+      "full_description": "<h3>Protect What Matters Most</h3><p>The KV-CAM-SMART-BLK-001 delivers professional-grade security monitoring without the professional price tag. Whether you're watching over your home, office, or loved ones, this smart camera provides peace of mind with crystal-clear video and intelligent alerts.</p><h4>Why Choose This Camera?</h4><ul><li>Advanced AI detection distinguishes between people, pets, and objects</li><li>Crystal-clear 1080p HD video with enhanced night vision</li><li>Two-way audio for real-time communication</li><li>Easy setup with WiFi connectivity</li><li>Weather-resistant design for indoor/outdoor use</li></ul><h4>Perfect For:</h4><p>Home security, baby monitoring, pet watching, office surveillance, and vacation property monitoring. The sleek black design blends seamlessly with any decor.</p>",
+      "features": [
+        "1080p Full HD Resolution - See every detail with crystal-clear video quality",
+        "AI-Powered Motion Detection - Smart alerts that distinguish people from pets and objects",
+        "Enhanced Night Vision - See up to 30ft in complete darkness with infrared LEDs",
+        "Two-Way Audio - Listen and speak through the camera via the mobile app",
+        "Weather-Resistant IP65 Rating - Built to withstand rain, snow, and extreme temperatures",
+        "WiFi Connectivity - Easy wireless setup with 2.4GHz networks",
+        "Cloud & SD Card Storage - Flexible storage options up to 128GB",
+        "Privacy Mode - One-tap disable for when you need privacy at home"
+      ],
+      "images": [
+        "/KV-CAM-SMART-BLK-001-1.webp",
+        "/KV-CAM-SMART-BLK-001-2.webp",
+        "/KV-CAM-SMART-BLK-001-3.webp",
+        "/KV-CAM-SMART-BLK-001-4.webp"
+      ],
+      "productPageContent": {
+        "headline": "Smart Security That Never Sleeps",
+        "subheadline": "Professional-grade protection meets user-friendly design. Monitor your world from anywhere, anytime.",
+        "keyBenefits": [
+          "AI-powered detection eliminates false alerts",
+          "Crystal-clear video day and night",
+          "Instant notifications to your smartphone",
+          "Easy DIY installation in minutes",
+          "Secure encrypted cloud storage"
+        ],
+        "featureGrid": [
+          {"icon": "📹", "title": "1080p HD Video", "desc": "Full HD resolution captures every detail"},
+          {"icon": "🌙", "title": "Night Vision", "desc": "See up to 30ft in total darkness"},
+          {"icon": "🤖", "title": "AI Detection", "desc": "Smart alerts for people, pets & vehicles"},
+          {"icon": "💬", "title": "Two-Way Audio", "desc": "Talk and listen through the app"},
+          {"icon": "🌧️", "title": "Weatherproof", "desc": "IP65 rated for outdoor use"},
+          {"icon": "📱", "title": "Mobile App", "desc": "Control from iOS or Android"}
+        ],
+        "lifestyleSection": "Whether you're at work checking on your pet, on vacation monitoring your home, or simply want to see who's at the door, the KV-CAM-SMART-BLK-001 keeps you connected. The sleek black design fits any environment, from modern living rooms to outdoor entryways.",
+        "faq": [
+          {"q": "Does this camera work without a subscription?", "a": "Yes! The camera works fully without a subscription. You can use a microSD card (up to 128GB) for local storage. Cloud storage is available as an optional subscription."},
+          {"q": "Can I view the camera from multiple phones?", "a": "Absolutely! Share access with family members through the app. Multiple users can view and control the camera simultaneously."},
+          {"q": "Does it work with Alexa or Google Home?", "a": "Yes, the camera is compatible with both Amazon Alexa and Google Assistant for voice control and display on smart screens."},
+          {"q": "How does the motion detection work?", "a": "Our AI-powered detection analyzes movement patterns to distinguish between people, pets, and objects like swaying trees, significantly reducing false alerts."},
+          {"q": "Is the night vision in color?", "a": "The camera uses infrared LEDs for night vision, providing clear black and white video up to 30ft. Some ambient light can produce color video in low-light conditions."}
+        ],
+        "cta": "Add to Cart - $49.99"
+      }
+    },
+    {
+      "sku": "KV-CAM-SMART-ORG-002",
+      "title": "KVGarage | Smart Security Camera - Vibrant Orange Edition with HD Monitoring",
+      "category": "Camera",
+      "cost_estimate": 24.99,
+      "price": 49.99,
+      "compare_price": 89.99,
+      "short_description": "Bold design meets smart security. Stand-out orange finish with all the features you need.",
+      "full_description": "<h3>Security That Stands Out</h3><p>The KV-CAM-SMART-ORG-002 combines powerful security features with a vibrant orange design that makes a statement. Don't hide your security camera—make it part of your decor with this eye-catching smart camera.</p><h4>Style Meets Substance</h4><ul><li>Same powerful features as our black edition</li><li>Bold orange finish that complements modern interiors</li><li>1080p HD video with advanced night vision</li><li>Smart motion detection with customizable zones</li><li>Works with Alexa and Google Assistant</li></ul><h4>Ideal For:</h4><p>Modern homes, creative spaces, kids' rooms, and anyone who wants security that doesn't look like typical surveillance equipment. The orange finish makes it easy to spot and serves as a visible deterrent.</p>",
+      "features": [
+        "1080p Full HD Resolution - Sharp, detailed video in any lighting",
+        "Signature Orange Design - Bold aesthetic that complements modern decor",
+        "Smart Night Vision - Infrared LEDs provide clear vision up to 30ft",
+        "Intelligent Motion Alerts - Customizable detection zones reduce false alarms",
+        "Built-in Microphone & Speaker - Two-way communication through the app",
+        "Simple WiFi Setup - Connects to 2.4GHz networks in minutes",
+        "Flexible Storage - microSD card slot (up to 128GB) or cloud storage",
+        "Voice Control Ready - Works with Alexa and Google Assistant"
+      ],
+      "images": [
+        "/KV-CAM-SMART-ORG-002-1.webp",
+        "/KV-CAM-SMART-ORG-002-2.webp"
+      ],
+      "productPageContent": {
+        "headline": "Security With Personality",
+        "subheadline": "Who says security cameras have to be boring? Get all the protection you need with a design you'll love to display.",
+        "keyBenefits": [
+          "Eye-catching orange design stands out",
+          "Full 1080p HD video quality",
+          "Smart AI-powered motion detection",
+          "Works with smart home systems",
+          "Easy setup and maintenance"
+        ],
+        "featureGrid": [
+          {"icon": "🎨", "title": "Bold Design", "desc": "Vibrant orange finish makes a statement"},
+          {"icon": "📹", "title": "1080p HD", "desc": "Crystal-clear video quality"},
+          {"icon": "🌙", "title": "Night Vision", "desc": "30ft range in darkness"},
+          {"icon": "🔔", "title": "Smart Alerts", "desc": "AI-powered motion detection"},
+          {"icon": "🏠", "title": "Smart Home", "desc": "Alexa & Google compatible"},
+          {"icon": "💾", "title": "Storage Options", "desc": "SD card or cloud storage"}
+        ],
+        "lifestyleSection": "The KV-CAM-SMART-ORG-002 isn't just a security camera—it's a design element. Place it on a bookshelf, desk, or entryway table and let it add a pop of color while keeping your space protected. Perfect for those who refuse to compromise on style or security.",
+        "faq": [
+          {"q": "Is the orange color fade-resistant?", "a": "Yes, the orange finish is UV-resistant and designed to maintain its vibrant color over time."},
+          {"q": "Does it have the same features as the black camera?", "a": "Yes, the orange edition has identical technical specifications and features to the black edition."},
+          {"q": "Can I use this camera outdoors?", "a": "This model is designed for indoor use. For outdoor applications, we recommend our weather-resistant black edition."},
+          {"q": "What's included in the box?", "a": "Camera, USB power cable, power adapter, mounting bracket, screws, and quick start guide."}
+        ],
+        "cta": "Add to Cart - $49.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-MATT-001",
+      "title": "KVGarage | Premium Camping Sleeping Mat - Ultra-Comfortable & Lightweight",
+      "category": "Sleep",
+      "cost_estimate": 29.99,
+      "price": 59.99,
+      "compare_price": 99.99,
+      "short_description": "Sleep comfortably anywhere with our self-inflating camping mat featuring 2-inch thickness.",
+      "full_description": "<h3>Sleep Soundly Under the Stars</h3><p>The KV-CAMP-MATT-001 transforms any campsite into a comfortable bedroom. Our premium self-inflating sleeping mat provides exceptional cushioning and insulation from cold ground, ensuring you wake up refreshed and ready for adventure.</p><h4>Engineered for Comfort</h4><ul><li>2-inch thickness provides superior cushioning</li><li>Self-inflating design for quick setup</li><li>Textured surface prevents sleeping bag slippage</li><li>Compact roll-up design for easy transport</li><li>Durable materials withstand rugged outdoor use</li></ul><h4>Perfect For:</h4><p>Car camping, backpacking, festival camping, guest bedding, and emergency preparedness. The universal size fits standard sleeping bags and tents.</p>",
+      "features": [
+        "2-Inch Ultra-Thick Cushioning - Premium comfort that rivals your bed at home",
+        "Self-Inflating Technology - Sets up in minutes with built-in foam core",
+        "Insulated Design - R-value of 4.5 keeps you warm on cold ground",
+        "Non-Slip Surface - Textured top keeps your sleeping bag in place all night",
+        "Compact & Lightweight - Rolls to 18\" x 6\" and weighs only 2.5 lbs",
+        "Durable 75D Polyester - Ripstop fabric resists punctures and tears",
+        "Two-Way Valve - Quick inflation and deflation for easy packing",
+        "Includes Storage Sack - Compression straps and carry bag included"
+      ],
+      "images": [
+        "/kv-ct-001.jpg",
+        "/kv-ct-001-2.jpg",
+        "/kv-ct-001-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Your Best Night's Sleep, Anywhere",
+        "subheadline": "Leave the lumpy ground behind. Our premium sleeping mat delivers hotel-level comfort in the wilderness.",
+        "keyBenefits": [
+          "2-inch thickness eliminates pressure points",
+          "Self-inflating for hassle-free setup",
+          "Insulated against cold ground temperatures",
+          "Compact size fits any backpack",
+          "Durable construction for years of use"
+        ],
+        "featureGrid": [
+          {"icon": "😴", "title": "2\" Thick", "desc": "Premium cushioning comfort"},
+          {"icon": "💨", "title": "Self-Inflating", "desc": "Sets up in under 5 minutes"},
+          {"icon": "🌡️", "title": "Insulated", "desc": "R-value 4.5 for warmth"},
+          {"icon": "🎒", "title": "Portable", "desc": "Lightweight at 2.5 lbs"},
+          {"icon": "💪", "title": "Durable", "desc": "75D ripstop polyester"},
+          {"icon": "📦", "title": "Compact", "desc": "Rolls to 18\" x 6\""}
+        ],
+        "lifestyleSection": "Whether you're car camping with the family or backpacking solo, the KV-CAMP-MATT-001 ensures you get the rest you need. Wake up without aches and pains, ready to hike, fish, or explore. It's also perfect as an unexpected guest bed or for sleepovers.",
+        "faq": [
+          {"q": "How firm is this sleeping mat?", "a": "The mat offers a medium-firm feel. You can adjust firmness by adding a few extra breaths of air after self-inflation."},
+          {"q": "Will this fit in a backpacking pack?", "a": "Yes! At 18\" x 6\" rolled and 2.5 lbs, it's designed for backpacking. The compression straps help minimize bulk."},
+          {"q": "Can it be used in winter camping?", "a": "With an R-value of 4.5, it provides good insulation for three-season camping. For winter camping, we recommend pairing it with an insulated sleeping bag."},
+          {"q": "How do I clean and store it?", "a": "Wipe clean with a damp cloth. Store fully inflated or loosely rolled in a cool, dry place to maintain the foam's integrity."}
+        ],
+        "cta": "Add to Cart - $59.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-GRILL-002",
+      "title": "KVGarage | Portable Camping Grill - Stainless Steel Foldable BBQ",
+      "category": "Cooking",
+      "cost_estimate": 34.99,
+      "price": 69.99,
+      "compare_price": 119.99,
+      "short_description": "Restaurant-quality grilling anywhere with our portable stainless steel camping grill.",
+      "full_description": "<h3>Grill Like a Pro, Anywhere You Go</h3><p>The KV-CAMP-GRILL-002 brings the joy of outdoor cooking to every adventure. This portable stainless steel grill sets up in minutes and delivers consistent, even heat for perfectly grilled meals whether you're at the campsite, tailgate, or beach.</p><h4>Built for Outdoor Chefs</h4><ul><li>Premium stainless steel construction for durability</li><li>Foldable design fits in included carry bag</li><li>Adjustable air vents for temperature control</li><li>Large cooking surface feeds 4-6 people</li><li>Compatible with charcoal and wood</li></ul><h4>Perfect For:</h4><p>Camping trips, tailgating, beach cookouts, backyard BBQs, and emergency preparedness. The compact design makes it easy to take great food anywhere.</p>",
+      "features": [
+        "Premium Stainless Steel - Rust-resistant 430 stainless steel built to last",
+        "Foldable Portable Design - Folds flat to 16\" x 12\" x 3\" for easy transport",
+        "Large Cooking Surface - 350 sq in grilling area feeds 4-6 people",
+        "Adjustable Air Vents - Precise temperature control for perfect results",
+        "Stable Leg System - Locking legs provide rock-solid stability on any terrain",
+        "Easy Cleanup - Removable ash tray and dishwasher-safe grates",
+        "Includes Carry Bag - Padded bag with handles for convenient transport",
+        "Multi-Fuel Compatible - Works with charcoal, wood, or biomass fuel"
+      ],
+      "images": [
+        "/KV-CAMP-GRILL-002-1.webp",
+        "/KV-CAMP-GRILL-002-2.webp",
+        "/KV-CAMP-GRILL-002-3.webp",
+        "/KV-CAMP-GRILL-002-4.webp",
+        "/KV-CAMP-GRILL-002-5.webp",
+        "/KV-CAMP-GRILL-002-6.webp",
+        "/KV-CAMP-GRILL-002-7.webp",
+        "/KV-CAMP-GRILL-002-8.webp",
+        "/KV-CAMP-GRILL-002-9.webp",
+        "/KV-CAMP-GRILL-002-10.webp"
+      ],
+      "productPageContent": {
+        "headline": "Adventure Tastes Better Grilled",
+        "subheadline": "Don't settle for cold camp food. Our portable grill brings real BBQ flavor to any outdoor adventure.",
+        "keyBenefits": [
+          "Sets up in under 60 seconds",
+          "Cooking surface large enough for family meals",
+          "Temperature control for perfect results",
+          "Folds flat for easy packing",
+          "Built to last a lifetime"
+        ],
+        "featureGrid": [
+          {"icon": "🔥", "title": "Even Heating", "desc": "Consistent heat distribution"},
+          {"icon": "📐", "title": "350 sq in", "desc": "Large cooking surface"},
+          {"icon": "🎒", "title": "Folds Flat", "desc": "Only 3\" thick packed"},
+          {"icon": "🌡️", "title": "Air Vents", "desc": "Precise temp control"},
+          {"icon": "🧹", "title": "Easy Clean", "desc": "Removable ash tray"},
+          {"icon": "💼", "title": "Carry Bag", "desc": "Included padded bag"}
+        ],
+        "lifestyleSection": "Imagine the smell of sizzling burgers at your campsite, the taste of perfectly charred vegetables at the beach, or the joy of hot dogs at your next tailgate. The KV-CAMP-GRILL-002 makes these moments possible. It's not just a grill—it's the centerpiece of outdoor memories.",
+        "faq": [
+          {"q": "How much charcoal does it hold?", "a": "The grill holds approximately 4 lbs of charcoal, providing 2-3 hours of cooking time depending on ventilation settings."},
+          {"q": "Is it suitable for RV camping?", "a": "Yes! The compact folded size fits easily in RV storage compartments. Always use on a stable, non-flammable surface."},
+          {"q": "Can I use this on a wooden picnic table?", "a": "No. Always use the grill on a non-flammable surface like dirt, gravel, or a dedicated fire pad. The bottom can get very hot."},
+          {"q": "Are replacement grates available?", "a": "Yes, replacement stainless steel grates are available through our customer service team."},
+          {"q": "How do I clean the grill?", "a": "Let it cool completely, remove the ash tray, brush the grates, and wipe down with a damp cloth. Grates are dishwasher safe."}
+        ],
+        "cta": "Add to Cart - $69.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-TENT-003",
+      "title": "KVGarage | 4-Person Dome Tent - Waterproof Family Camping Shelter",
+      "category": "Shelter",
+      "cost_estimate": 49.99,
+      "price": 99.99,
+      "compare_price": 179.99,
+      "short_description": "Spacious 4-person tent with full rainfly and easy setup for family camping adventures.",
+      "full_description": "<h3>Your Home Away From Home</h3><p>The KV-CAMP-TENT-003 provides reliable shelter for all your camping adventures. This spacious 4-person dome tent features a full-coverage rainfly, sturdy construction, and surprisingly easy setup so you can spend more time enjoying the outdoors.</p><h4>Designed for Families</h4><ul><li>Spacious interior fits 4 adults or 2 adults + 2 kids comfortably</li><li>Full-coverage rainfly keeps you dry in heavy rain</li><li>Two doors for easy entry and exit</li><li>Color-coded poles for quick setup</li><li>Interior pockets for gear organization</li></ul><h4>Perfect For:</h4><p>Family camping trips, music festivals, scout camping, backyard sleepovers, and beach camping. The versatile design handles various weather conditions.</p>",
+      "features": [
+        "Spacious 4-Person Capacity - 8' x 7' floor with 4.5' center height",
+        "Full-Coverage Rainfly - 1500mm waterproof rating keeps you dry",
+        "Dual Door Design - Two D-style doors for convenient access",
+        "Color-Coded Setup - Poles and clips match for easy assembly",
+        "Ventilated Canopy - Mesh roof panels reduce condensation",
+        "Interior Organization - 4 storage pockets and lantern hook",
+        "Strong Frame - Fiberglass poles withstand wind up to 35mph",
+        "Includes Rainfly & Stakes - Complete setup with guylines and carry bag"
+      ],
+      "images": [
+        "/kv-ct-003.jpg",
+        "/kv-ct-003-2.jpg",
+        "/kv-ct-003-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Adventures Start Here",
+        "subheadline": "Create lasting memories under the stars. Our family tent provides comfort, protection, and easy setup.",
+        "keyBenefits": [
+          "Fits a family of 4 comfortably",
+          "Keeps you dry in heavy rain",
+          "Sets up in under 10 minutes",
+          "Two doors prevent midnight climbs",
+          "Great ventilation reduces condensation"
+        ],
+        "featureGrid": [
+          {"icon": "⛺", "title": "4-Person", "desc": "8' x 7' floor space"},
+          {"icon": "🌧️", "title": "Waterproof", "desc": "1500mm rainfly rating"},
+          {"icon": "🚪", "title": "Dual Doors", "desc": "Easy entry and exit"},
+          {"icon": "⏱️", "title": "Quick Setup", "desc": "Color-coded poles"},
+          {"icon": "💨", "title": "Ventilated", "desc": "Mesh roof panels"},
+          {"icon": "🎒", "title": "Portable", "desc": "Fits in carry bag"}
+        ],
+        "lifestyleSection": "From first-time campers to seasoned outdoors families, the KV-CAMP-TENT-003 makes every trip comfortable. Kids love having their own space, parents appreciate the easy setup, and everyone enjoys staying dry when the weather turns. It's where campfire stories continue and memories are made.",
+        "faq": [
+          {"q": "How long does setup take?", "a": "Most people set up the tent in 8-10 minutes. The color-coded poles and clips make it straightforward, even for beginners."},
+          {"q": "Can it handle strong winds?", "a": "The tent is designed to withstand winds up to 35mph when properly staked. Always use all guylines in windy conditions."},
+          {"q": "Is there a footprint included?", "a": "A footprint (ground cloth) is sold separately but recommended to protect the tent floor and extend its life."},
+          {"q": "Can I stand up inside?", "a": "The center height is 4.5 feet, so most adults can sit comfortably but not stand. It's designed for sleeping and gear storage."},
+          {"q": "How do I waterproof it?", "a": "The tent comes with a waterproof rainfly. For extra protection, you can apply a seam sealer to the rainfly seams before your first trip."}
+        ],
+        "cta": "Add to Cart - $99.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-BAG-004",
+      "title": "KVGarage | 90L Expedition Duffel Bag - Waterproof Adventure Gear Hauler",
+      "category": "Accessories",
+      "cost_estimate": 39.99,
+      "price": 79.99,
+      "compare_price": 139.99,
+      "short_description": "Massive 90L waterproof duffel bag built for extended camping and adventure travel.",
+      "full_description": "<h3>Pack Everything. Worry About Nothing.</h3><p>The KV-CAMP-BAG-004 is the ultimate gear hauler for serious adventurers. With a massive 90-liter capacity and fully waterproof construction, this duffel bag handles extended camping trips, international travel, and everything in between.</p><h4>Built for the Long Haul</h4><ul><li>90L capacity fits gear for week-long trips</li><li>Fully waterproof TPU-coated fabric</li><li>Reinforced haul straps and padded handles</li><li>Multiple carry options: shoulder, hand, or backpack straps</li><li>Lashing points for securing to vehicles or boats</li></ul><h4>Perfect For:</h4><p>Extended camping trips, international backpacking, rafting expeditions, overlanding, military deployment, and as checked luggage. The rugged construction handles whatever you throw at it.</p>",
+      "features": [
+        "Massive 90L Capacity - Fits all your gear for extended adventures",
+        "100% Waterproof - TPU-coated 600D polyester with welded seams",
+        "Versatile Carry System - Padded shoulder strap, haul handles, and backpack straps",
+        "Reinforced Construction - Bar-tacked stress points for heavy loads",
+        "External Lashing Points - Secure to roof racks, boats, or ATVs",
+        "U-shaped Zipper - Wide opening for easy packing and access",
+        "Interior Organization - Mesh pocket and compression straps inside",
+        "Roll-Top Closure - Extra waterproof protection when needed"
+      ],
+      "images": [
+        "/KV-CAMP-BAG-004-7.webp",
+        "/KV-CAMP-BAG-004-8.webp",
+        "/KV-CAMP-BAG-004-9.webp",
+        "/KV-CAMP-BAG-004-10.webp",
+        "/KV-CAMP-BAG-004-11.webp",
+        "/KV-CAMP-BAG-004-12.webp",
+        "/KV-CAMP-BAG-004-13.webp",
+        "/KV-CAMP-BAG-004-14.webp",
+        "/KV-CAMP-BAG-004-15.webp",
+        "/KV-CAMP-BAG-004-16.webp",
+        "/KV-CAMP-BAG-004-17.webp",
+        "/KV-CAMP-BAG-004-18.webp",
+        "/KV-CAMP-BAG-004-19.webp",
+        "/KV-CAMP-BAG-004-20.webp"
+      ],
+      "productPageContent": {
+        "headline": "One Bag. Every Adventure.",
+        "subheadline": "From weekend camping to month-long expeditions, the 90L duffel carries it all. Waterproof, bombproof, adventure-proof.",
+        "keyBenefits": [
+          "90L capacity replaces multiple bags",
+          "Fully waterproof protects gear in any weather",
+          "Multiple carry options for any situation",
+          "Built to withstand years of hard use",
+          "Lashing points for vehicle transport"
+        ],
+        "featureGrid": [
+          {"icon": "📦", "title": "90L Capacity", "desc": "Massive storage space"},
+          {"icon": "💧", "title": "Waterproof", "desc": "Welded seams + TPU coating"},
+          {"icon": "🎒", "title": "4 Carry Ways", "desc": "Shoulder, hand, backpack, haul"},
+          {"icon": "🔗", "title": "Lashing Points", "desc": "Secure to any vehicle"},
+          {"icon": "💪", "title": "Reinforced", "desc": "Bar-tacked stress points"},
+          {"icon": "🗂️", "title": "Organized", "desc": "Interior pockets + straps"}
+        ],
+        "lifestyleSection": "The KV-CAMP-BAG-004 has been around the world and back. It's been rafted down rivers, strapped to roof racks, checked on international flights, and dragged through muddy campsites. And it keeps going. This isn't just a bag—it's your reliable partner for every journey, from weekend getaways to year-long expeditions.",
+        "faq": [
+          {"q": "Is this bag truly waterproof or just water-resistant?", "a": "It's fully waterproof! The TPU-coated fabric and welded seams keep water out even when submerged. The roll-top closure provides extra protection."},
+          {"q": "Can I use this as a carry-on?", "a": "At 90L, it's too large for most airline carry-ons. It's designed as checked luggage or for vehicle-based travel."},
+          {"q": "How much weight can it hold?", "a": "The bag is rated for up to 100 lbs of gear. The reinforced construction and strong zippers handle heavy loads."},
+          {"q": "Can the backpack straps be removed?", "a": "Yes, the backpack straps are stowable in a zippered pocket on the back panel when not in use."},
+          {"q": "What are the dimensions?", "a": "The bag measures approximately 30\" x 15\" x 15\" when fully packed. It can be compressed smaller when not fully loaded."}
+        ],
+        "cta": "Add to Cart - $79.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-LUXTENT-005",
+      "title": "KVGarage | Luxury Canvas Bell Tent - 5M Glamping Shelter with Stove Jack",
+      "category": "Shelter",
+      "cost_estimate": 149.99,
+      "price": 299.99,
+      "compare_price": 499.99,
+      "short_description": "Premium canvas bell tent with standing room, stove jack, and luxury glamping features.",
+      "full_description": "<h3>Glamping Redefined</h3><p>The KV-CAMP-LUXTENT-005 brings five-star comfort to the great outdoors. This spacious 5-meter canvas bell tent features standing room, a built-in stove jack for wood stoves, and premium materials that make camping feel like luxury accommodation.</p><h4>Luxury Meets Nature</h4><ul><li>5M diameter provides 196 sq ft of living space</li><li>6.5ft center height allows full standing room</li><li>Heavy-duty 12oz canvas is breathable and durable</li><li>Built-in stove jack for safe wood stove use</li><li>Large windows with bug screens for ventilation</li></ul><h4>Perfect For:</h4><p>Glamping sites, extended base camps, hunting camps, festival VIP areas, backyard guest houses, and anyone who refuses to rough it. This tent is a destination in itself.</p>",
+      "features": [
+        "Spacious 5M Design - 196 sq ft with 6.5ft center height for standing room",
+        "Premium 12oz Canvas - Breathable cotton/poly blend resists mildew",
+        "Stove Jack Included - Fire-retardant port for safe wood stove installation",
+        "4 Large Windows - Mesh-screened windows with canvas storm covers",
+        "Reinforced Structure - Galvanized steel center pole and aluminum ribs",
+        "Bathtub Floor - 6\" high waterproof floor prevents water entry",
+        "Multiple Doors - Main D-door plus rear exit for ventilation",
+        "Complete Package - Includes tent, poles, stakes, guylines, and carry bag"
+      ],
+      "images": [
+        "/kv-ct-005.jpg",
+        "/kv-ct-005-2.jpg",
+        "/kv-ct-005-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Camping Without Compromise",
+        "subheadline": "Why choose between comfort and nature? Our luxury bell tent gives you both. Stand up, walk around, and sleep like royalty.",
+        "keyBenefits": [
+          "Full standing room throughout center",
+          "Wood stove compatible for year-round use",
+          "Breathable canvas prevents condensation",
+          "Massive 196 sq ft living space",
+          "Beautiful aesthetic for Instagram-worthy camps"
+        ],
+        "featureGrid": [
+          {"icon": "⛺", "title": "5M Diameter", "desc": "196 sq ft of space"},
+          {"icon": "🧍", "title": "6.5ft Height", "desc": "Full standing room"},
+          {"icon": "🔥", "title": "Stove Jack", "desc": "Wood stove compatible"},
+          {"icon": "🪟", "title": "4 Windows", "desc": "Screened + storm covers"},
+          {"icon": "🌿", "title": "Canvas", "desc": "Breathable 12oz fabric"},
+          {"icon": "👑", "title": "Luxury", "desc": "Glamping-grade comfort"}
+        ],
+        "lifestyleSection": "The KV-CAMP-LUXTENT-005 isn't just a tent—it's an experience. Imagine waking up in a spacious canvas room, brewing coffee on your wood stove, and stepping out onto dew-covered grass. Host elegant dinner parties at your campsite. Create a backyard retreat that rivals any hotel. This is outdoor living, elevated.",
+        "faq": [
+          {"q": "How many people can sleep in this tent?", "a": "Comfortably sleeps 4-6 adults with room for cots or air mattresses. Can accommodate up to 8 with sleeping bags."},
+          {"q": "Is the wood stove included?", "a": "No, the stove is sold separately. The tent includes the fire-retardant stove jack for safe installation."},
+          {"q": "Can this tent handle snow?", "a": "Yes, the steep canvas walls shed snow well. The stove provides warmth, and the strong frame handles snow load. Not recommended for extreme winter conditions."},
+          {"q": "How heavy is it packed?", "a": "The tent weighs approximately 55 lbs packed. It's designed for vehicle-based camping rather than backpacking."},
+          {"q": "How do I maintain the canvas?", "a": "Always dry completely before storing. Clean with mild soap and water. Re-waterproof annually with canvas treatment. Store in a dry place."}
+        ],
+        "cta": "Add to Cart - $299.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-TABLE-006",
+      "title": "KVGarage | Aluminum Camping Table - Lightweight Folding Camp Kitchen",
+      "category": "Accessories",
+      "cost_estimate": 34.99,
+      "price": 69.99,
+      "compare_price": 109.99,
+      "short_description": "Sturdy aluminum folding table with adjustable legs and 110lb weight capacity.",
+      "full_description": "<h3>Your Camp Kitchen Headquarters</h3><p>The KV-CAMP-TABLE-006 is the ultimate camping workhorse. This lightweight aluminum table sets up in seconds, adjusts to uneven terrain, and provides a sturdy surface for cooking, eating, and organizing all your camp gear.</p><h4>Engineered for the Outdoors</h4><ul><li>Lightweight aluminum frame weighs only 11 lbs</li><li>Adjustable legs handle slopes and uneven ground</li><li>110lb weight capacity handles heavy coolers and stoves</li><li>Roll-up design fits in included carry bag</li><li>Textured surface prevents items from sliding</li></ul><h4>Perfect For:</h4><p>Camp cooking stations, tailgate setups, festival camping, beach picnics, craft fairs, and emergency outdoor workspace. The versatile design works anywhere you need a reliable surface.</p>",
+      "features": [
+        "Lightweight Aluminum - Aircraft-grade aluminum frame weighs only 11 lbs",
+        "Adjustable Legs - Independent leg adjustment for uneven terrain",
+        "110lb Capacity - Supports heavy coolers, stoves, and cooking gear",
+        "Roll-Up Design - Tabletop rolls for compact storage and transport",
+        "Textured Surface - Non-slip aluminum slats keep items in place",
+        "Quick Setup - Deploys in under 30 seconds with no assembly",
+        "Built-in Handle - Integrated carry handle for easy transport",
+        "Rust-Resistant - Anodized finish withstands outdoor elements"
+      ],
+      "images": [
+        "/kv-ct-006.jpg",
+        "/kv-ct-006-2.jpg",
+        "/kv-ct-006-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Every Camp Needs a Command Center",
+        "subheadline": "From meal prep to gear organization, our aluminum table is the heart of any great campsite.",
+        "keyBenefits": [
+          "Sets up in under 30 seconds",
+          "Adjusts to any terrain",
+          "Lightweight but incredibly strong",
+          "Rolls up for compact packing",
+          "Easy to clean after messy meals"
+        ],
+        "featureGrid": [
+          {"icon": "⚡", "title": "11 lbs", "desc": "Ultralight aluminum"},
+          {"icon": "📐", "title": "Adjustable", "desc": "Levels on any terrain"},
+          {"icon": "💪", "title": "110 lbs", "desc": "Heavy-duty capacity"},
+          {"icon": "🔄", "title": "Roll-Up", "desc": "Compact storage"},
+          {"icon": "⏱️", "title": "30 Sec", "desc": "Quick setup"},
+          {"icon": "🧹", "title": "Easy Clean", "desc": "Wipe-down surface"}
+        ],
+        "lifestyleSection": "The KV-CAMP-TABLE-006 transforms any campsite into a functional outdoor kitchen. Prep breakfast while the coffee brews. Organize your gear so you're not digging through bins. Host tailgate parties with a sturdy surface for food and drinks. It's the unsung hero of great outdoor experiences.",
+        "faq": [
+          {"q": "What are the dimensions when set up?", "a": "The table measures 36\" L x 24\" W x 27\" H when fully deployed. The height is adjustable by 3 inches."},
+          {"q": "Can it hold a full cooler?", "a": "Yes! The 110lb capacity easily supports a large cooler full of ice and drinks, plus additional cooking gear."},
+          {"q": "Does it work on sand or soft ground?", "a": "Yes, the adjustable legs help stabilize on soft surfaces. For very soft ground, we recommend using the included foot pads or placing boards under the legs."},
+          {"q": "Is the tabletop removable?", "a": "The aluminum slat top is attached but rolls up for packing. It's not designed to be removed entirely."}
+        ],
+        "cta": "Add to Cart - $69.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-STOVE-007",
+      "title": "KVGarage | Dual Burner Camp Stove - Wind-Resistant Propane Cooking Station",
+      "category": "Cooking",
+      "cost_estimate": 44.99,
+      "price": 89.99,
+      "compare_price": 149.99,
+      "short_description": "Powerful dual burner camp stove with wind shields and piezo ignition for reliable outdoor cooking.",
+      "full_description": "<h3>Cook Like You're at Home</h3><p>The KV-CAMP-STOVE-007 brings serious cooking power to your campsite. With two high-output burners, wind-resistant design, and reliable piezo ignition, this camp stove lets you prepare full meals anywhere adventure takes you.</p><h4>Serious Cooking Power</h4><ul><li>Two 10,000 BTU burners for fast, even heating</li><li>Built-in wind shields protect flames in breezy conditions</li><li>Piezo ignition lights with the push of a button</li><li>Independent burner controls for precise temperature</li><li>Removable cooking grates for easy cleaning</li></ul><h4>Perfect For:</h4><p>Family camping meals, tailgate cooking, hunting camps, emergency preparedness, outdoor catering, and car camping. Boil water, fry bacon, and simmer chili all at the same time.</p>",
+      "features": [
+        "Dual 10,000 BTU Burners - 20,000 total BTUs for powerful cooking",
+        "Wind-Resistant Design - Integrated wind shields protect both burners",
+        "Piezo Ignition - Push-button lighting, no matches needed",
+        "Independent Controls - Adjust each burner separately for multi-tasking",
+        "Pressure Control Technology - Consistent performance in varying temperatures",
+        "Removable Grates - Enamel-coated grates are easy to clean",
+        "PerfectFlow Technology - Performs in extreme heat or cold",
+        "Compact Folding - Legs fold for transport, accepts 16.4oz propane cylinders"
+      ],
+      "images": [
+        "/kv-ct-007.jpg",
+        "/kv-ct-007-2.jpg",
+        "/kv-ct-007-3.jpg",
+        "/kv-ct-007-4.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Real Cooking, Real Fire, Real Easy",
+        "subheadline": "Two burners, 20,000 BTUs, zero compromise. Cook full meals at your campsite just like at home.",
+        "keyBenefits": [
+          "Cook multiple dishes simultaneously",
+          "Wind shields work in breezy conditions",
+          "Push-button ignition every time",
+          "Works in hot or cold weather",
+          "Easy to clean after cooking"
+        ],
+        "featureGrid": [
+          {"icon": "🔥", "title": "20K BTU", "desc": "Two 10K burners"},
+          {"icon": "💨", "title": "Wind Shields", "desc": "Built-in protection"},
+          {"icon": "🔘", "title": "Piezo Ignition", "desc": "Push-button start"},
+          {"icon": "🌡️", "title": "All Weather", "desc": "Works in heat or cold"},
+          {"icon": "🍳", "title": "Even Heat", "desc": "Consistent cooking"},
+          {"icon": "🧹", "title": "Easy Clean", "desc": "Removable grates"}
+        ],
+        "lifestyleSection": "Remember the days of burnt hot dogs and cold beans? The KV-CAMP-STOVE-007 ends camp food mediocrity forever. Fry up a full breakfast while brewing coffee. Simmer a hearty chili after a day of hiking. Host tailgate feasts that make other campers jealous. This is outdoor cooking, grown up.",
+        "faq": [
+          {"q": "What size propane does it use?", "a": "The stove uses standard 16.4oz disposable propane cylinders. One cylinder typically lasts 1-2 hours on high heat. An adapter for larger propane tanks is available separately."},
+          {"q": "Can I use it indoors?", "a": "No. This stove is for outdoor use only due to carbon monoxide emissions. Never use in tents, vehicles, or enclosed spaces."},
+          {"q": "How long does it take to boil water?", "a": "With 10,000 BTU per burner, it boils 1 liter of water in approximately 3-4 minutes depending on conditions."},
+          {"q": "Is it stable enough for large pots?", "a": "Yes, the wide burner grates and stable base support large pots and Dutch ovens. The 110lb capacity handles heavy cookware."},
+          {"q": "Does it come with a carry case?", "a": "The stove folds compactly but does not include a carry case. Cases are available as an accessory."}
+        ],
+        "cta": "Add to Cart - $89.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-LIGHT-008",
+      "title": "KVGarage | Rechargeable LED Lantern - 1000 Lumen Camping Light with Power Bank",
+      "category": "Lighting",
+      "cost_estimate": 19.99,
+      "price": 39.99,
+      "compare_price": 69.99,
+      "short_description": "Ultra-bright 1000 lumen LED lantern with USB power bank and multiple lighting modes.",
+      "full_description": "<h3>Light Up Your Adventure</h3><p>The KV-CAMP-LIGHT-008 delivers powerful, versatile illumination for any outdoor activity. With 1000 lumens of brightness, multiple lighting modes, and a built-in power bank for charging devices, this lantern is an essential piece of camping gear.</p><h4>Brilliantly Designed</h4><ul><li>1000 lumens illuminates entire campsites</li><li>Rechargeable battery lasts up to 100 hours on low</li><li>4 lighting modes: high, medium, low, and SOS</li><li>Built-in USB port charges phones and devices</li><li>Collapsible design for compact storage</li></ul><h4>Perfect For:</h4><p>Campsite lighting, emergency preparedness, power outages, backyard gatherings, garage workshops, and as a portable power bank. The versatile design works anywhere you need light.</p>",
+      "features": [
+        "1000 Lumen Output - Powerful LED illuminates up to 300 sq ft",
+        "Rechargeable Battery - 10,000mAh battery with USB-C charging",
+        "4 Light Modes - High (4hrs), Medium (12hrs), Low (100hrs), SOS",
+        "Power Bank Function - USB-A port charges phones and tablets",
+        "Collapsible Design - Extends to 9\" tall, collapses to 5\" for packing",
+        "Water-Resistant IPX4 - Handles rain and splashes",
+        "Hanging Hook & Base - Hang from tent or stand on table",
+        "Battery Indicator - LED shows remaining power level"
+      ],
+      "images": [
+        "/kv-ct-008.jpg",
+        "/kv-ct-008-2.jpg",
+        "/kv-ct-008-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Never Be Left in the Dark",
+        "subheadline": "From ambient campsite glow to emergency SOS, our rechargeable lantern handles it all. Plus, it doubles as a phone charger.",
+        "keyBenefits": [
+          "1000 lumens lights up the whole camp",
+          "100-hour runtime on low setting",
+          "Charges your phone in a pinch",
+          "Collapsible for easy packing",
+          "Works during power outages at home"
+        ],
+        "featureGrid": [
+          {"icon": "💡", "title": "1000 Lumens", "desc": "Ultra-bright LED"},
+          {"icon": "🔋", "title": "100 Hrs", "desc": "Runtime on low mode"},
+          {"icon": "📱", "title": "Power Bank", "desc": "Charges devices via USB"},
+          {"icon": "🔄", "title": "Collapsible", "desc": "5\" to 9\" height"},
+          {"icon": "🌧️", "title": "IPX4", "desc": "Water-resistant"},
+          {"icon": "🆘", "title": "SOS Mode", "desc": "Emergency signaling"}
+        ],
+        "lifestyleSection": "The KV-CAMP-LIGHT-008 is the last light you'll need. Hang it in your tent for reading. Set it on the picnic table for dinner. Use it to find your way to the bathroom at 2 AM. When your phone dies, charge it back up. When the power goes out at home, grab it from your emergency kit. One light, endless uses.",
+        "faq": [
+          {"q": "How long does it take to recharge?", "a": "The lantern fully recharges in 6-8 hours via USB-C. A wall adapter is not included but any USB-C charger works."},
+          {"q": "Can it charge an iPhone?", "a": "Yes! The USB-A port provides 5V/2A output, compatible with all phones and most tablets."},
+          {"q": "Is it bright enough for cooking?", "a": "Absolutely. On high mode, 1000 lumens provides plenty of light for cooking, reading maps, or any detailed task."},
+          {"q": "Can I replace the battery?", "a": "The battery is not user-replaceable but is rated for 500+ charge cycles, providing years of use."}
+        ],
+        "cta": "Add to Cart - $39.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-SLEEP-009",
+      "title": "KVGarage | 20°F Mummy Sleeping Bag - Ultralight Cold Weather Camp Bed",
+      "category": "Sleep",
+      "cost_estimate": 44.99,
+      "price": 89.99,
+      "compare_price": 149.99,
+      "short_description": "Lightweight mummy sleeping bag rated to 20°F with water-resistant shell and compression sack.",
+      "full_description": "<h3>Sleep Warm, Adventure More</h3><p>The KV-CAMP-SLEEP-009 keeps you comfortable in cold conditions without weighing you down. This ultralight mummy bag features premium synthetic insulation, a water-resistant shell, and a compact design that fits easily in any pack.</p><h4>Engineered for Cold Adventures</h4><ul><li>20°F comfort rating handles three-season camping</li><li>Lightweight design weighs only 2.8 lbs</li><li>Water-resistant shell sheds moisture</li><li>Mummy shape maximizes warmth efficiency</li><li>Compression sack reduces pack size by 40%</li></ul><h4>Perfect For:</h4><p>Three-season backpacking, cold-weather camping, hunting trips, music festivals, emergency car kit, and as a spare guest bag. The versatile temperature rating works spring through fall.</p>",
+      "features": [
+        "20°F Temperature Rating - Comfortable in near-freezing temperatures",
+        "Ultralight Design - Weighs only 2.8 lbs for backpacking",
+        "Water-Resistant Shell - DWR coating repels moisture and condensation",
+        "Mummy Shape - Contoured design traps heat efficiently",
+        "Draft Tube & Hood - Insulated zipper tube and fitted hood prevent heat loss",
+        "Compression Sack - Included sack reduces size to 8\" x 16\"",
+        "Full-Length Zipper - Two-way zipper for ventilation control",
+        "Machine Washable - Easy care for long-lasting freshness"
+      ],
+      "images": [
+        "/kv-ct-009.jpg",
+        "/kv-ct-009-2.jpg",
+        "/kv-ct-009-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Cold Nights, Warm Sleep",
+        "subheadline": "Don't let dropping temperatures end your camping season. Our 20°F bag keeps you warm without the bulk.",
+        "keyBenefits": [
+          "Rated to 20°F for cold nights",
+          "Only 2.8 lbs for easy packing",
+          "Water-resistant for damp conditions",
+          "Compresses small in your pack",
+          "Machine washable for easy care"
+        ],
+        "featureGrid": [
+          {"icon": "🌡️", "title": "20°F Rated", "desc": "Three-season warmth"},
+          {"icon": "🪶", "title": "2.8 lbs", "desc": "Ultralight design"},
+          {"icon": "💧", "title": "Water-Resistant", "desc": "DWR coating"},
+          {"icon": "📦", "title": "Compact", "desc": "8\" x 16\" packed"},
+          {"icon": "🧥", "title": "Mummy Cut", "desc": "Maximum warmth"},
+          {"icon": "🧺", "title": "Washable", "desc": "Machine washable"}
+        ],
+        "lifestyleSection": "The KV-CAMP-SLEEP-009 extends your camping season into the shoulder months when crowds thin and views clear. Sleep warm under autumn stars. Wake up to frost on the tent and a hot cup of coffee. Whether you're backpacking solo or need a reliable bag for your kid's scout trips, this is cold-weather comfort without the weight.",
+        "faq": [
+          {"q": "What height person fits this bag?", "a": "The regular size fits up to 6' tall. A long size (fits up to 6'6\") is available separately."},
+          {"q": "Is it warm enough for winter camping?", "a": "The 20°F rating works for three-season camping. For winter camping below 20°F, we recommend a 0°F bag or using a liner."},
+          {"q": "Can two bags zip together?", "a": "Yes! Two bags with opposite zipper orientations can zip together to form a double bag. Order one left-zip and one right-zip version."},
+          {"q": "How do I wash it?", "a": "Machine wash cold on gentle cycle with mild detergent. Tumble dry low with tennis balls to fluff the insulation. Do not dry clean."}
+        ],
+        "cta": "Add to Cart - $89.99"
+      }
+    },
+    {
+      "sku": "KV-CAMP-CLIMB-010",
+      "title": "KVGarage | 50m Climbing Rope - Dynamic Single Rope UIAA Certified",
+      "category": "Accessories",
+      "cost_estimate": 89.99,
+      "price": 179.99,
+      "compare_price": 299.99,
+      "short_description": "UIAA certified dynamic climbing rope with dry treatment and middle mark for safety.",
+      "full_description": "<h3>Climb With Confidence</h3><p>The KV-CAMP-CLIMB-010 is a UIAA certified dynamic single rope designed for sport climbing, trad climbing, and mountaineering. With a dry treatment for all-weather performance and a clearly marked middle point, this rope delivers professional-grade safety and durability.</p><h4>Built for Serious Climbers</h4><ul><li>UIAA and CE certified for safety standards</li><li>9.8mm diameter balances handling and weight</li><li>Dry treatment resists water and dirt</li><li>Middle mark for easy rappel setup</li><li>Low impact force reduces strain on gear</li></ul><h4>Perfect For:</h4><p>Sport climbing, trad climbing, top-roping, mountaineering, climbing gym use, and rescue operations. The versatile 50m length works for most single-pitch routes.</p>",
+      "features": [
+        "UIAA Certified - Meets all UIAA and CE safety standards",
+        "9.8mm Diameter - Optimal balance of handling and weight",
+        "Dry Treatment - Hydrophobic coating resists water and abrasion",
+        "Middle Mark - Clearly visible mark for rappel and belay setup",
+        "Low Impact Force - 8.9 kN reduces stress on protection",
+        "Dynamic Elongation - 32% stretch absorbs fall energy",
+        "Bi-Pattern Sheath - Easy to identify rope ends",
+        "50m Length - Ideal for most single-pitch sport routes"
+      ],
+      "images": [
+        "/kv-ct-010.jpg",
+        "/kv-ct-010-2.jpg",
+        "/kv-ct-010-3.jpg"
+      ],
+      "productPageContent": {
+        "headline": "Your Safety, Our Standard",
+        "subheadline": "UIAA certified, dry-treated, and ready for any climb. From the gym to the crag, trust your life to gear that exceeds safety standards.",
+        "keyBenefits": [
+          "UIAA and CE certified for safety",
+          "Dry treatment for wet conditions",
+          "Middle mark for safe rappelling",
+          "Low impact force protects gear",
+          "Durable construction for long life"
+        ],
+        "featureGrid": [
+          {"icon": "✅", "title": "UIAA Certified", "desc": "Meets safety standards"},
+          {"icon": "📏", "title": "9.8mm", "desc": "Optimal diameter"},
+          {"icon": "💧", "title": "Dry Treatment", "desc": "Water-resistant"},
+          {"icon": "🎯", "title": "Middle Mark", "desc": "Easy rappel setup"},
+          {"icon": "🧗", "title": "50m", "desc": "Single-pitch length"},
+          {"icon": "🛡️", "title": "8.9 kN", "desc": "Low impact force"}
+        ],
+        "lifestyleSection": "Every climber knows that moment of trust—when you clip in and commit to the next move. The KV-CAMP-CLIMB-010 is built for those moments. Whether you're sending your project at the local crag, exploring new routes on a climbing trip, or working on technique at the gym, this rope is your reliable partner. It's not just gear; it's peace of mind.",
+        "faq": [
+          {"q": "Is this rope suitable for beginners?", "a": "Yes! This rope is excellent for climbers of all levels. The 9.8mm diameter is easy to handle and works well with most belay devices."},
+          {"q": "How many falls can it hold?", "a": "The rope is rated for 7-9 UIAA test falls, which translates to many years of regular climbing use with proper care."},
+          {"q": "Can I use this for ice climbing?", "a": "Yes, the dry treatment makes it suitable for ice climbing and alpine conditions. Consider a longer rope (70m+) for multi-pitch ice routes."},
+          {"q": "How do I care for the rope?", "a": "Store in a cool, dry place away from UV light. Wash periodically with rope-specific cleaner. Inspect before each use for damage. Retire after heavy falls or visible damage."},
+          {"q": "Does it come with a rope bag?", "a": "The rope includes a mesh stuff sack for storage. A dedicated rope bag with tarp is available separately."}
+        ],
+        "cta": "Add to Cart - $179.99"
+      }
+    }
+  ],
+  "collections": {
+    "Cameras": ["KV-CAM-SMART-BLK-001", "KV-CAM-SMART-ORG-002"],
+    "Camping Essentials": ["KV-CAMP-BAG-004", "KV-CAMP-TABLE-006"],
+    "Cooking": ["KV-CAMP-GRILL-002", "KV-CAMP-STOVE-007"],
+    "Shelter & Sleep": ["KV-CAMP-TENT-003", "KV-CAMP-LUXTENT-005", "KV-CAMP-MATT-001", "KV-CAMP-SLEEP-009"],
+    "Lighting": ["KV-CAMP-LIGHT-008"],
+    "Accessories": ["KV-CAMP-CLIMB-010"]
+  },
+  "metadata": {
+    "generatedAt": "2026-03-31T00:13:00-04:00",
+    "totalProducts": 12,
+    "note": "Products processed from available images in /public directory. Some SKUs (KV-CAMP-MATT-001, KV-CAMP-TENT-003, KV-CAMP-LUXTENT-005, KV-CAMP-TABLE-006, KV-CAMP-STOVE-007, KV-CAMP-LIGHT-008, KV-CAMP-SLEEP-009, KV-CAMP-CLIMB-010) were mapped to kv-ct-XXX images based on naming convention."
+  }
+}
