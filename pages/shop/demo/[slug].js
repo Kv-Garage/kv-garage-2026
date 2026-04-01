@@ -14,8 +14,8 @@
  */
 
 import { useRouter } from "next/router";
-import productsData from "../../../data/shopify-products.json";
-import ShopifyProductPage from "../../../components/product/ShopifyProductPage";
+import productsData from "../../../data/products.json";
+import SimpleProductPage from "../../../components/product/SimpleProductPage";
 
 export default function DemoProductPage({ product }) {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function DemoProductPage({ product }) {
     );
   }
 
-  return <ShopifyProductPage product={product} showTestControls={true} />;
+  return <SimpleProductPage product={product} />;
 }
 
 // Generate static paths for all demo products
