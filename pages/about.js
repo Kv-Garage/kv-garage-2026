@@ -133,9 +133,8 @@ export default function About() {
                 <div className="text-4xl mb-6">🚀</div>
                 <h3 className="text-2xl font-bold text-[#D4AF37] mb-4">Distribution</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Side-by-side control and help from order to delivery. 
-                  1-week delivery time with results showing in 72 hours. 
-                  Real-time tracking. Your success is our success.
+                  48-hour dispatch on retail orders. Real-time inventory tracking. 
+                  Global shipping partnerships. Your customers don't wait.
                 </p>
               </div>
 
@@ -156,16 +155,16 @@ export default function About() {
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-12 text-center">
               <div>
-                <div className="text-6xl font-bold text-[#D4AF37] mb-4">4,800+</div>
-                <p className="text-xl text-gray-300">Businesses Served</p>
+                <div className="text-6xl font-bold text-[#D4AF37] mb-4">7,800+</div>
+                <p className="text-xl text-gray-300">Operators Trained</p>
               </div>
               <div>
-                <div className="text-6xl font-bold text-[#D4AF37] mb-4">1 Week</div>
-                <p className="text-xl text-gray-300">Delivery Time</p>
+                <div className="text-6xl font-bold text-[#D4AF37] mb-4">1,000+</div>
+                <p className="text-xl text-gray-300">Products Available</p>
               </div>
               <div>
                 <div className="text-6xl font-bold text-[#D4AF37] mb-4">72 Hours</div>
-                <p className="text-xl text-gray-300">Showing Results</p>
+                <p className="text-xl text-gray-300">Average Dispatch Time</p>
               </div>
             </div>
           </div>

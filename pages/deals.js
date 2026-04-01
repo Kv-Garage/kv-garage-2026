@@ -130,20 +130,20 @@ export default function Deals() {
             {/* TRUST INDICATORS */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <div className="text-3xl font-bold text-[#D4AF37] mb-2">50+</div>
-                <div className="text-sm text-gray-400">Custom Systems Built</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-[#D4AF37] mb-2">97%</div>
-                <div className="text-sm text-gray-400">Client Retention Rate</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-[#D4AF37] mb-2">24-48 Hours</div>
-                <div className="text-sm text-gray-400">Average Delivery Time</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-[#D4AF37] mb-2">15K+</div>
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">4,800+</div>
                 <div className="text-sm text-gray-400">Businesses Served</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">1 Week</div>
+                <div className="text-sm text-gray-400">Delivery Time</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">72 Hours</div>
+                <div className="text-sm text-gray-400">Showing Results</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-[#D4AF37] mb-2">Side-by-Side</div>
+                <div className="text-sm text-gray-400">Control & Help</div>
               </div>
             </div>
           </div>
