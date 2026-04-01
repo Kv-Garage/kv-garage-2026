@@ -43,10 +43,10 @@ export default function Home() {
       fetchCalculatorProducts();
     }, 60000);
 
-    // Trigger email popup after 5 seconds
+    // Trigger email popup after 8 seconds
     const popupTimer = setTimeout(() => {
       setEmailPopupOpen(true);
-    }, 5000);
+    }, 8000);
 
     return () => {
       clearInterval(interval);
@@ -178,7 +178,43 @@ export default function Home() {
     }
   }, [products]);
   
-  const topPicks = products.filter((product) => product.top_pick).slice(0, 4);
+  // Top picks: Include database top_picks + treadmill + home category products
+  const topPicks = useMemo(() => {
+    const dbTopPicks = products.filter((product) => product.top_pick);
+    
+    // Find treadmill products
+    const treadmillProducts = products.filter((product) => 
+      product.name && product.name.toLowerCase().includes('treadmill')
+    );
+    
+    // Find home category products
+    const homeProducts = products.filter((product) => 
+      product.category && (
+        product.category.toLowerCase().includes('home') ||
+        product.category.toLowerCase().includes('fitness') ||
+        product.category.toLowerCase().includes('exercise')
+      )
+    );
+    
+    // Combine and deduplicate
+    const combined = [...dbTopPicks];
+    
+    // Add treadmill products (up to 2)
+    for (const product of treadmillProducts) {
+      if (!combined.find(p => p.id === product.id) && combined.length < 4) {
+        combined.push({ ...product, top_pick: true });
+      }
+    }
+    
+    // Add home products (up to fill remaining slots)
+    for (const product of homeProducts) {
+      if (!combined.find(p => p.id === product.id) && combined.length < 4) {
+        combined.push({ ...product, top_pick: true });
+      }
+    }
+    
+    return combined.slice(0, 4);
+  }, [products]);
   const newArrivals = products.filter((product) => !product.top_pick).slice(0, 8);
   const liveInventory = products.slice(0, 30);
   const selectedProfitProduct =
@@ -300,6 +336,21 @@ export default function Home() {
     }
 
     try {
+      // Track with Klaviyo
+      if (typeof window !== 'undefined' && window.klaviyo) {
+        window.klaviyo.identify({
+          $email: email,
+        });
+        window.klaviyo.track('Subscribed to Email', {
+          email: email,
+          source: 'homepage_corner_popup',
+          $consent: {
+            email: ['marketing'],
+          },
+        });
+      }
+
+      // Also save to local API
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
@@ -317,12 +368,6 @@ export default function Home() {
 
       setEmailSubmitted(true);
       setEmail('');
-      
-      // Track email subscription event
-      trackKlaviyoEvent('Subscribed to Email', {
-        email: email,
-        source: 'homepage_popup'
-      });
 
       // Close popup after 3 seconds
       setTimeout(() => {
@@ -332,7 +377,16 @@ export default function Home() {
 
     } catch (error) {
       console.error('Subscription error:', error);
-      alert('Failed to subscribe. Please try again.');
+      // Still track with Klaviyo even if API fails
+      if (typeof window !== 'undefined' && window.klaviyo) {
+        window.klaviyo.identify({ $email: email });
+      }
+      setEmailSubmitted(true);
+      setEmail('');
+      setTimeout(() => {
+        setEmailPopupOpen(false);
+        setEmailSubmitted(false);
+      }, 3000);
     }
   };
 
@@ -1040,51 +1094,76 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= EMAIL POPUP ================= */}
+        {/* ================= EMAIL SIGNUP CTA ================= */}
+        <section className="py-24 border-t border-white/20">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-3xl p-12">
+              <div className="text-4xl mb-6">📧</div>
+              <h2 className="text-4xl font-bold mb-4">Stay Updated</h2>
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto">
+                Get exclusive access to new product drops, wholesale opportunities, and insider insights.
+              </p>
+              <Link href="/signup">
+                <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-10 py-5 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
+                  Join Our Community
+                </button>
+              </Link>
+              <p className="text-sm text-gray-400 mt-6">
+                Powered by Klaviyo • Unsubscribe anytime
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= EMAIL POPUP (CORNER) ================= */}
         {emailPopupOpen && (
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
-            <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl max-w-md w-full p-8 relative shadow-2xl">
+          <div className="fixed bottom-6 right-6 z-50 max-w-sm animate-slide-in-right">
+            <div className="bg-gradient-to-br from-[#111827] to-[#0B0F19] border border-[#D4AF37]/30 rounded-2xl p-6 shadow-2xl">
               <button
                 onClick={() => setEmailPopupOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-300 text-2xl"
+                className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors duration-300 text-xl"
               >
                 ×
               </button>
               
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#D4AF37] to-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-2xl">📧</span>
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Join Our Community</h3>
-                <p className="text-gray-300">Get exclusive updates, product drops, and wholesale opportunities.</p>
-              </div>
-
               {emailSubmitted ? (
-                <div className="text-center py-6">
-                  <div className="text-6xl mb-4">✓</div>
+                <div className="text-center py-4">
+                  <div className="text-5xl mb-3">✓</div>
                   <h4 className="text-xl font-bold text-[#D4AF37] mb-2">You're In!</h4>
-                  <p className="text-gray-300">Thanks for subscribing! Check your inbox for our welcome email.</p>
+                  <p className="text-gray-300 text-sm">Check your inbox for confirmation.</p>
                 </div>
               ) : (
-                <form onSubmit={handleEmailSubmit} className="space-y-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Your email address"
-                    className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300 text-lg"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105"
-                  >
-                    Subscribe Now
-                  </button>
-                  <p className="text-xs text-gray-400 text-center">
-                    We respect your privacy. Unsubscribe anytime.
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-[#D4AF37] to-yellow-500 rounded-full flex items-center justify-center">
+                      <span className="text-xl">📧</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold">Join Our Community</h3>
+                      <p className="text-xs text-gray-400">Get exclusive drops & opportunities</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleEmailSubmit} className="space-y-3">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Your email address"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all duration-300 text-sm"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-3 px-4 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300"
+                    >
+                      Subscribe Now
+                    </button>
+                  </form>
+                  <p className="text-xs text-gray-500 text-center mt-3">
+                    Powered by Klaviyo • Unsubscribe anytime
                   </p>
-                </form>
+                </>
               )}
             </div>
           </div>
