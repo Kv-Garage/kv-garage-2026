@@ -98,10 +98,67 @@ export default function CartPage() {
     }
   }, [cart]);
 
-  const totalPrice = cart.reduce(
+  // Calculate cart total before discounts
+  const cartTotal = cart.reduce(
     (total, item) => total + Number(pricingMap[item.id]?.display_price || item.price || 0) * item.quantity,
     0
   );
+
+  // Calculate cart-based discount percentage
+  let cartDiscountPercent = 0;
+  let discountType = null;
+  
+  if (cartTotal >= 1000) {
+    cartDiscountPercent = 20;
+    discountType = 'cart-total';
+  } else if (cartTotal >= 500) {
+    cartDiscountPercent = 15;
+    discountType = 'cart-total';
+  } else if (cartTotal >= 250) {
+    cartDiscountPercent = 10;
+    discountType = 'cart-total';
+  } else if (cartTotal >= 100) {
+    cartDiscountPercent = 5;
+    discountType = 'cart-total';
+  }
+
+  // Check for per-item volume discounts
+  // Volume discount tiers: 4+ units (5% off), 10+ units (10% off), 25+ units (15% off)
+  let totalVolumeDiscount = 0;
+  const volumeDiscountItems = [];
+  
+  cart.forEach(item => {
+    const itemTotal = Number(pricingMap[item.id]?.display_price || item.price || 0) * item.quantity;
+    let itemVolumePercent = 0;
+    
+    if (item.quantity >= 25) {
+      itemVolumePercent = 15;
+    } else if (item.quantity >= 10) {
+      itemVolumePercent = 10;
+    } else if (item.quantity >= 4) {
+      itemVolumePercent = 5;
+    }
+    
+    if (itemVolumePercent > 0) {
+      const itemDiscount = itemTotal * (itemVolumePercent / 100);
+      totalVolumeDiscount += itemDiscount;
+      volumeDiscountItems.push({
+        name: item.name,
+        quantity: item.quantity,
+        discountPercent: itemVolumePercent,
+        discountAmount: itemDiscount
+      });
+    }
+  });
+  
+  // Use the higher of cart total discount or sum of item volume discounts
+  const cartDiscountAmount = cartTotal * (cartDiscountPercent / 100);
+  const bestDiscountAmount = Math.max(cartDiscountAmount, totalVolumeDiscount);
+  const bestDiscountType = totalVolumeDiscount >= cartDiscountAmount ? 'volume' : (cartDiscountPercent > 0 ? 'cart-total' : null);
+  const totalDiscountPercent = cartTotal > 0 ? Math.round((bestDiscountAmount / cartTotal) * 100) : 0;
+
+  // Calculate final price with best discount
+  const totalPrice = cartTotal - bestDiscountAmount;
 
   const getInventoryCount = (item) => {
     const raw =
@@ -174,10 +231,44 @@ export default function CartPage() {
       if (shopifyCartItems.length > 0 && stripeCartItems.length === 0) {
         console.log("🛍️ Using Shopify checkout");
         
+        // Calculate per-item discounts for Shopify items
+        const shopifySubtotal = shopifyCartItems.reduce((total, item) => 
+          total + Number(pricingMap[item.id]?.display_price || item.price || 0) * item.quantity, 0);
+        
+        // Calculate volume discounts for Shopify items
+        let shopifyVolumeDiscount = 0;
+        shopifyCartItems.forEach(item => {
+          const itemTotal = Number(pricingMap[item.id]?.display_price || item.price || 0) * item.quantity;
+          let itemVolumePercent = 0;
+          if (item.quantity >= 25) itemVolumePercent = 15;
+          else if (item.quantity >= 10) itemVolumePercent = 10;
+          else if (item.quantity >= 4) itemVolumePercent = 5;
+          if (itemVolumePercent > 0) {
+            shopifyVolumeDiscount += itemTotal * (itemVolumePercent / 100);
+          }
+        });
+        
+        // Calculate cart total discount for Shopify items
+        let shopifyCartDiscountPercent = 0;
+        if (shopifySubtotal >= 1000) shopifyCartDiscountPercent = 20;
+        else if (shopifySubtotal >= 500) shopifyCartDiscountPercent = 15;
+        else if (shopifySubtotal >= 250) shopifyCartDiscountPercent = 10;
+        else if (shopifySubtotal >= 100) shopifyCartDiscountPercent = 5;
+        
+        const shopifyCartDiscountAmount = shopifySubtotal * (shopifyCartDiscountPercent / 100);
+        const shopifyBestDiscount = Math.max(shopifyVolumeDiscount, shopifyCartDiscountAmount);
+        
+        // Apply discount proportionally to each item's price
+        const discountRatio = shopifySubtotal > 0 ? shopifyBestDiscount / shopifySubtotal : 0;
+        
         const shopifyPayload = {
           cartItems: shopifyCartItems.map(item => {
             // CRITICAL: Ensure we have the variant ID, not product ID
             const variantId = item.shopifyVariantId || item.variantId;
+            const basePrice = Number(pricingMap[item.id]?.display_price || item.price || 0);
+            
+            // Apply discount to the price
+            const discountedPrice = basePrice * (1 - discountRatio);
             
             console.log('🔍 Preparing Shopify item for checkout:', {
               name: item.name,
@@ -186,7 +277,10 @@ export default function CartPage() {
               shopifyVariantId: item.shopifyVariantId,
               variantId: item.variantId,
               finalVariantId: variantId,
-              hasVariantId: !!variantId
+              hasVariantId: !!variantId,
+              basePrice,
+              discountedPrice,
+              discountRatio
             });
             
             return {
@@ -196,9 +290,15 @@ export default function CartPage() {
               name: item.name,
               quantity: item.quantity,
               image: item.image,
-              price: Number(pricingMap[item.id]?.display_price || item.price || 0),
+              price: discountedPrice, // Use discounted price
+              originalPrice: basePrice, // Keep original for reference
+              discountApplied: discountRatio > 0 ? Math.round(discountRatio * 100) : 0,
             };
           }),
+          discountPercent: Math.round(discountRatio * 100),
+          discountAmount: shopifyBestDiscount,
+          subtotal: shopifySubtotal,
+          total: shopifySubtotal - shopifyBestDiscount,
         };
         
         console.log('📦 Shopify checkout payload:', JSON.stringify(shopifyPayload, null, 2));
@@ -243,13 +343,23 @@ export default function CartPage() {
       const accessToken = sessionData?.session?.access_token || null;
 
       const checkoutPayload = {
-        cartItems: cart.map((item) => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          image: item.image,
-          price: Number(pricingMap[item.id]?.display_price || item.price || 0),
-        })),
+        cartItems: cart.map((item) => {
+          const basePrice = Number(pricingMap[item.id]?.display_price || item.price || 0);
+          // Apply discount proportionally
+          const discountedPrice = basePrice * (1 - (cartTotal > 0 ? bestDiscountAmount / cartTotal : 0));
+          return {
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            image: item.image,
+            price: discountedPrice,
+            originalPrice: basePrice,
+            discountApplied: cartTotal > 0 ? Math.round((bestDiscountAmount / cartTotal) * 100) : 0,
+          };
+        }),
+        discountPercent: totalDiscountPercent,
+        discountAmount: bestDiscountAmount,
+        subtotal: cartTotal,
         total: Number(totalPrice.toFixed(2)),
         userId: currentUser?.id || null,
         customerEmail: currentUser?.email || null,
@@ -461,12 +571,93 @@ export default function CartPage() {
               )}
 
               <div className="text-xs text-gray-400 space-y-1">
-                <p>$100+ → improved pricing</p>
-                <p>$250+ → stronger margins</p>
-                <p>$500+ → bulk pricing</p>
+                <p>$100+ → 5% off</p>
+                <p>$250+ → 10% off</p>
+                <p>$500+ → 15% off</p>
+                <p>$1000+ → 20% off</p>
               </div>
 
             </div>
+
+            {/* Discount Summary */}
+            {bestDiscountType && totalDiscountPercent > 0 && (
+              <div className="bg-gradient-to-br from-green-900/20 to-transparent border border-green-500/30 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">🎉</span>
+                  <h3 className="font-semibold text-green-400">Discount Applied!</h3>
+                </div>
+                
+                {bestDiscountType === 'volume' && volumeDiscountItems.length > 0 && (
+                  <div className="space-y-3 mb-4">
+                    <p className="text-sm text-gray-300 font-semibold">📦 Volume Discounts (Per Item):</p>
+                    {volumeDiscountItems.map((vdi, idx) => (
+                      <div key={idx} className="flex justify-between text-sm bg-white/5 p-2 rounded">
+                        <span>{vdi.name.length > 30 ? vdi.name.substring(0, 30) + '...' : vdi.name} ({vdi.quantity} units)</span>
+                        <span className="text-green-400">-{vdi.discountPercent}% (${vdi.discountAmount.toFixed(2)})</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {bestDiscountType === 'cart-total' && (
+                  <p className="text-sm text-gray-300 mb-2">
+                    💰 Cart Total Discount: {cartDiscountPercent}% off (Cart over $${cartTotal >= 1000 ? '1,000' : cartTotal >= 500 ? '500' : cartTotal >= 250 ? '250' : '100'})
+                  </p>
+                )}
+                
+                <div className="mt-4 space-y-2 border-t border-white/20 pt-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Subtotal:</span>
+                    <span className="text-white">${cartTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-400">Discount ({totalDiscountPercent}%):</span>
+                    <span className="text-green-400">-${bestDiscountAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-lg border-t border-white/20 pt-2 mt-2">
+                    <span>Total:</span>
+                    <span className="text-[#D4AF37]">${totalPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Volume Discount Progress for Each Item */}
+            {cart.some(item => item.quantity >= 3) && (
+              <div className="bg-[#111827] border border-[#1C2233] rounded-xl p-6 mt-4">
+                <h3 className="font-semibold mb-3 text-sm text-gray-300">📦 Volume Discount Progress</h3>
+                {cart.filter(item => item.quantity >= 3).map((item, idx) => {
+                  const unitPrice = Number(pricingMap[item.id]?.display_price || item.price || 0);
+                  const nextTier = item.quantity >= 10 ? null : item.quantity >= 4 ? { at: 10, discount: '10%' } : { at: 4, discount: '5%' };
+                  const progress = nextTier ? Math.min(100, (item.quantity / nextTier.at) * 100) : 100;
+                  
+                  return (
+                    <div key={idx} className="mb-4 last:mb-0">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-400 truncate max-w-[150px]">{item.name.length > 25 ? item.name.substring(0, 25) + '...' : item.name}</span>
+                        <span className="text-gray-400">{item.quantity} units</span>
+                      </div>
+                      <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            item.quantity >= 10 ? 'bg-green-500' : 
+                            item.quantity >= 4 ? 'bg-yellow-500' : 'bg-blue-500'
+                          }`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      {nextTier ? (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Add {nextTier.at - item.quantity} more for {nextTier.discount} off this item!
+                        </p>
+                      ) : (
+                        <p className="text-xs text-green-400 mt-1">✓ Max volume discount unlocked!</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {bulkMode && (
               <div className="bg-[#111827] border border-[#1C2233] rounded-xl p-6">

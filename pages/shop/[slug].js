@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { buildCanonicalUrl } from '../../lib/seo';
+import { useCart } from '../../context/CartContext';
 import ReplicaDisclaimerModal from '../../components/product/ReplicaDisclaimerModal';
 import { getProductByHandle } from '../../lib/shopify';
 
@@ -114,6 +115,7 @@ const isWatchProduct = (product) => {
 
 export default function ProductPage({ product, source }) {
   const router = useRouter();
+  const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -176,28 +178,23 @@ export default function ProductPage({ product, source }) {
     setIsAddingToCart(true);
     
     try {
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const existingItem = cart.find(item => item.id === product.id);
+      // Use CartContext's addToCart function
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: displayPrice,
+        quantity: quantity,
+        image: images[0] || '/placeholder.jpg',
+        category: product.category || 'general',
+        slug: product.slug,
+        // Include Shopify-specific fields if applicable
+        shopifyId: product.source === 'shopify' ? product.id : null,
+        shopifyVariantId: product.variantId || null,
+        variantId: product.variantId || null,
+        isShopify: product.source === 'shopify',
+      });
       
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push({
-          id: product.id,
-          name: product.name,
-          price: displayPrice,
-          quantity: quantity,
-          image: images[0] || '/placeholder.jpg',
-          category: product.category || 'general',
-          slug: product.slug,
-        });
-      }
-      
-      localStorage.setItem('cart', JSON.stringify(cart));
       setAddedToCart(true);
-      
-      // Dispatch custom event to update cart count in header
-      window.dispatchEvent(new Event('cartUpdated'));
       
       setTimeout(() => {
         setAddedToCart(false);
@@ -214,30 +211,16 @@ export default function ProductPage({ product, source }) {
     localStorage.setItem('replicaDisclaimerAccepted', 'true');
     setShowReplicaModal(false);
     
-    // Add the pending item to cart
+    // Add the pending item to cart using CartContext
     if (pendingCartItem) {
-      try {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = cart.find(item => item.id === pendingCartItem.id);
-        
-        if (existingItem) {
-          existingItem.quantity += pendingCartItem.quantity;
-        } else {
-          cart.push(pendingCartItem);
-        }
-        
-        localStorage.setItem('cart', JSON.stringify(cart));
-        setAddedToCart(true);
-        window.dispatchEvent(new Event('cartUpdated'));
-        
-        setTimeout(() => {
-          setAddedToCart(false);
-          setIsAddingToCart(false);
-        }, 2000);
-      } catch (error) {
-        console.error('Error adding to cart:', error);
-      }
+      addToCart(pendingCartItem);
+      setAddedToCart(true);
       setPendingCartItem(null);
+      
+      setTimeout(() => {
+        setAddedToCart(false);
+        setIsAddingToCart(false);
+      }, 2000);
     }
   };
   

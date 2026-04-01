@@ -192,25 +192,28 @@ export default async function handler(req, res) {
         }
 
         const clientPrice = Number(item.price || 0);
-        console.log(`  💵 Prices - Server: $${serverPrice}, Client: $${clientPrice}`);
+        const originalPrice = Number(item.originalPrice || item.price || 0);
+        console.log(`  💵 Prices - Server: $${serverPrice}, Client: $${clientPrice}, Original: $${originalPrice}`);
 
-        // Validate price differences - prevent checkout if prices are too different
-        const priceDiff = Math.abs(clientPrice - serverPrice);
-        if (priceDiff > 0.50) {
-          console.error(`  ❌ Price difference too large: Server $${serverPrice} vs Client $${clientPrice} (diff: $${priceDiff.toFixed(2)})`);
-          return res.status(400).json({ 
-            error: `Price validation failed: Server price ($${serverPrice.toFixed(2)}) differs from client price ($${clientPrice.toFixed(2)}) by $${priceDiff.toFixed(2)}` 
-          });
+        // Use the LOWER of server price or client price (honor discounts for customer)
+        // This ensures volume/cart-total discounts are preserved
+        let finalPrice = serverPrice;
+        if (clientPrice > 0 && clientPrice < serverPrice) {
+          // Client price is lower (discounted) - honor it
+          console.log(`  ✅ Honoring client discount: $${clientPrice} (was $${serverPrice})`);
+          finalPrice = clientPrice;
         }
 
         validatedCart.push({
           id: product.id,
           name: product.name,
-          price: serverPrice || clientPrice,
+          price: finalPrice,
+          originalPrice: originalPrice || serverPrice,
           quantity,
           image: item.image || product.image || null,
           category: product.category || "General",
-          applied_tier: null,
+          applied_tier: item.discountApplied ? `${item.discountApplied}%` : null,
+          discountApplied: item.discountApplied || 0,
         });
         console.log(`  ✅ Item validated`);
       }

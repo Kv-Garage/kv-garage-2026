@@ -752,9 +752,22 @@ export default function Shop({ profile }) {
                               
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="text-3xl font-bold text-[#D4AF37]">${Number(product.display_price || product.price || 0).toFixed(2)}</p>
-                                  {product.price_note && (
-                                    <p className="text-sm text-[#B78B16] mt-2">{product.price_note}</p>
+                                  {/* Show original price with strikethrough if discounted */}
+                                  {product.retail_price && product.display_price < product.retail_price ? (
+                                    <>
+                                      <p className="text-sm text-gray-500 line-through">${Number(product.retail_price).toFixed(2)}</p>
+                                      <p className="text-3xl font-bold text-[#D4AF37]">${Number(product.display_price || product.price || 0).toFixed(2)}</p>
+                                      <span className="inline-block mt-1 bg-green-600/20 text-green-400 px-2 py-0.5 rounded text-xs font-semibold">
+                                        {product.discountType === 'volume' ? '📦 Volume' : '💰 Cart'} -{Math.round((1 - product.display_price / product.retail_price) * 100)}%
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p className="text-3xl font-bold text-[#D4AF37]">${Number(product.display_price || product.price || 0).toFixed(2)}</p>
+                                      {product.price_note && (
+                                        <p className="text-sm text-[#B78B16] mt-2">{product.price_note}</p>
+                                      )}
+                                    </>
                                   )}
                                 </div>
                                 {product.top_pick && (
