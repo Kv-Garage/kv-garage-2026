@@ -1,45 +1,52 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { supabase } from '../lib/supabase';
 
 export default function TrackOrderPage() {
   const [orderNumber, setOrderNumber] = useState('');
   const [email, setEmail] = useState('');
   const [order, setOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setMessage('');
     setOrder(null);
+    setOrders([]);
+    setCustomer(null);
 
     try {
-      // Query orders table for matching order
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', orderNumber)
-        .eq('customer_email', email)
-        .single();
+      const res = await fetch('/api/track-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderNumber, email }),
+      });
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          setError('Order not found. Please check your order number and email.');
-        } else {
-          setError('An error occurred while searching for your order.');
-        }
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'An error occurred while searching for your order.');
         return;
       }
 
-      if (!data) {
-        setError('Order not found. Please check your order number and email.');
-        return;
+      if (data.order) {
+        setOrder(data.order);
+        setCustomer(data.customer);
+      } else if (data.orders && data.orders.length > 0) {
+        setOrders(data.orders);
+        setCustomer(data.customer);
+        setMessage(data.message || 'Showing all orders for this email.');
+      } else {
+        setError('No orders found for this email address.');
       }
-
-      setOrder(data);
     } catch (err) {
       console.error('Track order error:', err);
       setError('An error occurred while searching for your order.');
@@ -148,54 +155,89 @@ export default function TrackOrderPage() {
             )}
           </div>
 
-          {/* Order Details */}
+          {/* Message */}
+          {message && (
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-600 text-sm">{message}</p>
+            </div>
+          )}
+
+          {/* Single Order Details */}
           {order && (
             <div className="bg-white rounded-lg shadow-lg p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Order #{order.orderNumber || order.id}</h2>
                 <div className={`flex items-center gap-2 ${getStatusColor(order.status)}`}>
                   <span className="text-2xl">{getStatusIcon(order.status)}</span>
                   <span className="text-lg font-semibold capitalize">{order.status}</span>
                 </div>
               </div>
 
+              {customer && (
+                <p className="text-gray-600 mb-6">Welcome back, {customer.name}</p>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Order ID</p>
-                  <p className="text-lg font-semibold text-gray-900 mt-1">{order.id}</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-1">{order.orderNumber || order.id}</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Customer</p>
-                  <p className="text-lg font-semibold text-gray-900 mt-1">{order.customer_name || 'Customer'}</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-1">{order.customerName || 'Customer'}</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Total</p>
-                  <p className="text-lg font-semibold text-gray-900 mt-1">${Number(order.total || 0).toFixed(2)}</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-1">${Number(order.total || 0).toFixed(2)} {order.currency}</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Date</p>
                   <p className="text-lg font-semibold text-gray-900 mt-1">
-                    {order.created_at ? new Date(order.created_at).toLocaleDateString() : '-'}
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '-'}
                   </p>
                 </div>
               </div>
 
+              {/* Line Items */}
+              {order.lineItems && order.lineItems.length > 0 && (
+                <div className="border-t border-gray-200 pt-6 mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h3>
+                  <div className="space-y-4">
+                    {order.lineItems.map((item, index) => (
+                      <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                        {item.image && (
+                          <img src={item.image} alt={item.title} className="w-16 h-16 object-cover rounded" />
+                        )}
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{item.title}</p>
+                          <p className="text-sm text-gray-600">{item.variant} × {item.quantity}</p>
+                        </div>
+                        <p className="text-lg font-semibold text-gray-900">${Number(item.price || 0).toFixed(2)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Tracking Information */}
-              {order.tracking_number && (
+              {order.trackingNumber && (
                 <div className="border-t border-gray-200 pt-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Tracking Information</h3>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-600 mb-2">Tracking Number</p>
-                    <p className="text-lg font-mono font-semibold text-blue-900">{order.tracking_number}</p>
-                    {order.tracking_url && (
+                    <p className="text-lg font-mono font-semibold text-blue-900">{order.trackingNumber}</p>
+                    {order.trackingUrl && (
                       <a
-                        href={order.tracking_url}
+                        href={order.trackingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium"
                       >
                         Track on carrier website →
                       </a>
+                    )}
+                    {order.trackingCompany && (
+                      <p className="text-sm text-blue-600 mt-2">Carrier: {order.trackingCompany}</p>
                     )}
                   </div>
                 </div>
@@ -212,7 +254,7 @@ export default function TrackOrderPage() {
                     <div>
                       <p className="font-medium text-gray-900">Order Placed</p>
                       <p className="text-sm text-gray-600">
-                        {order.created_at ? new Date(order.created_at).toLocaleString() : '-'}
+                        {order.createdAt ? new Date(order.createdAt).toLocaleString() : '-'}
                       </p>
                     </div>
                   </div>
@@ -238,7 +280,7 @@ export default function TrackOrderPage() {
                     <div>
                       <p className="font-medium text-gray-900">Order Shipped</p>
                       <p className="text-sm text-gray-600">
-                        {order.tracking_number ? `Tracking: ${order.tracking_number}` : 'Your order has been shipped'}
+                        {order.trackingNumber ? `Tracking: ${order.trackingNumber}` : 'Your order has been shipped'}
                       </p>
                     </div>
                   </div>
@@ -263,6 +305,60 @@ export default function TrackOrderPage() {
                 <Link href="/contact" className="text-orange-500 hover:text-orange-600 font-medium">
                   Contact Customer Support →
                 </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Multiple Orders */}
+          {orders.length > 0 && !order && (
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Orders</h2>
+              {customer && (
+                <p className="text-gray-600 mb-6">Welcome back, {customer.name}</p>
+              )}
+              <div className="space-y-6">
+                {orders.map((o) => (
+                  <div key={o.id} className="border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Order #{o.orderNumber || o.id}</p>
+                        <p className="text-lg font-semibold text-gray-900">{o.name}</p>
+                      </div>
+                      <div className={`flex items-center gap-2 ${getStatusColor(o.status)}`}>
+                        <span className="text-xl">{getStatusIcon(o.status)}</span>
+                        <span className="font-semibold capitalize">{o.status}</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Date</p>
+                        <p className="font-medium">{o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Total</p>
+                        <p className="font-medium">${Number(o.total || 0).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Items</p>
+                        <p className="font-medium">{o.lineItems?.length || 0} items</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Tracking</p>
+                        <p className="font-medium">{o.trackingNumber ? 'Available' : 'Not yet shipped'}</p>
+                      </div>
+                    </div>
+                    {o.trackingNumber && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-sm text-blue-600">Tracking: {o.trackingNumber}</p>
+                        {o.trackingUrl && (
+                          <a href={o.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                            Track shipment →
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           )}
