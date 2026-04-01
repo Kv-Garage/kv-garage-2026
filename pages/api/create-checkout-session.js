@@ -195,14 +195,10 @@ export default async function handler(req, res) {
         const originalPrice = Number(item.originalPrice || item.price || 0);
         console.log(`  💵 Prices - Server: $${serverPrice}, Client: $${clientPrice}, Original: $${originalPrice}`);
 
-        // Use the LOWER of server price or client price (honor discounts for customer)
+        // ALWAYS use the client price if provided (honor all discounts for customer)
         // This ensures volume/cart-total discounts are preserved
-        let finalPrice = serverPrice;
-        if (clientPrice > 0 && clientPrice < serverPrice) {
-          // Client price is lower (discounted) - honor it
-          console.log(`  ✅ Honoring client discount: $${clientPrice} (was $${serverPrice})`);
-          finalPrice = clientPrice;
-        }
+        let finalPrice = clientPrice > 0 ? clientPrice : serverPrice;
+        console.log(`  ✅ Using price: $${finalPrice} (client: $${clientPrice}, server: $${serverPrice})`);
 
         validatedCart.push({
           id: product.id,
