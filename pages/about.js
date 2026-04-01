@@ -8,7 +8,7 @@ export default function About() {
         <title>About KV Garage | From Garage to Global Supply Empire</title>
         <meta
           name="description"
-          content="The KV Garage story — built from a garage with $500, now a multi-division supply system serving 15,000+ operators worldwide."
+          content="The KV Garage story — built from flipping AirPods in a garage, now a multi-division supply empire serving 7,800+ operators worldwide."
         />
       </Head>
 
@@ -29,7 +29,7 @@ export default function About() {
             </h1>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               KV Garage started with $500, a garage, and a refusal to accept the traditional path.
-              Today, it's a multi-division supply empire serving 15,000+ operators worldwide.
+              What began as flipping AirPods has grown into a multi-division supply empire serving 7,800+ operators worldwide.
             </p>
           </div>
         </section>
@@ -59,10 +59,10 @@ export default function About() {
                     <span className="text-black font-bold text-xl">1</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">The Garage Era</h3>
+                    <h3 className="text-xl font-semibold mb-2">The AirPods Era</h3>
                     <p className="text-gray-400">
-                      Started with $500 and a single product category. Every dollar was reinvested. 
-                      Every mistake was documented. Every win was scaled.
+                      Started with $500 and a case of AirPods. Bought low, sold high, learned faster. 
+                      Every flip taught something new about margins, demand, and the art of the deal.
                     </p>
                   </div>
                 </div>
@@ -72,10 +72,11 @@ export default function About() {
                     <span className="text-black font-bold text-xl">2</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">The System</h3>
+                    <h3 className="text-xl font-semibold mb-2">The Pallet & Pop-Up Era</h3>
                     <p className="text-gray-400">
-                      Built a repeatable sourcing and distribution system that turned chaos into 
-                      predictability. What was once instinct became infrastructure.
+                      Scaled from individual flips to buying entire pallets. Then came clothing, 
+                      case cords, and pop-up shops. What was once a side hustle became a real business 
+                      with real inventory, real customers, and real systems.
                     </p>
                   </div>
                 </div>
@@ -88,7 +89,8 @@ export default function About() {
                     <h3 className="text-xl font-semibold mb-2">The Empire</h3>
                     <p className="text-gray-400">
                       Four divisions now operate under one roof: retail inventory, wholesale supply, 
-                      capital allocation, and operator education. 15,000+ graduates. Global reach.
+                      capital allocation, and operator education. 7,800+ graduates trained. Global reach. 
+                      From garage flips to global supply chains.
                     </p>
                   </div>
                 </div>
@@ -140,7 +142,7 @@ export default function About() {
                 <div className="text-4xl mb-6">🎓</div>
                 <h3 className="text-2xl font-bold text-[#D4AF37] mb-4">Education</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  15,000+ operators trained. From first sale to scaled operations. 
+                  7,800+ operators trained. From first sale to scaled operations. 
                   Mentorship, systems, and a community that wins together.
                 </p>
               </div>
@@ -153,7 +155,7 @@ export default function About() {
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-12 text-center">
               <div>
-                <div className="text-6xl font-bold text-[#D4AF37] mb-4">15,000+</div>
+                <div className="text-6xl font-bold text-[#D4AF37] mb-4">7,800+</div>
                 <p className="text-xl text-gray-300">Operators Trained</p>
               </div>
               <div>
@@ -161,7 +163,7 @@ export default function About() {
                 <p className="text-xl text-gray-300">Products Available</p>
               </div>
               <div>
-                <div className="text-6xl font-bold text-[#D4AF37] mb-4">48 Hours</div>
+                <div className="text-6xl font-bold text-[#D4AF37] mb-4">72 Hours</div>
                 <p className="text-xl text-gray-300">Average Dispatch Time</p>
               </div>
             </div>
