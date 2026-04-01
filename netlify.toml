@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NEXT_PUBLIC_SHOPIFY_DOMAIN = "kv-garage-2.myshopify.com"
+  NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN = "0ff52702d6942586f86c3dc28fd5a042"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
