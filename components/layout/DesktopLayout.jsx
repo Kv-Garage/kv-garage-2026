@@ -155,6 +155,7 @@ export default function DesktopLayout({ children, title, description, image, hid
                   <h3 className="font-bold mb-4">Quick Links</h3>
                   <ul className="space-y-2 text-gray-400">
                     <li><Link href="/shop" className="hover:text-white transition-colors duration-200">Shop</Link></li>
+                    <li><Link href="/about" className="hover:text-white transition-colors duration-200">About Us</Link></li>
                     <li><Link href="/learn" className="hover:text-white transition-colors duration-200">Learn</Link></li>
                     <li><Link href="/wholesale" className="hover:text-white transition-colors duration-200">Wholesale</Link></li>
                     <li><Link href="/mentorship" className="hover:text-white transition-colors duration-200">Mentorship</Link></li>
