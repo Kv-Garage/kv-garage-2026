@@ -60,6 +60,12 @@ export default function DesktopLayout({ children, title, description, image, hid
                 <Link href="/trade" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Trading</Link>
                 <Link href="/deals" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Deal</Link>
                 <Link href="/contact" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Contact</Link>
+                <Link href="/track-order" className="text-green-400 hover:text-green-300 transition-colors duration-200 font-medium text-lg flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  Track Order
+                </Link>
               </div>
 
               {/* Desktop Actions */}
@@ -156,6 +162,12 @@ export default function DesktopLayout({ children, title, description, image, hid
                   <ul className="space-y-2 text-gray-400">
                     <li><Link href="/shop" className="hover:text-white transition-colors duration-200">Shop</Link></li>
                     <li><Link href="/about" className="hover:text-white transition-colors duration-200">About Us</Link></li>
+                    <li><Link href="/track-order" className="hover:text-white transition-colors duration-200 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                      Track Order
+                    </Link></li>
                     <li><Link href="/learn" className="hover:text-white transition-colors duration-200">Learn</Link></li>
                     <li><Link href="/wholesale" className="hover:text-white transition-colors duration-200">Wholesale</Link></li>
                     <li><Link href="/mentorship" className="hover:text-white transition-colors duration-200">Mentorship</Link></li>
