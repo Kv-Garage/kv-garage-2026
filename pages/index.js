@@ -590,30 +590,16 @@ export default function Home() {
                       Shop Retail
                     </button>
                   </Link>
+
+                  <Link href="/about">
+                    <button className="flex-1 border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      About Us
+                    </button>
+                  </Link>
                 </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/wholesale">
-                  <button className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
-                    Enter Wholesale
-                  </button>
-                </Link>
-
-                <Link href="/shop">
-                  <button className="border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                    Shop Retail
-                  </button>
-                </Link>
-
-                <Link href="/about">
-                  <button className="border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    About Us
-                  </button>
-                </Link>
               </div>
             </div>
 
