@@ -1,0 +1,23 @@
+# Shopify Discount Function Configuration
+# Volume & Cart Tier Pricing
+
+name = "KV Garage Volume Pricing"
+type = "discount"
+description = "Automatic volume and cart tier discounts - applies highest discount per item"
+api_version = "2024-01"
+
+# No UI extension needed - fully automatic discount
+# The function runs server-side at checkout
+
+[build]
+command = ""
+
+[permissions]
+# Required to access cart data and apply discounts
+- read_cart
+- write_discounts
+
+[[targets]]
+# Target: Product discounts
+target = "apply_to_product_item"
+export = "default"

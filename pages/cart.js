@@ -283,10 +283,19 @@ export default function CartPage() {
               discountRatio
             });
             
+            // Format variant ID for Shopify API (must be full GraphQL ID)
+            let formattedVariantId = variantId;
+            if (variantId && !variantId.startsWith('gid://shopify/ProductVariant/')) {
+              // If it's just an ID number, we need to fetch the full variant ID
+              // For now, pass through and let the API handle it
+              console.warn('⚠️ Variant ID may not be in correct format:', variantId);
+            }
+            
             return {
               id: item.id,
               shopifyId: item.shopifyId || (typeof item.id === 'string' ? item.id.replace('shopify_', '') : null),
-              shopifyVariantId: variantId,
+              shopifyVariantId: formattedVariantId,
+              variantId: formattedVariantId, // Also include as variantId for fallback
               name: item.name,
               quantity: item.quantity,
               image: item.image,

@@ -15,6 +15,7 @@
     "blog:full-setup": "npm run setup:blog:automation && npm run update:sitemap && npm run test:blog"
   },
   "dependencies": {
+    "@shopify/shopify_function": "~2.0.0",
     "@stripe/stripe-js": "^8.8.0",
     "@supabase/supabase-js": "^2.99.2",
     "bcryptjs": "^2.4.3",

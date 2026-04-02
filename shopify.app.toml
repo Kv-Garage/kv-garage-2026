@@ -1,0 +1,39 @@
+# Shopify App Configuration
+# KV Garage - Volume Pricing Discount Function
+
+name = "KV Garage Volume Pricing"
+client_id = "YOUR_SHOPIFY_APP_CLIENT_ID"
+application_url = "https://kvgarage.com"
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "kv-garage-2.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Minimal scopes needed for discount function
+scopes = "read_products,write_discounts,read_discounts"
+
+[auth]
+redirect_urls = [
+  "https://kvgarage.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
+
+# Discount Function Extension
+[[extensions]]
+name = "KV Garage Volume Pricing"
+type = "discount"
+path = "functions/discount-volume-pricing"
+
+  [extensions.build]
+  command = ""
+
+  [extensions.ui]
+  handle = "kv-garage-volume-pricing"

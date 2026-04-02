@@ -1,0 +1,23 @@
+{
+  "name": "kv-garage-volume-pricing-function",
+  "version": "1.0.0",
+  "description": "Shopify Discount Function for KV Garage volume and cart tier pricing",
+  "main": "discount-volume-pricing.js",
+  "type": "module",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "echo 'No build step required for JS functions'",
+    "test": "echo 'No tests configured'"
+  },
+  "keywords": [
+    "shopify",
+    "discount",
+    "function",
+    "volume-pricing"
+  ],
+  "author": "KV Garage",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@shopify/shopify_function": "^1.0.0"
+  }
+}

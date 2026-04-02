@@ -133,22 +133,36 @@ export default async function handler(req, res) {
       for (const item of cartItems) {
         console.log(`  🔍 Validating item: ${item.name} (${item.id})`);
         
-        // CRITICAL FIX: Ensure product_id is numeric
-        const productId = Number(item.id);
-        if (!productId || isNaN(productId) || productId <= 0) {
-          console.error(`  ❌ Invalid product ID: ${item.id} (not a valid number)`);
-          return res.status(400).json({ 
-            error: `Invalid product ID: ${item.id}. Product ID must be a valid number.` 
-          });
-        }
-
-        console.log(`  ✅ Product ID validated: ${productId}`);
+        // Check if this is a Shopify product (string ID) or database product (numeric ID)
+        const isShopifyProduct = typeof item.id === 'string' && 
+          (item.id.startsWith('gid://shopify') || item.id.startsWith('shopify_') || item.shopifyId);
         
-        const { data: product, error: productError } = await supabaseAdmin
-          .from("products")
-          .select("*")
-          .eq("id", productId)
-          .maybeSingle();
+        // For database products, validate numeric ID
+        if (!isShopifyProduct) {
+          const productId = Number(item.id);
+          if (!productId || isNaN(productId) || productId <= 0) {
+            console.error(`  ❌ Invalid product ID: ${item.id} (not a valid number)`);
+            return res.status(400).json({ 
+              error: `Invalid product ID: ${item.id}. Product ID must be a valid number.` 
+            });
+          }
+          console.log(`  ✅ Product ID validated: ${productId}`);
+        } else {
+          console.log(`  🛍️ Shopify product detected: ${item.id}`);
+        }
+        
+        let product = null;
+        let productError = null;
+        
+        // Only query database for non-Shopify products
+        if (!isShopifyProduct) {
+          const productId = Number(item.id);
+          ({ data: product, error: productError } = await supabaseAdmin
+            .from("products")
+            .select("*")
+            .eq("id", productId)
+            .maybeSingle());
+        }
 
         if (productError) {
           console.error(`  ❌ Database error for ${item.id}:`, productError);
@@ -157,7 +171,7 @@ export default async function handler(req, res) {
 
         if (!product) {
           console.warn(`  ⚠️ Product not found in database, using client data: ${item.id}`);
-          // Use client price if product not found
+          // Use client price if product not found (including Shopify products)
           validatedCart.push({
             id: item.id,
             name: item.name,
@@ -166,6 +180,7 @@ export default async function handler(req, res) {
             image: item.image || null,
             category: item.category || "General",
             applied_tier: null,
+            isShopify: isShopifyProduct,
           });
           continue;
         }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { buildCanonicalUrl } from '../../lib/seo';
 import { useCart } from '../../context/CartContext';
 import ReplicaDisclaimerModal from '../../components/product/ReplicaDisclaimerModal';
+import AirPodMaxDisclaimerModal from '../../components/product/AirPodMaxDisclaimerModal';
 import { getProductByHandle } from '../../lib/shopify';
 
 // Helper function to check if product is from Shopify
@@ -29,6 +30,11 @@ export async function getServerSideProps({ params, req }) {
       }
       
       // Transform Shopify product to match the expected format
+      // CRITICAL: Ensure variantId is properly set for checkout
+      const firstVariant = shopifyProduct.variants && shopifyProduct.variants.length > 0 
+        ? shopifyProduct.variants[0] 
+        : null;
+      
       const product = {
         id: shopifyProduct.id,
         name: shopifyProduct.title,
@@ -49,9 +55,17 @@ export async function getServerSideProps({ params, req }) {
         vendor: shopifyProduct.vendor || '',
         source: 'shopify',
         handle: shopifyProduct.handle,
-        variantId: shopifyProduct.variantId || null,
+        // CRITICAL: Use shopifyProduct.variantId or fall back to first variant's id
+        variantId: shopifyProduct.variantId || firstVariant?.id || null,
         variants: shopifyProduct.variants || [],
       };
+      
+      console.log('🔍 Shopify product transformed:', {
+        name: product.name,
+        variantId: product.variantId,
+        hasVariants: product.variants.length > 0,
+        firstVariantId: firstVariant?.id,
+      });
       
       return {
         props: {
@@ -113,6 +127,31 @@ const isWatchProduct = (product) => {
   return false;
 };
 
+// Helper function to check if product is AirPod Max
+const isAirPodMaxProduct = (product) => {
+  if (!product) return false;
+  const name = (product.name || '').toLowerCase();
+  const category = (product.category || '').toLowerCase();
+  const tags = (product.tags || []).map(t => t.toLowerCase());
+  
+  // Check name for AirPod Max variations
+  if (name.includes('airpod max') || name.includes('airpods max') || name.includes('airpodmax')) {
+    return true;
+  }
+  
+  // Check category
+  if (category.includes('airpod max') || category.includes('airpods max')) {
+    return true;
+  }
+  
+  // Check tags
+  if (tags.some(tag => tag.includes('airpod max') || tag.includes('airpods max'))) {
+    return true;
+  }
+  
+  return false;
+};
+
 export default function ProductPage({ product, source }) {
   const router = useRouter();
   const { addToCart } = useCart();
@@ -122,10 +161,25 @@ export default function ProductPage({ product, source }) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [showReplicaModal, setShowReplicaModal] = useState(false);
+  const [showAirPodMaxModal, setShowAirPodMaxModal] = useState(false);
   const [pendingCartItem, setPendingCartItem] = useState(null);
+  const [airPodMaxAcknowledged, setAirPodMaxAcknowledged] = useState(false);
+  const [replicaDisclaimerAccepted, setReplicaDisclaimerAccepted] = useState(false);
+  const [airPodMaxDisclaimerAccepted, setAirPodMaxDisclaimerAccepted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   
   // Check if this is a watch product (needs replica disclaimer)
   const needsReplicaDisclaimer = isWatchProduct(product);
+  
+  // Check if this is an AirPod Max product (needs specific disclaimer)
+  const needsAirPodMaxDisclaimer = isAirPodMaxProduct(product);
+
+  // Load localStorage values on client side only
+  useEffect(() => {
+    setIsClient(true);
+    setReplicaDisclaimerAccepted(localStorage.getItem('replicaDisclaimerAccepted') === 'true');
+    setAirPodMaxDisclaimerAccepted(localStorage.getItem('airPodMaxDisclaimerAccepted') === 'true');
+  }, []);
 
   if (router.isFallback) {
     return (
@@ -155,8 +209,8 @@ export default function ProductPage({ product, source }) {
   }
 
   const handleAddToCart = () => {
-    // If this is a watch product, show the replica disclaimer modal
-    if (needsReplicaDisclaimer && !localStorage.getItem('replicaDisclaimerAccepted')) {
+    // If this is an AirPod Max product and not yet accepted, show modal
+    if (needsAirPodMaxDisclaimer && !airPodMaxDisclaimerAccepted && !airPodMaxAcknowledged) {
       setPendingCartItem({
         id: product.id,
         name: product.name,
@@ -165,12 +219,37 @@ export default function ProductPage({ product, source }) {
         image: images[0] || '/placeholder.jpg',
         category: product.category || 'general',
         slug: product.slug,
+        // Include Shopify-specific fields
+        shopifyId: product.source === 'shopify' ? product.id : null,
+        shopifyVariantId: product.variantId || null,
+        variantId: product.variantId || null,
+        isShopify: product.source === 'shopify',
+      });
+      setShowAirPodMaxModal(true);
+      return;
+    }
+    
+    // If this is a watch product and not yet accepted, show modal
+    if (needsReplicaDisclaimer && !replicaDisclaimerAccepted) {
+      setPendingCartItem({
+        id: product.id,
+        name: product.name,
+        price: displayPrice,
+        quantity: quantity,
+        image: images[0] || '/placeholder.jpg',
+        category: product.category || 'general',
+        slug: product.slug,
+        // Include Shopify-specific fields
+        shopifyId: product.source === 'shopify' ? product.id : null,
+        shopifyVariantId: product.variantId || null,
+        variantId: product.variantId || null,
+        isShopify: product.source === 'shopify',
       });
       setShowReplicaModal(true);
       return;
     }
     
-    // If disclaimer already accepted or not a watch, add directly
+    // If disclaimer already accepted or not a watch/airpod max, add directly
     addToCartDirectly();
   };
   
@@ -226,6 +305,29 @@ export default function ProductPage({ product, source }) {
   
   const handleReplicaModalClose = () => {
     setShowReplicaModal(false);
+    setPendingCartItem(null);
+  };
+  
+  const handleAirPodMaxModalAccept = () => {
+    // Mark disclaimer as accepted
+    localStorage.setItem('airPodMaxDisclaimerAccepted', 'true');
+    setShowAirPodMaxModal(false);
+    
+    // Add the pending item to cart using CartContext
+    if (pendingCartItem) {
+      addToCart(pendingCartItem);
+      setAddedToCart(true);
+      setPendingCartItem(null);
+      
+      setTimeout(() => {
+        setAddedToCart(false);
+        setIsAddingToCart(false);
+      }, 2000);
+    }
+  };
+  
+  const handleAirPodMaxModalClose = () => {
+    setShowAirPodMaxModal(false);
     setPendingCartItem(null);
   };
 
@@ -337,7 +439,7 @@ export default function ProductPage({ product, source }) {
                 </div>
 
                 {/* Inventory */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                   <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
                     product.inventory > 0
                       ? 'bg-green-900/20 border border-green-500/30 text-green-400'
@@ -349,6 +451,12 @@ export default function ProductPage({ product, source }) {
                   </div>
                   {source === 'database' && (
                     <div className="text-xs text-gray-500">Live inventory</div>
+                  )}
+                  {/* 1:1 Inventory Warning for AirPod Max */}
+                  {needsAirPodMaxDisclaimer && (
+                    <div className="px-4 py-2 rounded-full text-sm font-semibold bg-yellow-900/20 border border-yellow-500/30 text-yellow-400">
+                      ⚠️ 1:1 High Quality Inventory
+                    </div>
                   )}
                 </div>
 
@@ -486,6 +594,16 @@ export default function ProductPage({ product, source }) {
           isOpen={showReplicaModal}
           onClose={handleReplicaModalClose}
           onAccept={handleReplicaModalAccept}
+          productName={product.name}
+        />
+      )}
+      
+      {/* AirPod Max Disclaimer Modal - Only for AirPod Max products */}
+      {needsAirPodMaxDisclaimer && (
+        <AirPodMaxDisclaimerModal
+          isOpen={showAirPodMaxModal}
+          onClose={handleAirPodMaxModalClose}
+          onAccept={handleAirPodMaxModalAccept}
           productName={product.name}
         />
       )}
