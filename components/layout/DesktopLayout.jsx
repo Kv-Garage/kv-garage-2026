@@ -45,27 +45,18 @@ export default function DesktopLayout({ children, title, description, image, hid
                 </span>
               </Link>
 
-              {/* Desktop Navigation */}
+              {/* Desktop Navigation - High-Converting Garage Brand Structure */}
               <div className="hidden lg:flex items-center space-x-8">
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Home</Link>
                 <Link href="/shop" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Shop</Link>
-                <Link href="/shop/private-preview" className="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium text-lg flex items-center gap-2">
-                  <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
-                  Sourcing Desk
+                <Link href="/shop?category=garage-storage" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Garage Storage</Link>
+                <Link href="/shop?category=workbenches" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Workbenches</Link>
+                <Link href="/shop?category=wall-organization" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Wall Organization</Link>
+                <Link href="/bundles" className="text-[#D4AF37] hover:text-yellow-400 transition-colors duration-200 font-medium text-lg flex items-center gap-2">
+                  <span className="bg-[#D4AF37] text-black text-xs px-2 py-1 rounded-full font-bold">SAVE</span>
+                  Bundles
                 </Link>
-                <Link href="/learn" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Learn</Link>
-                <Link href="/wholesale" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Wholesale</Link>
-                <Link href="/mentorship" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Mentorship</Link>
-                <Link href="/affiliate" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Affiliate</Link>
-                <Link href="/trade" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Trading</Link>
-                <Link href="/deals" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Deal</Link>
                 <Link href="/contact" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium text-lg">Contact</Link>
-                <Link href="/track-order" className="text-green-400 hover:text-green-300 transition-colors duration-200 font-medium text-lg flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
-                  Track Order
-                </Link>
               </div>
 
               {/* Desktop Actions */}
@@ -120,7 +111,7 @@ export default function DesktopLayout({ children, title, description, image, hid
           {children}
         </main>
 
-        {/* Footer */}
+        {/* Footer - High-Converting Garage Brand Structure */}
         {!hideFooter && (
           <footer className="bg-gradient-to-br from-[#0B0F19] to-[#111827] border-t border-white/20">
             <div className="max-w-7xl mx-auto px-6 py-12">
@@ -138,8 +129,8 @@ export default function DesktopLayout({ children, title, description, image, hid
                     </span>
                   </div>
                   <p className="text-gray-400 mb-6 max-w-md">
-                    Premium business education and wholesale opportunities for serious entrepreneurs. 
-                    Build real, scalable revenue with proven systems and verified supplier relationships.
+                    Transform your garage into a professional workspace with premium storage solutions, 
+                    workbenches, and organization systems built for real performance.
                   </p>
                   <div className="footer-social">
                     <a href="https://www.instagram.com/kave.steele/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-200">
@@ -157,30 +148,38 @@ export default function DesktopLayout({ children, title, description, image, hid
                   </div>
                 </div>
                 
+                {/* Other KV Brands */}
                 <div>
-                  <h3 className="font-bold mb-4">Quick Links</h3>
+                  <h3 className="font-bold mb-4 text-[#D4AF37]">Other KV Brands</h3>
                   <ul className="space-y-2 text-gray-400">
-                    <li><Link href="/shop" className="hover:text-white transition-colors duration-200">Shop</Link></li>
-                    <li><Link href="/about" className="hover:text-white transition-colors duration-200">About Us</Link></li>
-                    <li><Link href="/track-order" className="hover:text-white transition-colors duration-200 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                      </svg>
-                      Track Order
-                    </Link></li>
-                    <li><Link href="/learn" className="hover:text-white transition-colors duration-200">Learn</Link></li>
                     <li><Link href="/wholesale" className="hover:text-white transition-colors duration-200">Wholesale</Link></li>
                     <li><Link href="/mentorship" className="hover:text-white transition-colors duration-200">Mentorship</Link></li>
+                    <li><Link href="/trade" className="hover:text-white transition-colors duration-200">Trading</Link></li>
+                    <li><Link href="/affiliate" className="hover:text-white transition-colors duration-200">Affiliate</Link></li>
+                    <li><Link href="/learn" className="hover:text-white transition-colors duration-200">Learn</Link></li>
+                    <li><Link href="/deals" className="hover:text-white transition-colors duration-200">Deals</Link></li>
                   </ul>
                 </div>
                 
+                {/* Customer Support */}
                 <div>
-                  <h3 className="font-bold mb-4">Support</h3>
+                  <h3 className="font-bold mb-4">Customer Support</h3>
                   <ul className="space-y-2 text-gray-400">
-                    <li><Link href="/contact" className="hover:text-white transition-colors duration-200">Contact Us</Link></li>
-                    <li><Link href="/privacy-policy" className="hover:text-white transition-colors duration-200">Privacy Policy</Link></li>
-                    <li><Link href="/terms-and-conditions" className="hover:text-white transition-colors duration-200">Terms</Link></li>
-                    <li><Link href="/shipping-policy" className="hover:text-white transition-colors duration-200">Shipping</Link></li>
+                    <li><Link href="/contact" className="hover:text-white transition-colors duration-200">Contact</Link></li>
+                    <li><Link href="/shipping-policy" className="hover:text-white transition-colors duration-200">Shipping Policy</Link></li>
+                    <li><Link href="/privacy-policy" className="hover:text-white transition-colors duration-200">Returns</Link></li>
+                    <li><Link href="/terms-and-conditions" className="hover:text-white transition-colors duration-200">FAQ</Link></li>
+                  </ul>
+                </div>
+                
+                {/* Shop Categories */}
+                <div>
+                  <h3 className="font-bold mb-4">Shop Categories</h3>
+                  <ul className="space-y-2 text-gray-400">
+                    <li><Link href="/shop?category=garage-storage" className="hover:text-white transition-colors duration-200">Garage Storage</Link></li>
+                    <li><Link href="/shop?category=workbenches" className="hover:text-white transition-colors duration-200">Workbenches</Link></li>
+                    <li><Link href="/shop?category=wall-organization" className="hover:text-white transition-colors duration-200">Wall Organization</Link></li>
+                    <li><Link href="/bundles" className="hover:text-white transition-colors duration-200 text-[#D4AF37] font-semibold">Bundles</Link></li>
                   </ul>
                 </div>
               </div>

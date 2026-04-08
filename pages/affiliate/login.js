@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { buildCanonicalUrl } from "../../lib/seo";
@@ -30,22 +31,49 @@ export default function AffiliateLoginPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/affiliate/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      // Use the main Supabase auth system
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
+      if (authError) {
+        throw new Error("Login failed: " + authError.message);
+      }
 
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      if (!data.user) {
+        throw new Error("No user data returned");
+      }
+
+      // Check if user has affiliate role
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role, approved, email")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profileError) {
+        await supabase.auth.signOut();
+        throw new Error("Profile error: " + profileError.message);
+      }
+
+      if (!profile) {
+        await supabase.auth.signOut();
+        throw new Error("Profile not found for user ID: " + data.user.id);
+      }
+
+      if (profile.role !== "affiliate" || !profile.approved) {
+        await supabase.auth.signOut();
+        throw new Error("Your affiliate account is not approved yet. Role: " + profile.role + ", Approved: " + profile.approved + ". Please wait for admin approval.");
       }
 
       // Store affiliate session
-      localStorage.setItem("affiliate_session", JSON.stringify(data.affiliate));
+      localStorage.setItem("affiliate_session", JSON.stringify({
+        id: data.user.id,
+        email: data.user.email,
+        role: profile.role,
+      }));
+      
       router.push("/affiliate/dashboard");
     } catch (err) {
       setError(err.message);

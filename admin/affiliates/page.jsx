@@ -1,8 +1,9 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../../../context/AuthContext";
 import { supabase } from "../../../lib/supabase";
-import { getAffiliateApplications, getAffiliates, approveAffiliateApplication, rejectAffiliateApplication } from "../../../lib/affiliates";
 
 export default function AdminAffiliatesPage() {
   const { user } = useAuth();
@@ -11,7 +12,51 @@ export default function AdminAffiliatesPage() {
   const [affiliates, setAffiliates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("applications");
-  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  // Fetch affiliate data from API
+  const loadAffiliateData = async () => {
+    setLoading(true);
+    try {
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        console.error("No auth token available");
+        setLoading(false);
+        return;
+      }
+
+      // Fetch applications
+      const appsResponse = await fetch("/api/admin/affiliate-applications", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (appsResponse.ok) {
+        const appsData = await appsResponse.json();
+        setApplications(appsData);
+      }
+
+      // Fetch affiliates (we'll create this endpoint next)
+      const affiliatesResponse = await fetch("/api/admin/affiliates", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (affiliatesResponse.ok) {
+        const affiliatesData = await affiliatesResponse.json();
+        setAffiliates(affiliatesData);
+      }
+    } catch (err) {
+      console.error("Error loading affiliate data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -35,47 +80,89 @@ export default function AdminAffiliatesPage() {
     loadAffiliateData();
   }, [user, router]);
 
-  const loadAffiliateData = async () => {
-    setLoading(true);
-    try {
-      const [applicationsData, affiliatesData] = await Promise.all([
-        getAffiliateApplications(),
-        getAffiliates()
-      ]);
-      
-      setApplications(applicationsData);
-      setAffiliates(affiliatesData);
-    } catch (err) {
-      console.error("Error loading affiliate data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleApprove = async (applicationId) => {
+    setActionLoading(applicationId);
     try {
-      const result = await approveAffiliateApplication(applicationId);
-      if (result.success) {
-        loadAffiliateData();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        alert("Authentication required");
+        return;
       }
+
+      const response = await fetch("/api/admin/affiliate-applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          applicationId,
+          action: "approve"
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to approve application");
+      }
+
+      // Reload data
+      loadAffiliateData();
     } catch (err) {
       console.error("Error approving application:", err);
+      alert("Failed to approve application: " + err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleReject = async (applicationId) => {
+    const reason = prompt("Please provide a reason for rejection (optional):");
+    
+    setActionLoading(applicationId);
     try {
-      const result = await rejectAffiliateApplication(applicationId);
-      if (result.success) {
-        loadAffiliateData();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        alert("Authentication required");
+        return;
       }
+
+      const response = await fetch("/api/admin/affiliate-applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          applicationId,
+          action: "reject",
+          rejectionReason: reason || null
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to reject application");
+      }
+
+      // Reload data
+      loadAffiliateData();
     } catch (err) {
       console.error("Error rejecting application:", err);
+      alert("Failed to reject application: " + err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className="min-h-screen bg-[#05070D] flex items-center justify-center text-white">Loading...</div>;
   }
 
   return (
@@ -101,7 +188,7 @@ export default function AdminAffiliatesPage() {
             </div>
           </div>
 
-          {/* 🔥 RIGHT SIDE (AUTH + CART) */}
+          {/* RIGHT SIDE (AUTH + CART) */}
           <div className="flex items-center gap-3">
 
             <span className="text-xs text-gray-400">
@@ -249,23 +336,23 @@ export default function AdminAffiliatesPage() {
                           </div>
                           
                           <div className="mb-4">
-                            <p className="text-gray-300">{app.reason}</p>
+                            <p className="text-gray-300 whitespace-pre-line">{app.reason}</p>
                           </div>
                           
                           <div className="flex gap-3">
                             <button
                               onClick={() => handleApprove(app.id)}
-                              disabled={app.status !== 'pending'}
+                              disabled={app.status !== 'pending' || actionLoading === app.id}
                               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
                             >
-                              Approve
+                              {actionLoading === app.id ? "Processing..." : "Approve"}
                             </button>
                             <button
                               onClick={() => handleReject(app.id)}
-                              disabled={app.status !== 'pending'}
+                              disabled={app.status !== 'pending' || actionLoading === app.id}
                               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
                             >
-                              Reject
+                              {actionLoading === app.id ? "Processing..." : "Reject"}
                             </button>
                           </div>
                           

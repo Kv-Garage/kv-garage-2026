@@ -415,17 +415,46 @@ export default function ProductPage({ product, source }) {
                         TOP PICK
                       </span>
                     )}
+                    {product.inventory > 0 && product.inventory < 10 && (
+                      <span className="bg-red-600 text-white px-4 py-1 rounded-full text-sm font-semibold animate-pulse">
+                        LOW STOCK
+                      </span>
+                    )}
                   </div>
                   
                   <h1 className="text-4xl lg:text-5xl font-bold mb-4">{product.name}</h1>
                   
-                  <div className="flex items-center gap-6">
-                    <p className="text-4xl font-bold text-[#D4AF37]">
-                      ${Number(displayPrice).toFixed(2)}
-                    </p>
+                  {/* Pricing Psychology */}
+                  <div className="flex items-center gap-6 flex-wrap">
+                    <div className="flex items-center gap-4">
+                      <p className="text-4xl font-bold text-[#D4AF37]">
+                        ${Number(displayPrice).toFixed(2)}
+                      </p>
+                      {product.compare_at_price && (
+                        <>
+                          <p className="text-2xl text-gray-500 line-through">
+                            ${Number(product.compare_at_price).toFixed(2)}
+                          </p>
+                          <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            Save {Math.round((1 - displayPrice / product.compare_at_price) * 100)}%
+                          </span>
+                        </>
+                      )}
+                    </div>
                     {product.price_note && (
                       <p className="text-sm text-[#B78B16]">{product.price_note}</p>
                     )}
+                  </div>
+                </div>
+
+                {/* Trust Elements */}
+                <div className="bg-gradient-to-br from-green-900/10 to-transparent border border-green-500/30 rounded-2xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🚚</div>
+                    <div>
+                      <p className="font-semibold text-green-400">Fast US Shipping</p>
+                      <p className="text-sm text-gray-400">Ships within 48 hours • Free shipping on orders over $199</p>
+                    </div>
                   </div>
                 </div>
 
@@ -554,6 +583,71 @@ export default function ProductPage({ product, source }) {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Upsell & Cross-Sell Section */}
+        <section className="py-16 border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-12 text-center">
+              <h2 className="text-4xl font-bold mb-4">Complete Your Setup</h2>
+              <p className="text-xl text-gray-300">Customers who bought this also purchased these popular items</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Bundle Recommendation */}
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
+                <div className="text-4xl mb-4">📦</div>
+                <h3 className="text-2xl font-bold mb-4">Save with Bundle</h3>
+                <p className="text-gray-300 mb-6">Get everything you need at a discounted price</p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">This Product</span>
+                    <span className="font-semibold">${Number(displayPrice).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">Recommended Add-ons</span>
+                    <span className="font-semibold">$149.99</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm border-t border-white/20 pt-3">
+                    <span className="text-gray-400">Bundle Price</span>
+                    <span className="text-[#D4AF37] font-bold">$299.99</span>
+                  </div>
+                  <div className="text-xs text-green-400 font-semibold">You Save $49.99 (14%)</div>
+                </div>
+                <Link href="/bundles">
+                  <button className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-3 px-6 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300">
+                    View Bundle
+                  </button>
+                </Link>
+              </div>
+
+              {/* Cross-Sell Product 1 */}
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
+                <div className="aspect-square w-full mb-4 rounded-xl overflow-hidden bg-white/10">
+                  <img src="/placeholder.jpg" alt="Recommended product" className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Heavy-Duty Shelving</h3>
+                <p className="text-gray-300 text-sm mb-4">Perfect companion for your new purchase</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-[#D4AF37]">$199.99</span>
+                  <span className="text-sm text-green-400 font-semibold">+ Add to Cart</span>
+                </div>
+              </div>
+
+              {/* Cross-Sell Product 2 */}
+              <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
+                <div className="aspect-square w-full mb-4 rounded-xl overflow-hidden bg-white/10">
+                  <img src="/placeholder.jpg" alt="Recommended product" className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Wall Organization Kit</h3>
+                <p className="text-gray-300 text-sm mb-4">Maximize your space efficiency</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-[#D4AF37]">$129.99</span>
+                  <span className="text-sm text-green-400 font-semibold">+ Add to Cart</span>
+                </div>
               </div>
             </div>
           </div>

@@ -98,26 +98,40 @@ export default function MobileLayout({ children, title, description, image, hide
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu - High-Converting Garage Brand Structure */}
           <div className={`transition-all duration-300 overflow-hidden ${
-            isMenuOpen ? "max-h-96 border-t border-white/10" : "max-h-0"
+            isMenuOpen ? "max-h-screen border-t border-white/10" : "max-h-0"
           }`}>
             <div className="px-4 py-4 space-y-3 bg-gradient-to-br from-[#0B0F19]/95 to-[#111827]/95">
-              <Link href="/" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Home</Link>
-              <Link href="/shop" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Shop</Link>
-              <Link href="/shop/private-preview" className="block text-blue-400 hover:text-blue-300 transition-colors duration-200 py-3 border-b border-white/10 flex items-center gap-2">
-                <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
-                Sourcing Desk
-              </Link>
-              <Link href="/learn" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Learn</Link>
-              <Link href="/wholesale" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Wholesale</Link>
-              <Link href="/mentorship" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Mentorship</Link>
-              <Link href="/affiliate" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Affiliate</Link>
-              <Link href="/trade" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Trading</Link>
-              <Link href="/deals" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Deals</Link>
-              <Link href="/contact" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Contact</Link>
+              {/* Main Navigation */}
+              <div className="space-y-1">
+                <Link href="/" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Home</Link>
+                <Link href="/shop" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Shop All</Link>
+                <Link href="/shop?category=garage-storage" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Garage Storage</Link>
+                <Link href="/shop?category=workbenches" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Workbenches</Link>
+                <Link href="/shop?category=wall-organization" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3 border-b border-white/10">Wall Organization</Link>
+                <Link href="/bundles" className="block text-[#D4AF37] hover:text-yellow-400 transition-colors duration-200 py-3 border-b border-white/10 font-semibold flex items-center gap-2">
+                  <span className="bg-[#D4AF37] text-black text-xs px-2 py-1 rounded-full font-bold">SAVE</span>
+                  Bundles
+                </Link>
+              </div>
               
+              {/* Other KV Brands */}
+              <div className="pt-2">
+                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">Other KV Brands</h3>
+                <div className="space-y-1">
+                  <Link href="/wholesale" className="block text-gray-400 hover:text-white transition-colors duration-200 py-2 text-sm">Wholesale</Link>
+                  <Link href="/mentorship" className="block text-gray-400 hover:text-white transition-colors duration-200 py-2 text-sm">Mentorship</Link>
+                  <Link href="/trade" className="block text-gray-400 hover:text-white transition-colors duration-200 py-2 text-sm">Trading</Link>
+                  <Link href="/affiliate" className="block text-gray-400 hover:text-white transition-colors duration-200 py-2 text-sm">Affiliate</Link>
+                  <Link href="/learn" className="block text-gray-400 hover:text-white transition-colors duration-200 py-2 text-sm">Learn</Link>
+                  <Link href="/deals" className="block text-gray-400 hover:text-white transition-colors duration-200 py-2 text-sm">Deals</Link>
+                </div>
+              </div>
+              
+              {/* Account & Support */}
               <div className="border-t border-white/10 pt-4 space-y-3">
+                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">Account & Support</h3>
                 {user ? (
                   <>
                     <Link href="/admin" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3">
@@ -140,6 +154,8 @@ export default function MobileLayout({ children, title, description, image, hide
                     </Link>
                   </>
                 )}
+                <Link href="/contact" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3">Contact</Link>
+                <Link href="/track-order" className="block text-gray-300 hover:text-white transition-colors duration-200 py-3">Track Order</Link>
               </div>
             </div>
           </div>
@@ -211,9 +227,9 @@ export default function MobileLayout({ children, title, description, image, hide
           {children}
         </main>
 
-        {/* Mobile Bottom Navigation */}
+        {/* Mobile Bottom Navigation - High-Converting Garage Brand Structure */}
         <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0B0F19] to-[#111827] border-t border-white/20 z-50">
-          <div className="grid grid-cols-6 gap-1 px-2 py-2">
+          <div className="grid grid-cols-5 gap-1 px-2 py-2">
             <Link href="/" className="flex flex-col items-center py-2 px-1 text-center group">
               <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -228,37 +244,40 @@ export default function MobileLayout({ children, title, description, image, hide
               <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Shop</span>
             </Link>
             
-            <Link href="/learn" className="flex flex-col items-center py-2 px-1 text-center group">
-              <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Learn</span>
+            <Link href="/bundles" className="flex flex-col items-center py-2 px-1 text-center group">
+              <div className="relative">
+                <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span className="absolute -top-1 -right-1 bg-[#D4AF37] text-black text-xs px-1 py-0.5 rounded-full font-bold">SAVE</span>
+              </div>
+              <span className="text-xs text-[#D4AF37] group-hover:text-yellow-400 transition-colors duration-200 mt-1 font-semibold">Bundles</span>
             </Link>
             
-            <Link href="/wholesale" className="flex flex-col items-center py-2 px-1 text-center group">
+            <Link href="/contact" className="flex flex-col items-center py-2 px-1 text-center group">
               <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-4h-2v4m0 0h-2m-4-4v4m-2-4v.01" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.83 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Wholesale</span>
+              <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Contact</span>
             </Link>
             
-            <Link href="/trade" className="flex flex-col items-center py-2 px-1 text-center group">
-              <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Trading</span>
-            </Link>
-            
-            <Link href="/deals" className="flex flex-col items-center py-2 px-1 text-center group">
-              <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Deals</span>
+            <Link href="/cart" className="flex flex-col items-center py-2 px-1 text-center group">
+              <div className="relative">
+                <svg className="w-6 h-6 text-gray-400 group-hover:text-[#D4AF37] transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-200 mt-1">Cart</span>
             </Link>
           </div>
         </nav>
 
-        {/* Footer */}
+        {/* Footer - High-Converting Garage Brand Structure */}
         {!hideFooter && (
           <footer className="bg-gradient-to-br from-[#0B0F19] to-[#111827] border-t border-white/20 mt-8">
             <div className="container-responsive py-8">
@@ -277,8 +296,8 @@ export default function MobileLayout({ children, title, description, image, hide
                     </span>
                   </div>
                   <p className="text-gray-400 text-sm max-w-md mx-auto">
-                    Premium business education and wholesale opportunities for serious entrepreneurs. 
-                    Build real, scalable revenue with proven systems and verified supplier relationships.
+                    Transform your garage into a professional workspace with premium storage solutions, 
+                    workbenches, and organization systems built for real performance.
                   </p>
                 </div>
 
@@ -298,24 +317,40 @@ export default function MobileLayout({ children, title, description, image, hide
                   </a>
                 </div>
 
-                {/* Quick Links */}
-                <div className="grid grid-cols-2 gap-4 text-center">
+                {/* Footer Sections */}
+                <div className="grid grid-cols-1 gap-6">
+                  {/* Other KV Brands */}
                   <div>
-                    <h3 className="font-bold text-sm mb-2">Quick Links</h3>
-                    <ul className="space-y-1 text-xs text-gray-400">
-                      <li><Link href="/shop" className="hover:text-white transition-colors duration-200">Shop</Link></li>
-                      <li><Link href="/learn" className="hover:text-white transition-colors duration-200">Learn</Link></li>
+                    <h3 className="font-bold text-sm mb-3 text-[#D4AF37]">Other KV Brands</h3>
+                    <ul className="space-y-2 text-xs text-gray-400">
                       <li><Link href="/wholesale" className="hover:text-white transition-colors duration-200">Wholesale</Link></li>
                       <li><Link href="/mentorship" className="hover:text-white transition-colors duration-200">Mentorship</Link></li>
+                      <li><Link href="/trade" className="hover:text-white transition-colors duration-200">Trading</Link></li>
+                      <li><Link href="/affiliate" className="hover:text-white transition-colors duration-200">Affiliate</Link></li>
+                      <li><Link href="/learn" className="hover:text-white transition-colors duration-200">Learn</Link></li>
+                      <li><Link href="/deals" className="hover:text-white transition-colors duration-200">Deals</Link></li>
                     </ul>
                   </div>
+
+                  {/* Customer Support */}
                   <div>
-                    <h3 className="font-bold text-sm mb-2">Support</h3>
-                    <ul className="space-y-1 text-xs text-gray-400">
-                      <li><Link href="/contact" className="hover:text-white transition-colors duration-200">Contact Us</Link></li>
-                      <li><Link href="/privacy-policy" className="hover:text-white transition-colors duration-200">Privacy Policy</Link></li>
-                      <li><Link href="/terms-and-conditions" className="hover:text-white transition-colors duration-200">Terms</Link></li>
-                      <li><Link href="/shipping-policy" className="hover:text-white transition-colors duration-200">Shipping</Link></li>
+                    <h3 className="font-bold text-sm mb-3">Customer Support</h3>
+                    <ul className="space-y-2 text-xs text-gray-400">
+                      <li><Link href="/contact" className="hover:text-white transition-colors duration-200">Contact</Link></li>
+                      <li><Link href="/shipping-policy" className="hover:text-white transition-colors duration-200">Shipping Policy</Link></li>
+                      <li><Link href="/privacy-policy" className="hover:text-white transition-colors duration-200">Returns</Link></li>
+                      <li><Link href="/terms-and-conditions" className="hover:text-white transition-colors duration-200">FAQ</Link></li>
+                    </ul>
+                  </div>
+
+                  {/* Shop Categories */}
+                  <div>
+                    <h3 className="font-bold text-sm mb-3">Shop Categories</h3>
+                    <ul className="space-y-2 text-xs text-gray-400">
+                      <li><Link href="/shop?category=garage-storage" className="hover:text-white transition-colors duration-200">Garage Storage</Link></li>
+                      <li><Link href="/shop?category=workbenches" className="hover:text-white transition-colors duration-200">Workbenches</Link></li>
+                      <li><Link href="/shop?category=wall-organization" className="hover:text-white transition-colors duration-200">Wall Organization</Link></li>
+                      <li><Link href="/bundles" className="hover:text-white transition-colors duration-200 text-[#D4AF37] font-semibold">Bundles</Link></li>
                     </ul>
                   </div>
                 </div>

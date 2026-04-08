@@ -53,8 +53,52 @@ export default function Login() {
 
     if (profileError) {
       console.error("Profile fetch error:", profileError);
-      setError("Account profile not found. Please contact support.");
-      setLoading(false);
+      // Try to get profile by email instead
+      const { data: profileByEmail } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("email", user.email)
+        .single();
+      
+      if (!profileByEmail) {
+        setError("Account profile not found. Please contact support. Error: " + profileError.message);
+        setLoading(false);
+        return;
+      }
+      
+      // Use the profile found by email
+      const profile = profileByEmail;
+      
+      // Continue with the rest of the logic
+      if (profile.role === "admin") {
+        router.push("/admin");
+        setLoading(false);
+        return;
+      }
+
+      if (profile.role === "affiliate_pending" && !profile.approved) {
+        await supabase.auth.signOut();
+        setError("Your affiliate application is pending approval. You will receive an email once approved.");
+        setLoading(false);
+        return;
+      }
+
+      if (profile.role === "wholesale" && !profile.approved) {
+        await supabase.auth.signOut();
+        setError("Wholesale account pending approval. Please wait for confirmation.");
+        setLoading(false);
+        return;
+      }
+
+      // If profile exists but approved is null or undefined, treat as not approved for pending roles
+      if ((profile.role === "affiliate_pending" || profile.role === "wholesale") && (profile.approved === null || profile.approved === undefined || !profile.approved)) {
+        await supabase.auth.signOut();
+        setError("Your account is pending approval. Please wait for confirmation.");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/shop");
       return;
     }
 
@@ -68,6 +112,22 @@ export default function Login() {
 
     if (profile.role === "admin") {
       router.push("/admin");
+      setLoading(false);
+      return;
+    }
+
+    // Handle pending affiliate accounts
+    if (profile.role === "affiliate_pending" && !profile.approved) {
+      await supabase.auth.signOut();
+      setError("Your affiliate application is pending approval. You will receive an email once approved.");
+      setLoading(false);
+      return;
+    }
+
+    // If profile exists but approved is null or undefined, treat as not approved for pending roles
+    if ((profile.role === "affiliate_pending" || profile.role === "wholesale") && (profile.approved === null || profile.approved === undefined || !profile.approved)) {
+      await supabase.auth.signOut();
+      setError("Your account is pending approval. Please wait for confirmation.");
       setLoading(false);
       return;
     }

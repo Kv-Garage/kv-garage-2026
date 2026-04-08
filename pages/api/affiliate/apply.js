@@ -6,11 +6,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, reason } = req.body;
+    const { name, email, platform, experience, reason } = req.body;
+
+    // Handle both formats: direct 'reason' or 'platform' + 'experience'
+    const applicationReason = reason || `${platform || ''}\n\nExperience: ${experience || ''}`;
 
     // Validate required fields
-    if (!name || !email || !reason) {
-      return res.status(400).json({ error: "All fields are required" });
+    if (!name || !email) {
+      return res.status(400).json({ error: "Name and email are required" });
+    }
+
+    if (!applicationReason.trim()) {
+      return res.status(400).json({ error: "Please provide information about your platform or experience" });
     }
 
     // Validate email format
@@ -29,7 +36,7 @@ export default async function handler(req, res) {
     const result = await submitAffiliateApplication({
       name,
       email,
-      reason
+      reason: applicationReason
     });
 
     if (!result.success) {

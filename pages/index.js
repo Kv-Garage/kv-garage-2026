@@ -510,25 +510,25 @@ export default function Home() {
             <div className="space-y-8">
               <div className="flex items-center gap-4">
                 <span className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold">EST. 2022</span>
-                <span className="text-gray-400 text-sm">Trusted by 1,200+ operators</span>
+                <span className="text-gray-400 text-sm">Trusted by 5,000+ garage owners</span>
               </div>
               
               <h1 className="text-6xl lg:text-7xl font-bold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
-                  Source Inventory
+                  Transform Your Garage
                 </span>
                 <br />
-                <span className="text-gray-300">→ Sell → Scale</span>
+                <span className="text-gray-300">Into a Professional Workspace</span>
               </h1>
 
               <p className="text-xl text-gray-300 leading-relaxed max-w-2xl">
-                Wholesale supply and scalable systems designed for serious operators. 
-                Build your supply chain with verified products and institutional-grade support.
+                Heavy-duty storage, workbenches, and organization systems built for real performance. 
+                Premium quality solutions designed for serious garage owners and professionals.
               </p>
 
-              {/* 🔥 TOP PICKS - MOVED TO TOP */}
+              {/* 🔥 GARAGE SOLUTIONS - MOVED TO TOP */}
               <div className="grid grid-cols-2 gap-6 mb-8">
-                {(topPicks.slice(0, 2).length > 0 ? topPicks.slice(0, 2) : products.slice(0, 2)).map((p, i) => (
+                {products.slice(0, 2).map((p, i) => (
                   <Link key={i} href={`/shop/${p.slug}`}>
                     <div className="group bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-6 hover:border-[#D4AF37]/50 transition-all duration-500 hover:scale-105">
                       <div className="aspect-square w-full mb-4 rounded-xl overflow-hidden bg-white/10">
@@ -538,10 +538,10 @@ export default function Home() {
                       <div className="space-y-2">
                         <span className="inline-flex items-center gap-2 bg-[#D4AF37] text-black px-3 py-1 rounded-full text-sm font-semibold">
                           <span className="w-2 h-2 bg-black rounded-full"></span>
-                          Top Pick
+                          Garage Pro
                         </span>
                         <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-[#D4AF37] transition-colors duration-300">{p.name}</h3>
-                        <p className="text-sm text-gray-400">Min Order: {getMOQ(p)} Units</p>
+                        <p className="text-sm text-gray-400">Professional Grade</p>
                         <p className="text-2xl font-bold text-[#D4AF37]">${Number(getPrice(p)).toFixed(2)}</p>
                       </div>
                     </div>
@@ -549,54 +549,55 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* 🔥 WHOLESALE MODEL - MOVED TO TOP */}
+              {/* 🔥 GARAGE BRAND VALUE PROPOSITION */}
               <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl p-8 mb-8">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
-                  <h3 className="text-2xl font-bold text-[#D4AF37]">Wholesale Supply Model</h3>
+                  <h3 className="text-2xl font-bold text-[#D4AF37]">Professional Garage Solutions</h3>
                 </div>
 
                 <p className="text-gray-300 mb-6 leading-relaxed">
-                  Built for resellers, store owners, and volume buyers. Products require minimum quantities and offer better pricing at scale.
+                  Industrial-grade storage and workspace solutions built to withstand demanding environments. 
+                  Designed for professionals who demand reliability and performance.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   <div className="bg-white/5 border border-white/20 rounded-lg p-4">
-                    <div className="text-2xl mb-2">📦</div>
-                    <div className="font-semibold mb-1">MOQ Based Pricing</div>
-                    <div className="text-sm text-gray-400">Better margins at volume</div>
+                    <div className="text-2xl mb-2">🔧</div>
+                    <div className="font-semibold mb-1">Heavy-Duty Build</div>
+                    <div className="text-sm text-gray-400">Industrial materials</div>
                   </div>
                   <div className="bg-white/5 border border-white/20 rounded-lg p-4">
-                    <div className="text-2xl mb-2">🔄</div>
-                    <div className="font-semibold mb-1">Bundle Inventory</div>
-                    <div className="text-sm text-gray-400">Pre-packaged deals</div>
+                    <div className="text-2xl mb-2">⚡</div>
+                    <div className="font-semibold mb-1">Quick Setup</div>
+                    <div className="text-sm text-gray-400">Professional installation</div>
                   </div>
                   <div className="bg-white/5 border border-white/20 rounded-lg p-4">
-                    <div className="text-2xl mb-2">📈</div>
-                    <div className="font-semibold mb-1">Weekly Updates</div>
-                    <div className="text-sm text-gray-400">Fresh inventory drops</div>
+                    <div className="text-2xl mb-2">🛡️</div>
+                    <div className="font-semibold mb-1">1-Year Warranty</div>
+                    <div className="text-sm text-gray-400">Peace of mind guaranteed</div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/apply" className="flex-1">
-                    <button className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
-                      Apply for Wholesale
-                    </button>
-                  </Link>
-
                   <Link href="/shop" className="flex-1">
-                    <button className="w-full border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
-                      Shop Retail
+                    <button className="w-full bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black py-4 px-6 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 transform hover:scale-105">
+                      Shop Garage Solutions
                     </button>
                   </Link>
 
-                  <Link href="/about" className="flex-1">
+                  <Link href="/bundles" className="flex-1">
+                    <button className="w-full border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300">
+                      View Bundles & Save
+                    </button>
+                  </Link>
+
+                  <Link href="/contact" className="flex-1">
                     <button className="w-full border border-white/30 text-white py-4 px-6 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.83 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      About Us
+                      Contact Us
                     </button>
                   </Link>
                 </div>
@@ -605,66 +606,49 @@ export default function Home() {
 
             {/* RIGHT */}
             <div className="space-y-6">
-              {/* 🔥 PARTNER & INVEST - FULL WIDTH HORIZONTAL SECTION */}
+              {/* 🔥 BEFORE/AFTER TRANSFORMATION - FULL WIDTH HORIZONTAL SECTION */}
               <section className="col-span-full bg-gradient-to-br from-white/5 to-transparent border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
                 <div className="p-8">
                   <h2 className="text-3xl lg:text-5xl font-bold mb-8 text-center text-[#D4AF37] border-b border-white/20 pb-6">
-                    Partner & Invest – Dominate Your Financial Future
+                    Before & After: Real Transformations
                   </h2>
                   <div className="grid lg:grid-cols-2 gap-8">
-                    {/* LEFT: VALUE PROPOSITION */}
+                    {/* LEFT: BEFORE */}
                     <div className="space-y-6">
-                      <p className="text-lg text-gray-300 leading-relaxed">
-                        Join KV Garage and IP Value Managements for elite investment opportunities and mentorship partnerships. Grow wealth, sell strategies, and become a top-performing partner.
-                      </p>
+                      <div className="bg-gray-900 border border-gray-600 rounded-xl p-6">
+                        <div className="text-4xl mb-4">❌</div>
+                        <h3 className="text-xl font-bold mb-3">Before: Cluttered Chaos</h3>
+                        <ul className="space-y-2 text-gray-300">
+                          <li>• Tools scattered everywhere</li>
+                          <li>• No organized storage</li>
+                          <li>• Wasted space and time</li>
+                          <li>• Frustration and inefficiency</li>
+                        </ul>
+                      </div>
                       
-                      <div className="space-y-4">
-                        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
-                          <div className="text-4xl mb-4">✅</div>
-                          <h3 className="text-xl font-bold mb-3">Trusted Investment Platform</h3>
-                          <p className="text-gray-300 leading-relaxed">Profit-sharing opportunities with proven returns and institutional-grade security</p>
-                        </div>
-                        <div className="bg-white/10 border border-white/20 rounded-xl p-4">
-                          <div className="text-4xl mb-4">✅</div>
-                          <h3 className="text-xl font-bold mb-3">Mentor & Earn</h3>
-                          <p className="text-gray-300 leading-relaxed">Sell strategies to earn while helping others grow their wealth and financial knowledge</p>
-                        </div>
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">⬇️</div>
+                        <p className="text-lg font-semibold text-[#D4AF37]">30 Days Later</p>
                       </div>
                     </div>
 
-                    {/* RIGHT: DUAL CTAs */}
+                    {/* RIGHT: AFTER */}
                     <div className="space-y-6">
-                      <a
-                        href="https://academy.ipvaluemanagements.com/invest?rep=146DA53E"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group block w-full bg-blue-600 text-white font-bold text-lg lg:text-xl px-8 py-6 rounded-xl hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                        aria-label="Invest with IP Value Managements via KV Garage Partnership"
-                      >
-                        <div className="flex items-center justify-center gap-4">
-                          <span className="text-2xl">💼</span>
-                          <span>Start Investing</span>
-                          <span className="text-sm opacity-75 group-hover:opacity-100 transition-opacity">→</span>
-                        </div>
-                      </a>
-                      <a
-                        href="https://midnight-architect.emergent.host/join?ref=146DA53E&dept=sales_rep"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group block w-full bg-green-600 text-white font-bold text-lg lg:text-xl px-8 py-6 rounded-xl hover:bg-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                        aria-label="Apply to Sell Investment Strategies as KV Garage Partner"
-                      >
-                        <div className="flex items-center justify-center gap-4">
-                          <span className="text-2xl">🚀</span>
-                          <span>Apply to Make Money</span>
-                          <span className="text-sm opacity-75 group-hover:opacity-100 transition-opacity">→</span>
-                        </div>
-                      </a>
+                      <div className="bg-gradient-to-br from-green-900/20 to-transparent border border-green-500/30 rounded-xl p-6">
+                        <div className="text-4xl mb-4">✅</div>
+                        <h3 className="text-xl font-bold mb-3">After: Professional Workspace</h3>
+                        <ul className="space-y-2 text-gray-300">
+                          <li>• Everything organized and accessible</li>
+                          <li>• Heavy-duty storage solutions</li>
+                          <li>• Maximized space utilization</li>
+                          <li>• Professional-grade efficiency</li>
+                        </ul>
+                      </div>
                       
                       <div className="bg-white/10 border border-white/20 rounded-xl p-4">
                         <div className="text-4xl mb-4">📈</div>
-                        <h3 className="text-xl font-bold mb-3">Exponential Growth</h3>
-                        <p className="text-gray-300 leading-relaxed">Growth opportunities for committed partners</p>
+                        <h3 className="text-xl font-bold mb-3">Results Achieved</h3>
+                        <p className="text-gray-300 leading-relaxed">Join thousands of satisfied customers who've transformed their garages into professional workspaces with our premium solutions.</p>
                       </div>
                     </div>
                   </div>
@@ -672,19 +656,19 @@ export default function Home() {
                   {/* SOCIAL PROOF & URGENCY */}
                   <div className="grid md:grid-cols-3 gap-6 mt-8">
                     <div className="bg-white/10 border border-white/20 rounded-xl p-6 text-center">
-                      <div className="text-4xl mb-4">🚀</div>
-                      <div className="text-3xl font-bold text-[#D4AF37] mb-2">10,000+</div>
-                      <p className="text-gray-300">Investors growing their wealth daily</p>
+                      <div className="text-4xl mb-4">🏠</div>
+                      <div className="text-3xl font-bold text-[#D4AF37] mb-2">5,000+</div>
+                      <p className="text-gray-300">Garages transformed</p>
                     </div>
                     <div className="bg-white/10 border border-white/20 rounded-xl p-6 text-center">
-                      <div className="text-4xl mb-4">💰</div>
-                      <div className="text-3xl font-bold text-[#D4AF37] mb-2">Millions</div>
-                      <p className="text-gray-300">Dollars invested and growing every month</p>
+                      <div className="text-4xl mb-4">⭐</div>
+                      <div className="text-3xl font-bold text-[#D4AF37] mb-2">4.9/5</div>
+                      <p className="text-gray-300">Average customer rating</p>
                     </div>
                     <div className="bg-white/10 border border-white/20 rounded-xl p-6 text-center">
                       <div className="text-4xl mb-4">⏰</div>
-                      <div className="text-2xl font-bold text-red-300 mb-2">Limited Spots</div>
-                      <p className="text-gray-300">Secure your partnership today before opportunities fill up!</p>
+                      <div className="text-2xl font-bold text-red-300 mb-2">Limited Stock</div>
+                      <p className="text-gray-300">Premium inventory moves fast - secure yours today!</p>
                     </div>
                   </div>
                 </div>

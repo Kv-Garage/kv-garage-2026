@@ -1,7 +1,58 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Affiliate() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    platform: "",
+    experience: ""
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/affiliate/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          reason: `${formData.platform}\n\nExperience: ${formData.experience}`
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit application");
+      }
+
+      setSubmitted(true);
+      setFormData({ name: "", email: "", platform: "", experience: "" });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -251,60 +302,83 @@ export default function Affiliate() {
               Join thousands of successful affiliates who are building real income with our program.
             </p>
 
-            <form
-              name="affiliate-application"
-              method="POST"
-              data-netlify="true"
-              netlify
-              data-netlify-honeypot="bot-field"
-              className="bg-white rounded-2xl p-8 shadow-lg"
-            >
-              <input type="hidden" name="form-name" value="affiliate-application" />
-              <input type="hidden" name="bot-field" />
+            {submitted ? (
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-8 shadow-lg">
+                <div className="text-center">
+                  <span className="text-5xl mb-4 block">✅</span>
+                  <h3 className="text-2xl font-bold text-green-800 mb-4">Application Submitted!</h3>
+                  <p className="text-green-700 mb-6">
+                    Thank you for applying. We'll review your application and email you at <strong>{formData.email}</strong> with our decision within 24-48 hours.
+                  </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="text-green-600 hover:text-green-800 font-semibold underline"
+                  >
+                    Submit another application
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 shadow-lg">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    {error}
+                  </div>
+                )}
 
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Your Full Name"
+                    required
+                    className="w-full px-4 py-3 bg-white text-black placeholder-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Your Email Address"
+                    required
+                    className="w-full px-4 py-3 bg-white text-black placeholder-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                </div>
+
                 <input
                   type="text"
-                  name="fullName"
-                  placeholder="Your Full Name"
+                  name="platform"
+                  value={formData.platform}
+                  onChange={handleChange}
+                  placeholder="Where will you promote? (Social media, blog, email, etc.)"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white text-black placeholder-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-6"
                 />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Your Email Address"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-              </div>
 
-              <input
-                type="text"
-                name="platform"
-                placeholder="Where will you promote? (Social media, blog, email, etc.)"
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-6"
-              />
+                <textarea
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  placeholder="Tell us about your experience (optional but helpful)"
+                  rows="4"
+                  className="w-full px-4 py-3 bg-white text-black placeholder-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-6"
+                ></textarea>
 
-              <textarea
-                name="experience"
-                placeholder="Tell us about your experience (optional but helpful)"
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-6"
-              ></textarea>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Submitting..." : "Get Started - It's Free!"}
+                </button>
 
-              <button
-                type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-              >
-                Get Started - It's Free!
-              </button>
-
-              <p className="text-sm text-gray-500 mt-4">
-                By signing up, you agree to our terms and privacy policy. We respect your privacy.
-              </p>
-            </form>
+                <p className="text-sm text-gray-500 mt-4">
+                  By signing up, you agree to our terms and privacy policy. We respect your privacy.
+                </p>
+              </form>
+            )}
 
             {/* Guarantee */}
             <div className="mt-12 bg-white rounded-xl p-6 shadow-lg">

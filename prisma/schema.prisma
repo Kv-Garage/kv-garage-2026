@@ -1,0 +1,209 @@
+// KV Garage Affiliate Engine - Prisma Schema
+// Institutional-grade affiliate + genealogy + payout system
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTH MODELS
+// ============================================
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String?
+  role            Role      @default(customer)
+  affiliateCode   String?   @unique
+  referredBy      String?
+  referrer        User?     @relation("Referrals", fields: [referredBy], references: [id])
+  referrals       User[]    @relation("Referrals")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  wallet          Wallet?
+  orders          Order[]
+  affiliateOrders Order[]   @relation("AffiliateOrders")
+  commissions     Commission[]
+  payouts         Payout[]
+
+  @@index([affiliateCode])
+  @@index([referredBy])
+  @@index([role])
+}
+
+enum Role {
+  customer
+  affiliate_pending
+  affiliate
+  admin
+}
+
+// ============================================
+// WALLET MODEL
+// ============================================
+
+model Wallet {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  balance         Decimal  @default(0) @db.Decimal(10, 2)
+  pendingBalance  Decimal  @default(0) @db.Decimal(10, 2)
+  lifetimeEarnings Decimal @default(0) @db.Decimal(10, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ============================================
+// ORDER MODEL
+// ============================================
+
+model Order {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  affiliateId String?
+  affiliate   User?    @relation("AffiliateOrders", fields: [affiliateId], references: [id])
+  total       Decimal  @db.Decimal(10, 2)
+  status      OrderStatus @default(pending)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  commissions Commission[]
+
+  @@index([userId])
+  @@index([affiliateId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum OrderStatus {
+  pending
+  completed
+  cancelled
+  refunded
+}
+
+// ============================================
+// COMMISSION MODEL
+// ============================================
+
+model Commission {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  orderId     String
+  order       Order         @relation(fields: [orderId], references: [id])
+  amount      Decimal       @db.Decimal(10, 2)
+  level       Int           // 1, 2, 3 for multi-level commissions
+  status      CommissionStatus @default(pending)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@index([level])
+
+  // Prevent duplicate commissions
+  @@unique([orderId, userId, level])
+}
+
+enum CommissionStatus {
+  pending
+  available
+  paid
+  cancelled
+}
+
+// ============================================
+// PAYOUT MODEL
+// ============================================
+
+model Payout {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  amount      Decimal     @db.Decimal(10, 2)
+  status      PayoutStatus @default(pending)
+  paymentMethod String?
+  paymentDetails String?
+  adminNotes  String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  processedAt DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum PayoutStatus {
+  pending
+  approved
+  paid
+  rejected
+  cancelled
+}
+
+// ============================================
+// AFFILIATE TRACKING MODEL
+// ============================================
+
+model AffiliateClick {
+  id          String   @id @default(cuid())
+  affiliateCode String
+  visitorId   String?
+  ipAddress   String?
+  userAgent   String?
+  referer     String?
+  path        String?
+  createdAt   DateTime @default(now())
+
+  @@index([affiliateCode])
+  @@index([visitorId])
+  @@index([createdAt])
+}
+
+model AffiliateConversion {
+  id          String   @id @default(cuid())
+  affiliateCode String
+  orderId     String
+  visitorId   String?
+  conversionValue Decimal @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
+
+  @@index([affiliateCode])
+  @@index([orderId])
+  @@index([createdAt])
+}
+
+// ============================================
+// GENEALOGY TREE MODEL (for multi-level tracking)
+// ============================================
+
+model GenealogyNode {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  parentId    String?
+  parent      GenealogyNode? @relation("GenealogyTree", fields: [parentId], references: [id])
+  children    GenealogyNode[] @relation("GenealogyTree")
+  level       Int      @default(0) // Depth in tree
+  path        String   // Materialized path for quick queries (e.g., "1/5/23/")
+  createdAt   DateTime @default(now())
+
+  @@index([parentId])
+  @@index([path])
+  @@index([level])
+}
