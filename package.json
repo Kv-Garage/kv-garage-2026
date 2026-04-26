@@ -15,6 +15,7 @@
     "blog:full-setup": "npm run setup:blog:automation && npm run update:sitemap && npm run test:blog"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "@shopify/shopify_function": "~2.0.0",
     "@stripe/stripe-js": "^8.8.0",
     "@supabase/supabase-js": "^2.99.2",
@@ -34,6 +35,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.24",
     "postcss": "^8.5.6",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.4.4"
   }
 }

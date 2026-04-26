@@ -33,6 +33,7 @@ model User {
   affiliateOrders Order[]   @relation("AffiliateOrders")
   commissions     Commission[]
   payouts         Payout[]
+  genealogyNode   GenealogyNode?
 
   @@index([affiliateCode])
   @@index([referredBy])
